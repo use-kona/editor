@@ -11,7 +11,7 @@
 .root {
   [role="textbox"] {
     outline: none;
-    padding: 16px 0;
+    padding: 16px 16px;
   }
 
   h1 {
@@ -27,6 +27,14 @@
   h3 {
     font-size: 18px;
     font-weight: 600;
+  }
+
+  ol {
+    list-style: decimal;
+  }
+
+  li {
+    list-style-position: inside;
   }
 }
 

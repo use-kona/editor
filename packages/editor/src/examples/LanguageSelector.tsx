@@ -1,6 +1,7 @@
 import { Node } from 'slate';
 import type { CustomElement } from '../../types';
 import { CopyIcon } from '../icons/copy';
+import styles from './LanguageSelector.module.css';
 
 type Props = {
   value: string;
@@ -46,7 +47,7 @@ export const LanguageSelector = (props: Props) => {
   };
 
   return (
-    <div>
+    <div className={styles.root}>
       <select
         tabIndex={-1}
         value={language}
@@ -59,7 +60,7 @@ export const LanguageSelector = (props: Props) => {
         ))}
       </select>
       {/*<select value={value} onChange={(event) => onChange(event.target.value)}></select>*/}
-      <button type="button" onClick={handleCopyClick}>
+      <button className={styles.button} type="button" onClick={handleCopyClick}>
         <CopyIcon size={16} />
       </button>
     </div>
