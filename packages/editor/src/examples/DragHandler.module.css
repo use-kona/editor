@@ -1,0 +1,17 @@
+.dragHandler {
+  position: absolute;
+  cursor: grab;
+  top: 9px;
+}
+
+.dragHandlerHeading1 {
+  top: 10px;
+}
+
+.dragHandlerHeading2 {
+  top: 8px;
+}
+
+.dragHandlerHeading3 {
+  top: 6px;
+}

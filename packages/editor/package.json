@@ -1,16 +1,15 @@
 {
-  "name": "rslib-react-ts",
+  "name": "@kona/editor",
   "version": "1.0.0",
   "type": "module",
   "exports": {
-    ".": {
-      "types": "./dist/index.d.ts",
-      "import": "./dist/index.js"
-    }
+    ".": "./src/index.ts"
   },
+  "main": "./dist/editor.js",
   "types": "./dist/index.d.ts",
   "files": [
-    "dist"
+    "dist",
+    "src"
   ],
   "scripts": {
     "build": "rslib build",

@@ -11,7 +11,18 @@
   outline: none;
   overflow: auto;
 
-  & > [role='textbox'] {
+  &::-webkit-scrollbar {
+    background: rgba(0, 0, 0, 0.025);
+    width: 4px;
+    border-radius: 8px;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: rgba(0, 0, 0, 0.075);
+    border-radius: 8px;
+  }
+
+  & > [role="textbox"] {
     outline: none;
   }
 }

@@ -1,0 +1,42 @@
+.root {
+  position: relative;
+  border-top: 2px solid transparent;
+  border-bottom: 2px solid transparent;
+}
+
+.top {
+  border-top: 2px solid #3498db;
+}
+
+.bottom {
+  border-bottom: 2px solid #3498db;
+}
+
+.drag {
+  display: inline-block;
+  vertical-align: baseline;
+  width: 16px;
+  cursor: move;
+  line-height: 1.2;
+  opacity: 0;
+  transition: opacity 0.25s;
+}
+
+.block {
+  position: relative;
+  border-radius: 4px;
+  display: grid;
+  grid-template-columns: 16px 1fr;
+  column-gap: 8px;
+  align-items: start;
+  padding: 4px 8px 4px 8px;
+  transition: background-color 0.25s;
+
+  &:hover {
+    background-color: rgba(0, 0, 0, 0.015);
+  }
+
+  &:hover .drag {
+    opacity: 1;
+  }
+}

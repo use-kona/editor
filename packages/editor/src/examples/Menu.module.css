@@ -1,0 +1,33 @@
+.root {
+  padding: 8px;
+  display: flex;
+  column-gap: 4px;
+  border-bottom: 1px dashed #ddd;
+  width: 100%;
+}
+
+.button {
+  width: 20px;
+  height: 20px;
+  border-radius: 4px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  padding: 0;
+  margin: 0;
+  outline: none;
+  background-color: transparent;
+  border: none;
+}
+
+.active {
+  background-color: #eee;
+}
+
+.divider {
+  display: inline-block;
+  border-left: 1px solid #eee;
+  width: 1px;
+  height: 20px;
+}

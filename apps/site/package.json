@@ -1,0 +1,19 @@
+{
+  "name": "site",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "build": "rspress build",
+    "dev": "rspress dev",
+    "preview": "rspress preview"
+  },
+  "dependencies": {
+    "@kona/editor": "workspace:*",
+    "rspress": "^1.40.2"
+  },
+  "devDependencies": {
+    "@types/node": "^18.11.17",
+    "@types/react": "^19.1.8",
+    "rspress-plugin-font-open-sans": "^1.0.0"
+  }
+}

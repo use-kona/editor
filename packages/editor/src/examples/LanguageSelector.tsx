@@ -48,6 +48,7 @@ export const LanguageSelector = (props: Props) => {
   return (
     <div>
       <select
+        tabIndex={-1}
         value={language}
         onChange={(event) => onChange(event.target.value)}
       >
