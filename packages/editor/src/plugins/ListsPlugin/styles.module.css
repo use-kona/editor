@@ -1,0 +1,7 @@
+.list {
+  padding: 0;
+}
+
+.listItem {
+  list-style-position: inside;
+}

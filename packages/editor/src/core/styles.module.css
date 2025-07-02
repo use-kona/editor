@@ -1,0 +1,17 @@
+.root {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  color: var(--text-color, #444);
+  background-color: var(--background-color, #fff);
+}
+
+.editor {
+  outline: none;
+  overflow: auto;
+
+  & > [role='textbox'] {
+    outline: none;
+  }
+}

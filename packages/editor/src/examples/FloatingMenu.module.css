@@ -1,0 +1,82 @@
+.root {
+  height: 24px;
+  background-color: #fff;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  overflow: hidden;
+  z-index: 2;
+}
+
+:global(body.dark-theme) .root {
+  background-color: #222;
+  border: 1px solid #000;
+  color: #eee;
+}
+
+.button {
+  width: 24px;
+  height: 24px;
+  cursor: pointer;
+  padding: 0;
+  margin: 0;
+  outline: none;
+  background-color: transparent;
+  border: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: inherit;
+  transition: background-color 0.25s;
+}
+
+.button.active {
+  background-color: rgba(0, 0, 0, 0.05);
+}
+
+:global(body.dark-theme) .button.active {
+  background-color: rgba(0, 0, 0, 0.25);
+}
+
+.button:first-child {
+  border-top-left-radius: 4px;
+  border-bottom-left-radius: 4px;
+}
+
+.button:last-child {
+  border-top-right-radius: 4px;
+  border-bottom-right-radius: 4px;
+}
+
+.color {
+  width: 16px;
+  height: 16px;
+  border-radius: 4px;
+}
+
+.link {
+  display: flex;
+  overflow: hidden;
+  width: 250px;
+  column-gap: 1px;
+
+  & input {
+    background-color: transparent;
+    padding: 0 8px;
+    color: inherit;
+    height: 24px;
+    box-sizing: border-box;
+    flex: 1;
+    min-width: 0;
+    outline: none;
+    border: none;
+  }
+
+  & button {
+    color: inherit;
+    border: none;
+    background-color: transparent;
+    height: 24px;
+    display: flex;
+    align-items: center;
+  }
+}

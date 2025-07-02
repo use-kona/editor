@@ -1,0 +1,1 @@
+export { AttachmentsPlugin } from './AttachmentsPlugin';

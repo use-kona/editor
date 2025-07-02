@@ -1,0 +1,1 @@
+export { MenuPlugin } from './MenuPlugin';

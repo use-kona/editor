@@ -1,0 +1,1 @@
+export { BasicFormattingPlugin } from './BasicFormattingPlugin';

@@ -1,0 +1,17 @@
+.absolute {
+  /*position: absolute;*/
+}
+
+.placeholder {
+  position: relative;
+}
+
+.placeholder::after {
+  content: attr(data-placeholder);
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: max-content;
+  opacity: 0.3;
+  font-weight: normal;
+}

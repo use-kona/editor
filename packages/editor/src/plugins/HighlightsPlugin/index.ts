@@ -1,0 +1,1 @@
+export { HighlightsPlugin } from './HighlightsPlugin';

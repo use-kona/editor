@@ -1,0 +1,85 @@
+.toc {
+  position: absolute;
+  top: 40px;
+  right: 8px;
+  z-index: 3;
+}
+
+.toc .max {
+  transform: scale(0);
+}
+
+.toc:hover .max {
+  transform: scale(1);
+}
+
+.toc:hover .mini {
+  transform: scale(0);
+}
+
+.mini {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
+  transition: all 0.25s;
+  transform-origin: top right;
+}
+
+.mini .h1 {
+  width: 12px;
+  height: 2px;
+  background-color: rgba(0, 0, 0, 0.5);
+}
+
+.mini .h2 {
+  width: 8px;
+  height: 2px;
+  background-color: rgba(0, 0, 0, 0.5);
+}
+
+.mini .h3 {
+  width: 6px;
+  height: 2px;
+  background-color: rgba(0, 0, 0, 0.5);
+}
+
+.max {
+  position: absolute;
+  right: 0;
+  top: 0;
+  background-color: #fff;
+  padding: 4px;
+  border-radius: 4px;
+  border: 1px solid #ddd;
+  transition: all 0.25s;
+  transform-origin: top right;
+  width: max-content;
+  max-width: 200px;
+}
+
+.max .h1 {
+  cursor: pointer;
+  font-size: 12px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.max .h2 {
+  cursor: pointer;
+  font-size: 12px;
+  padding-left: 4px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.max .h3 {
+  cursor: pointer;
+  font-size: 12px;
+  padding-left: 8px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}

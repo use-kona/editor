@@ -1,0 +1,123 @@
+body {
+  --background-color: #fff;
+  --kona-editor-background-color: #fff;
+  --text-color: #444;
+  --kona-editor-text-color: #444;
+  --border-color: #ddd;
+  --kona-editor-border-color: #ddd;
+}
+
+:global(body.dark-theme) {
+  background-color: #222;
+  color: #eee;
+  --background-color: #222;
+  --text-color: #eee;
+  --border-color: #000;
+}
+
+.root {
+  width: 600px;
+  height: calc(100vh - 128px * 2);
+  overflow: hidden;
+  max-height: 100vh;
+  margin: 128px auto;
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+
+  [role="textbox"] {
+    outline: none;
+  }
+}
+
+.menu {
+  padding: 8px;
+  display: flex;
+  column-gap: 4px;
+}
+
+.button {
+  width: 24px;
+  height: 24px;
+  border-radius: 4px;
+  cursor: pointer;
+  padding: 0;
+  margin: 0;
+  outline: none;
+  background-color: transparent;
+  border: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: inherit;
+  transition: background-color 0.25s;
+}
+
+.button.active {
+  background-color: #eee;
+}
+
+.divider {
+  display: inline-block;
+  background-color: #ccc;
+  width: 1px;
+  height: 24px;
+}
+
+.floating {
+  height: 24px;
+}
+
+.hint {
+  background-color: var(--background-color);
+  color: var(--text-color);
+  padding: 2px;
+  border-radius: 4px;
+  border: 1px solid var(--border-color);
+}
+
+.editorToolbar {
+  display: flex;
+  justify-content: space-between;
+  column-gap: 4px;
+  padding: 8px;
+  background-color: #f9f9f9;
+
+  & select {
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    padding: 4px;
+    background-color: #fff;
+    color: inherit;
+    outline: none;
+  }
+
+  & button {
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    display: inline-flex;
+    align-items: center;
+    padding: 4px;
+    background-color: #fff;
+    cursor: pointer;
+    color: inherit;
+    outline: none;
+  }
+}
+
+.backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 1;
+}
+
+.hint {
+  background-color: #fff;
+  color: #444;
+  padding: 2px;
+  border-radius: 4px;
+  border: 1px solid #ccc;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.06);
+}
