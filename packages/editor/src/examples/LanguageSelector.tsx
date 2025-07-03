@@ -1,6 +1,6 @@
 import { Node } from 'slate';
 import type { CustomElement } from '../../types';
-import { CopyIcon } from '../icons/copy';
+import { CopyIcon } from './icons/copy';
 import styles from './LanguageSelector.module.css';
 
 type Props = {

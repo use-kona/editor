@@ -1,7 +1,7 @@
 import type { RenderElementProps } from 'slate-react';
-import { DragIcon } from '../icons/drag';
 import { HeadingsPlugin, ListsPlugin } from '../plugins';
 import styles from './DragHandler.module.css';
+import { DragIcon } from './icons/drag';
 
 export const DragHandler = (props: RenderElementProps) => {
   switch (props.element.type) {

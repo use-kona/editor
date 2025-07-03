@@ -1,4 +1,4 @@
-import type { IconProps } from './types';
+import { IconProps } from './types';
 
 export const BoldIcon = ({ size }: IconProps) => (
   <svg

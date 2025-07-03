@@ -1,10 +1,10 @@
 import type { Editor } from 'slate';
-import { Heading1Icon } from '../icons/heading1';
-import { Heading2Icon } from '../icons/heading2';
-import { Heading3Icon } from '../icons/heading3';
-import { OlIcon } from '../icons/ol';
-import { UlIcon } from '../icons/ul';
 import { HeadingsPlugin, ListsPlugin } from '../plugins';
+import { Heading1Icon } from './icons/heading1';
+import { Heading2Icon } from './icons/heading2';
+import { Heading3Icon } from './icons/heading3';
+import { OlIcon } from './icons/ol';
+import { UlIcon } from './icons/ul';
 import styles from './Menu.module.css';
 
 type Props = {

@@ -1,8 +1,8 @@
 import { Editor, Transforms } from 'slate';
 import { ReactEditor } from 'slate-react';
-import { EditIcon } from '../icons/edit';
-import { ExternalIcon } from '../icons/external';
 import type { FloatingMenuPlugin, OptionsMethods } from '../plugins';
+import { EditIcon } from './icons/edit';
+import { ExternalIcon } from './icons/external';
 import { $store } from './store';
 import styles from './styles.module.css';
 

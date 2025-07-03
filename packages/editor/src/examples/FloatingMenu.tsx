@@ -2,14 +2,6 @@ import { useStore } from '@nanostores/react';
 import type { MapStore } from 'nanostores';
 import { type FormEvent, useEffect, useRef, useState } from 'react';
 import type { Editor } from 'slate';
-import { BoldIcon } from '../icons/bold';
-import { CheckIcon } from '../icons/check';
-import { ColorIcon } from '../icons/color';
-import { CrossIcon } from '../icons/cross';
-import { ItalicIcon } from '../icons/italic';
-import { LinkIcon } from '../icons/link';
-import { StrikethroughIcon } from '../icons/strikethrough';
-import { UnderlineIcon } from '../icons/underline';
 import {
   BasicFormattingPlugin,
   HighlightsPlugin,
@@ -17,6 +9,14 @@ import {
 } from '../plugins';
 import { Color, colors } from './colors';
 import styles from './FloatingMenu.module.css';
+import { BoldIcon } from './icons/bold';
+import { CheckIcon } from './icons/check';
+import { ColorIcon } from './icons/color';
+import { CrossIcon } from './icons/cross';
+import { ItalicIcon } from './icons/italic';
+import { LinkIcon } from './icons/link';
+import { StrikethroughIcon } from './icons/strikethrough';
+import { UnderlineIcon } from './icons/underline';
 
 type Mode = 'main' | 'link' | 'colors';
 
