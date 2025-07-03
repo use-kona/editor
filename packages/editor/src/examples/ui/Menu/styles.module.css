@@ -1,0 +1,143 @@
+.delimiter {
+  border-width: 1px 0 0 0;
+  border-style: solid;
+  border-color: #ccc;
+  width: 100%;
+  height: 1px;
+  margin: 0;
+}
+
+/* MenuItem styles */
+.menuItemRoot {
+  list-style: none;
+  cursor: pointer;
+  padding: 0 4px;
+  margin: 0;
+  border-radius: 4px;
+}
+
+.menuItemRootNonSelectable {
+  cursor: default;
+}
+
+.menuItemContent {
+  border-radius: 4px;
+  padding: 8px 8px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  user-select: none;
+  color: #333333;
+  background-color: transparent;
+}
+
+.menuItemContentSelected {
+  color: #0066cc;
+  background-color: #e6f0ff;
+}
+
+.menuItemContentDanger {
+  color: #cc0000;
+}
+
+/* MenuIcon styles */
+.menuIcon {
+  display: inline-flex;
+  width: 16px;
+  height: 16px;
+  align-items: center;
+  justify-content: center;
+  color: inherit;
+}
+
+/* MenuTitle styles */
+.menuTitle {
+  flex-grow: 1;
+  min-width: 70px;
+  color: inherit;
+}
+
+/* MenuHotkey styles */
+.menuHotkey {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background-color: rgba(0, 0, 0, 0.05);
+  border-radius: 4px;
+  padding: 0 4px;
+}
+
+/* Menu styles */
+.menu {
+  position: absolute;
+  z-index: 13;
+  margin: 0;
+  padding: 4px 0;
+  background-color: #ffffff;
+  border: 1px solid #dddddd;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  overflow: hidden;
+  box-sizing: border-box;
+}
+
+.menuVisible {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.menuBody {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.menuScrollable {
+  overflow-y: auto;
+  overflow-x: hidden;
+  flex-grow: 1;
+}
+
+.menuScrollable::-webkit-scrollbar {
+  background: #f5f5f5;
+  width: 6px;
+  border-radius: 8px;
+}
+
+.menuScrollable::-webkit-scrollbar-thumb {
+  background: #cccccc;
+  border-radius: 8px;
+}
+
+.menuBackdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 20;
+  background-color: rgba(0, 0, 0, 0.025);
+}
+
+.menuEnterAnimation {
+  animation: menuEnter 0.2s ease-in forwards;
+}
+
+@keyframes menuEnter {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes menuExit {
+  from {
+    opacity: 1;
+    transform: scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+}

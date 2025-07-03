@@ -1,7 +1,12 @@
+import { forwardRef, useMemo } from 'react';
 import { Node } from 'slate';
 import type { CustomElement } from '../../types';
+import { CheckIcon } from './icons/check';
 import { CopyIcon } from './icons/copy';
 import styles from './LanguageSelector.module.css';
+import { Button } from './ui/Button';
+import { Dropdown } from './ui/Dropdown';
+import { Menu as MenuBase, type MenuConfig } from './ui/Menu';
 
 type Props = {
   value: string;
@@ -46,23 +51,49 @@ export const LanguageSelector = (props: Props) => {
     navigator.clipboard.writeText(text);
   };
 
+  // biome-ignore lint/correctness/useExhaustiveDependencies: we don't care about other deps
+  const menuConfig: MenuConfig = useMemo(
+    () => ({
+      items: languages.map(({ label, value }) => ({
+        render: () => (
+          <>
+            <MenuBase.Icon>
+              {value === language && <CheckIcon size={16} />}
+            </MenuBase.Icon>
+            <MenuBase.Title>{label}</MenuBase.Title>
+          </>
+        ),
+        onSelect: () => {
+          onChange(value);
+        },
+      })),
+    }),
+    [language],
+  );
   return (
     <div className={styles.root}>
-      <select
-        tabIndex={-1}
-        value={language}
-        onChange={(event) => onChange(event.target.value)}
+      <Dropdown
+        config={menuConfig}
+        Menu={forwardRef<HTMLDivElement, { className: string }>(
+          (props, ref) => (
+            <div
+              {...props}
+              ref={ref}
+              className={[styles.customMenu, props.className].join(' ')}
+            />
+          ),
+        )}
       >
-        {languages.map((language) => (
-          <option key={language.value} value={language.value}>
-            {language.label}
-          </option>
-        ))}
-      </select>
-      {/*<select value={value} onChange={(event) => onChange(event.target.value)}></select>*/}
-      <button className={styles.button} type="button" onClick={handleCopyClick}>
+        {({ ref, onClick }) => (
+          <Button ref={ref} size="sm" onClick={onClick}>
+            {languages.find((l) => l.value === language)?.label ||
+              'Select language'}
+          </Button>
+        )}
+      </Dropdown>
+      <Button size="sm" type="button" onClick={handleCopyClick}>
         <CopyIcon size={16} />
-      </button>
+      </Button>
     </div>
   );
 };
