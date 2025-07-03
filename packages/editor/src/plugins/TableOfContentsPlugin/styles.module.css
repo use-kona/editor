@@ -56,30 +56,58 @@
   transform-origin: top right;
   width: max-content;
   max-width: 200px;
+  max-height: 160px;
+  overflow-y: auto;
+
+  &::-webkit-scrollbar {
+    background: rgba(0, 0, 0, 0.025);
+    width: 4px;
+    border-radius: 8px;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: rgba(0, 0, 0, 0.075);
+    border-radius: 8px;
+  }
 }
 
 .max .h1 {
   cursor: pointer;
-  font-size: 12px;
+  font-size: 13px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  opacity: 0.65;
+
+  &:hover {
+    opacity: 1;
+  }
 }
 
 .max .h2 {
   cursor: pointer;
-  font-size: 12px;
+  font-size: 13px;
   padding-left: 4px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  opacity: 0.65;
+
+  &:hover {
+    opacity: 1;
+  }
 }
 
 .max .h3 {
   cursor: pointer;
-  font-size: 12px;
+  font-size: 13px;
   padding-left: 8px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  opacity: 0.65;
+
+  &:hover {
+    opacity: 1;
+  }
 }

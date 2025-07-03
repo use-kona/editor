@@ -68,5 +68,60 @@ export const text = (
       Defining the list of plugins might be a little tricky, but I've tried to
       cover everything you'll need in docs.
     </paragraph>
+    <heading2>List of plugins</heading2>
+    <heading3>BasicFormattingPlugin</heading3>
+    <paragraph>
+      Allows to use <htext bold>bold</htext>, <htext italic>italic</htext>,{' '}
+      <htext underline>underlined</htext> and{' '}
+      <htext strikethrough>strikethrough</htext> text
+    </paragraph>
+
+    <heading3>BreaksPlugin</heading3>
+    <paragraph>
+      Overrides default Slate behavior by breaking custom block types when user
+      presses Enter.
+    </paragraph>
+
+    <heading3>CodeBlockPlugin</heading3>
+    <paragraph>Adds support for code blocks.</paragraph>
+
+    <heading3>CommandsPlugin</heading3>
+    <paragraph>Adds Notion-style menu with custom list of commands</paragraph>
+
+    <heading3>DnDPlugin</heading3>
+    <paragraph>Allows reordering blocks by drag'n'dropping them</paragraph>
+
+    <heading3>FloatingMenuPlugin</heading3>
+    <paragraph>Adds menu which is shown when user selects a text</paragraph>
+
+    <heading3>HeadingsPlugin</heading3>
+    <paragraph>Adds three levels of headings</paragraph>
+
+    <heading3>HighlightsPlugin</heading3>
+    <paragraph>Allows highlighting selected text with a custom color</paragraph>
+
+    <heading3>LinksPlugin</heading3>
+    <paragraph>
+      Gives user ability to convert the selected text into a link
+    </paragraph>
+
+    <heading3>MenuPlugin</heading3>
+    <paragraph>Adds pinned to the top menu with custom commands</paragraph>
+
+    <heading3>NodeIdPlugin</heading3>
+    <paragraph>Assigns a unique id to each block</paragraph>
+
+    <heading3>PlaceholderPlugin</heading3>
+    <paragraph>
+      Allows to setup a custom placeholder for the selected line
+    </paragraph>
+
+    <heading3>ShortcutsPlugin</heading3>
+    <paragraph>
+      Converts some popular markdown shortcuts to a custom node
+    </paragraph>
+
+    <heading3>TableOfContentsPlugin</heading3>
+    <paragraph>Shows a quick map of headings inside the document</paragraph>
   </fragment>
 );

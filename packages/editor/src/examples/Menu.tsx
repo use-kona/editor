@@ -2,6 +2,7 @@ import type { Editor } from 'slate';
 import { Heading1Icon } from '../icons/heading1';
 import { Heading2Icon } from '../icons/heading2';
 import { Heading3Icon } from '../icons/heading3';
+import { OlIcon } from '../icons/ol';
 import { UlIcon } from '../icons/ul';
 import { HeadingsPlugin, ListsPlugin } from '../plugins';
 import styles from './Menu.module.css';
@@ -57,6 +58,18 @@ export const Menu = (props: Props) => {
         }}
       >
         <UlIcon size={16} />
+      </button>
+      <button
+        type="button"
+        className={getButtonClassName(
+          ListsPlugin.isListActive(editor, ListsPlugin.NUMBERED_LIST_ELEMENT),
+        )}
+        onMouseDown={(event) => {
+          event.preventDefault();
+          ListsPlugin.toggleList(editor, ListsPlugin.NUMBERED_LIST_ELEMENT);
+        }}
+      >
+        <OlIcon size={16} />
       </button>
     </div>
   );
