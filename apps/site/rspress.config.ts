@@ -57,6 +57,14 @@ export default defineConfig({
             {
               text: 'FloatingMenuPlugin',
               link: '/guide/plugins/floating-menu-plugin',
+            },
+            {
+              text: 'HeadingsPlugin',
+              link: '/guide/plugins/headings-plugin',
+            },
+            {
+              text: 'HighlightsPlugin',
+              link: '/guide/plugins/highlights-plugin',
             }
           ]
         }

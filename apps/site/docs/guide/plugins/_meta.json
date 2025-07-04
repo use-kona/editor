@@ -4,5 +4,7 @@
   "code-block-plugin/index",
   "commands-plugin/index",
   "dnd-plugin/index",
-  "floating-menu-plugin/index"
+  "floating-menu-plugin/index",
+  "headings-plugin/index",
+  "highlights-plugin/index"
 ]

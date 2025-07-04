@@ -1,6 +1,6 @@
-import { IPlugin } from '../../types';
-import { RenderElementProps } from 'slate-react';
 import { Editor, Element, Transforms } from 'slate';
+import { RenderElementProps } from 'slate-react';
+import { IPlugin } from '../../types';
 
 export class HeadingsPlugin implements IPlugin {
   static HeadingLevel1 = 'h1';
@@ -46,15 +46,15 @@ export class HeadingsPlugin implements IPlugin {
   }
 
   static toggleHeading1(editor: Editor) {
-    this.toggleHeading(editor, HeadingsPlugin.HeadingLevel1);
+    HeadingsPlugin.toggleHeading(editor, HeadingsPlugin.HeadingLevel1);
   }
 
   static toggleHeading2(editor: Editor) {
-    this.toggleHeading(editor, HeadingsPlugin.HeadingLevel2);
+    HeadingsPlugin.toggleHeading(editor, HeadingsPlugin.HeadingLevel2);
   }
 
   static toggleHeading3(editor: Editor) {
-    this.toggleHeading(editor, HeadingsPlugin.HeadingLevel3);
+    HeadingsPlugin.toggleHeading(editor, HeadingsPlugin.HeadingLevel3);
   }
 }
 
@@ -66,7 +66,8 @@ const isBlockActive = (editor, type) => {
   const [match] = Array.from(
     Editor.nodes(editor, {
       at: Editor.unhangRange(editor, selection),
-      match: (node) => !Editor.isEditor(node) && Element.isElement(node) && node.type === type,
+      match: (node) =>
+        !Editor.isEditor(node) && Element.isElement(node) && node.type === type,
     }),
   );
 

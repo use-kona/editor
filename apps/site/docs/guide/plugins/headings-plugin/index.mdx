@@ -1,0 +1,37 @@
+---
+title: HeadingsPlugin
+---
+
+## Description
+
+Adds three levels of headings to the editor.
+
+
+## Usage
+### Example
+```tsx
+import { KonaEditor, HeadingsPlugin } from "@kona/editor";
+
+const headingsPlugin = new HeadingsPlugin();
+
+return (
+  <KonaEditor
+    plugins={[headingsPlugin]}
+  />
+)
+```
+
+## Static methods
+You can check if a heading is active or toggle it with static methods of this plugin
+
+### `HeadingsPlugin.isHeading1Active()`
+### `HeadingsPlugin.isHeading2Active()`
+### `HeadingsPlugin.isHeading3Active()`
+
+Checks if the current node is a heading of this level.
+
+### `HeadingsPlugin.toggleHeading1()`
+### `HeadingsPlugin.toggleHeading2()`
+### `HeadingsPlugin.toggleHeading3()`
+
+Converts the current node to the heading of this level.

@@ -1,0 +1,46 @@
+---
+title: HighlightsPlugin
+---
+
+## Description
+
+Allows highlighting the text with a set of pre-defined colors;
+
+
+## Usage
+### Example
+```tsx
+import { KonaEditor, HighlightsPlugin } from "@kona/editor";
+
+export enum Color {
+  Red = 'red',
+  Blue = 'blue',
+  Yellow = 'yellow',
+}
+
+export const colors = {
+  [Color.Red]: '#ff000055',
+  [Color.Blue]: '#0000ff55',
+  [Color.Yellow]: '#ffff0055',
+};
+
+
+const highlightsPlugin = new HighlightsPlugin({
+  color,
+});
+
+return (
+  <KonaEditor
+    plugins={[highlightsPlugin]}
+  />
+)
+```
+
+## Static methods
+
+
+### `HighlightsPlugin.isHighlightActive(editor, color)`
+Returns true if the currently selected text is highlighted with this particular color.
+
+### `HighlightsPlugin.toggleHighlight(editor, color)`
+Highlights the selected text with this color.
