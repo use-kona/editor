@@ -17,7 +17,7 @@ import {
   ShortcutsPlugin,
   TableOfContentsPlugin,
 } from '../plugins';
-import type { CodeElement } from '../plugins/CodeBlockPlugin/type';
+import type { CodeElement } from '../plugins/CodeBlockPlugin/types';
 import { Backdrop } from './Backdrop';
 import { colors } from './colors';
 import { DragBlock } from './DragBlock';

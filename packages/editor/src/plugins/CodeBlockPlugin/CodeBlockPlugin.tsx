@@ -15,7 +15,7 @@ import {
 } from 'slate-react';
 import type { IPlugin } from '../../types';
 import { CodeBlock } from './CodeBlock';
-import type { CodeElement } from './type';
+import type { CodeElement } from './types';
 import { normalizeTokens } from './utils';
 import 'prismjs/themes/prism.css';
 import type { CustomElement } from '../../../types';

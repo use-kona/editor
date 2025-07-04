@@ -1,0 +1,45 @@
+---
+title: BasicFormattingPlugin
+---
+
+## Description
+
+This plugin allows user to mark text as **bold**, _italic_, ~~strikethrough~~ or <ins>underlined</ins> text.
+It also adds common hotkeys for these formatting:
+
+|Hotkey|Mark|
+------|---------|
+|`ctrl/cmd + b`|bold|
+|`ctrl/cmd + i`|italic|
+|`ctrl/cmd + u`|underline|
+
+
+## Usage
+### Example
+```tsx
+import { KonaEditor, BasicFormattingPlugin } from "@kona/editor";
+return (
+  <KonaEditor
+    plugins={[
+      new BasicFormattingPlugin()
+    ]}
+  />
+)
+```
+
+## Static methods
+This plugin provides some static methods for toggling marks on the text and checking if a mark is active:
+
+### `isMarkActive`
+```typescript
+type MarkType = 'bold' | 'italic' | 'underline' | 'strikethrough';
+
+BasicFormattingPlugin.isMarkActive(editor: Editor, mark: MarkType); // return Boolean;
+```
+
+### `toggleMark`
+```typescript
+type MarkType = 'bold' | 'italic' | 'underline' | 'strikethrough';
+
+BasicFormattingPlugin.toggleMark(editor: Editor, mark: MarkType);
+```

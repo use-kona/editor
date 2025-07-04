@@ -1,6 +1,6 @@
 import * as path from 'node:path';
-import { defineConfig } from 'rspress/config';
-import { pluginFontOpenSans } from 'rspress-plugin-font-open-sans';
+import {defineConfig} from 'rspress/config';
+import {pluginFontOpenSans} from 'rspress-plugin-font-open-sans';
 
 
 const packagesDir = path.resolve(__dirname, '../../packages');
@@ -13,21 +13,55 @@ export default defineConfig({
   plugins: [
     pluginFontOpenSans()
   ],
-  // builderConfig: {
-  //   source: {
-  //     include: [
-  //       {
-  //         and: [path.resolve(packagesDir, 'editor'), { not: /[\\/]node_modules[\\/]/ }]
-  //       }
-  //     ]
-  //   }
-  // },
-  // icon: '/rspress-icon.png',
-  // logo: {
-  //   light: '/rspress-light-logo.png',
-  //   dark: '/rspress-dark-logo.png',
-  // },
   themeConfig: {
+    nav: [
+      {
+        text: 'Home',
+        link: '/',
+      },
+      {
+        text: 'Guide',
+        link: '/guide/',
+      },
+    ],
+    sidebar: {
+      '/guide/': [
+        {
+          text: 'Introduction',
+          link: '/guide/',
+        },
+        {
+          text: 'Plugins',
+          link: '/guide/plugins',
+          items: [
+            {
+              text: 'BasicFormattingPlugin',
+              link: '/guide/plugins/basic-formatting-plugin',
+            },
+            {
+              text: 'BreaksPlugin',
+              link: '/guide/plugins/breaks-plugin',
+            },
+            {
+              text: 'CodeBlockPlugin',
+              link: '/guide/plugins/code-block-plugin',
+            },
+            {
+              text: 'CommandsPlugin',
+              link: '/guide/plugins/commands-plugin',
+            },
+            {
+              text: 'DnDPlugin',
+              link: '/guide/plugins/dnd-plugin',
+            },
+            {
+              text: 'FloatingMenuPlugin',
+              link: '/guide/plugins/floating-menu-plugin',
+            }
+          ]
+        }
+      ],
+    },
     socialLinks: [
       {
         icon: 'github',

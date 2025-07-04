@@ -1,0 +1,8 @@
+[
+  "basic-formatting-plugin/index",
+  "breaks-plugin/index",
+  "code-block-plugin/index",
+  "commands-plugin/index",
+  "dnd-plugin/index",
+  "floating-menu-plugin/index"
+]

@@ -1,0 +1,82 @@
+---
+title: CodeBlockPlugin
+---
+import { Tab, Tabs } from 'rspress/theme';
+
+
+## Description
+
+This plugin allows adding code blocks to the editor. You need to bring your own language selector.
+
+## Usage
+### Example
+<Tabs>
+  <Tab label="Editor.tsx">
+    ```tsx
+      import { KonaEditor, CodeBlockPlugin } from "@kona/editor";
+
+      const codeBlockPlugin = new CodeBlockPlugin({
+        renderLanguageSelector: (value, onChange, params) => {
+          return (
+            <LanguageSelector value={value} onChange={onChange} params={params} />
+          )
+        },
+      });
+
+      return (
+        <KonaEditor
+          plugins={[codeBlockPlugin]}
+        />
+      )
+    ```
+  </Tab>
+  <Tab label="LanguageSelector.tsx">
+    ```tsx
+    type Props = {
+      value: string;
+      onChange: (value: string) => void;
+      params: {
+        element: CustomElement;
+      };
+    };
+
+    const languages = [
+      { value: 'javascript', label: 'JavaScript' },
+      { value: 'typescript', label: 'TypeScript' },
+      { value: 'jsx', label: 'JSX' },
+      { value: 'tsx', label: 'TSX' },
+      { value: 'html', label: 'HTML' },
+      { value: 'css', label: 'CSS' },
+      { value: 'json', label: 'JSON' },
+      { value: 'python', label: 'Python' },
+      { value: 'java', label: 'Java' },
+      { value: 'c', label: 'C' },
+      { value: 'cpp', label: 'C++' },
+      { value: 'csharp', label: 'C#' },
+      { value: 'go', label: 'Go' },
+      { value: 'rust', label: 'Rust' },
+      { value: 'ruby', label: 'Ruby' },
+      { value: 'php', label: 'PHP' },
+      { value: 'bash', label: 'Bash' },
+      { value: 'sql', label: 'SQL' },
+      { value: 'markdown', label: 'Markdown' },
+      { value: 'yaml', label: 'YAML' },
+      { value: 'plaintext', label: 'Plain Text' },
+    ];
+
+    export const LanguageSelector = (props: Props) => {
+      const { value, onChange, params } = props;
+
+      return (
+        <div>
+          <select value={value} onChange={onChange}>
+            {languages.map(({ label, value }) => (
+              <option value={value}>{label}</option>
+            ))}
+          </select>
+        </div>
+      )
+    }
+    ```
+  </Tab>
+</Tabs>

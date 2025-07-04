@@ -1,0 +1,29 @@
+---
+title: BreaksPlugin
+---
+
+## Description
+
+Default Slate.js behavior might not be suitable for some blocks.
+We expect that when a user presses `Enter`, we exit from heading blocks and return to the paragraph.
+This plugin does exactly that. Pass a list of node types that should follow this expected behavior.
+
+## Usage
+### Example
+```tsx
+import { KonaEditor, BreaksPlugin, HeadingsPlugin } from "@kona/editor";
+
+return (
+  <KonaEditor
+    plugins={[
+      new BreaksPlugin({
+        breakNodes: [
+          HeadingsPlugin.HeadingLevel1,
+          HeadingsPlugin.HeadingLevel2,
+          HeadingsPlugin.HeadingLevel3,
+        ]
+      })
+    ]}
+  />
+)
+```

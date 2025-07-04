@@ -1,0 +1,61 @@
+---
+title: Introduction
+---
+import { PackageManagerTabs } from '@theme';
+
+Kona editor is a custom wrapper around Slate.js that makes it easier to add additional functionality to this editor.
+Slate.js doesn't have any plugin system, so I spent sometime building one. My goal was to make it simple, but powerful 
+at the same time.
+
+Using the Kona editor is simple, but it can take some time to set it up correctly. The reason is that I wanted to make 
+the component as universal as possible, so I've tried to make each plugin less opinionated and more configurable.
+
+## Installing
+
+<PackageManagerTabs command="install @kona/editor" />
+
+You will also need the following packages for some plugins to work:
+
+```js
+react-dnd // for DnDPlugin
+```
+
+## Using
+I would recommend creating a custom wrapper around **Kona Editor** to use it in your app. This is because
+most of the plugins need setting up before using, and it will be easier to do it in one place.
+
+```tsx title="Editor.tsx"
+import { KonaEditor } from "@kona/editor";
+import { useMemo } from "react";
+import { getPlugins } from "./getPlugins";
+import { Descendant } from "slate";
+
+type Props = {
+  initialValue: Descendant[];
+  onChange: (value: Descendant[]) => void
+}
+
+export const Editor = (props: Props) => {
+  const { initialValue, onChange } = props;
+  const plugins = useMemo(() => getPlugins(), []);
+
+  return (
+    <KonaEditor initialValue={initialValue} onChange={onChange} plugins={plugins} />
+  )
+}
+
+```
+
+My approach is to divide everything into a lot of small files:
+
+```
+components/
+└── Editor/
+    ├── Editor.tsx  // your KonaEditor wrapper
+    ├── Editor.module.css  // your custom styles
+    ├── getPlugins.tsx  // helper to get an array of plugins
+    ├── getCommands.tsx  // list of commands for CommandsPlugin
+    └── getShortcuts.tsx  // list of shortcuts for ShortcutsPlugin
+```
+
+I would also add components for some of the plugins here. Read the plugin documentation for more information.

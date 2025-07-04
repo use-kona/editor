@@ -1,0 +1,63 @@
+import {KonaEditor} from "@kona/editor";import { Tab, Tabs } from 'rspress/theme';
+
+## Description
+
+This plugin allows to enter `/` to open the menu with a custom list of commands.
+
+## Usage
+You need to provide a list of commands to this plugin and render the menu itself.
+
+<Tabs>
+  <Tab label="Editor.tsx">
+    ```tsx
+    import { KonaEditor, CommandsPlugin } from '@kona/editor';
+    import { getCommands } from './getCommands';
+
+    const commandsPlugin = new CommandsPlugin({
+      commands: getCommands(),
+      renderMenu: (children) => {
+        return <div>{children}</div>;
+      },
+      ignoreNodes: [CodeBlockPlugin.CODE_LINE_ELEMENT],
+    });
+
+    return (
+      <KonaEditor plugins={[commandsPlugin]} />
+    )
+    ```
+  </Tab>
+  <Tab label="getCommands.ts">
+    ```tsx
+    const getCommands = (): Command[] => ([
+      {
+        name: 'paragraph', // unique name
+        title: 'Paragraph', // displayed name
+        icon: <TextIcon size={16} />, // icon
+        commandName: 'paragraph', // english name for search
+        action: (actions) => { // action to perform on select command
+          actions.set({ type: 'paragraph' });
+        },
+      },
+    ])
+    ```
+  </Tab>
+</Tabs>
+
+### actions
+When you pass a callback to the action parameter, it receives an object with methods that can help you
+perform various actions on you current node:
+
+#### `actions.removeCommand`
+Removes the entered command text from the editor.
+
+#### `actions.set`
+Sets custom parameters to the current node.
+
+#### `actions.insert`
+Inserts a custom element to the cursor position.
+
+#### `actions.wrap`
+Wraps the current node in a custom element.
+
+#### `actions.insertText`
+Insert text at the cursor position

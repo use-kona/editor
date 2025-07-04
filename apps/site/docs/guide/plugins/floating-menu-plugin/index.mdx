@@ -1,0 +1,109 @@
+---
+title: FloatingMenuPlugin
+---
+import { Tab, Tabs } from 'rspress/theme';
+
+## Description
+
+Adds a floating menu when you select a text. Needed for applying formatting and adding links.
+
+## Usage
+
+### `renderMenu`
+You control the menu you render because there are too many cases on how to do it. In Kona I use
+the same plugin for displaying main marks, control link url and highlighting text with colors.
+`renderMenu` function accepts current Editor instance as a first argument and `commands` as a second.
+`commands` allow you to reposition the currently opened menu via `commands.onUpdate()` and close it
+via `commands.onClose`.
+
+### `renderBackdrop`
+If you want to handle clicks outside of the menu, you can do it here.
+This function accepts the same `commands` object that `renderMenu` accepts.
+
+### `ignoreNodes`
+List the nodes in which the floating menu won't be opened. In our case it is code blocks.
+
+### Example
+<Tabs>
+  <Tab label="Editor.tsx">
+    ```tsx
+    import { KonaEditor, FloatingMenuPlugin } from '@kona/editor';
+
+    const floatingMenuPlugin = new FloatingMenuPlugin({
+      ignoreNodes: [CodeBlockPlugin.CODE_ELEMENT],
+      renderMenu: (editor: Editor, commands: Commands) => {
+        return (
+          <FloatingMenu $store={$store} editor={editor} commands={commands} />
+        );
+      },
+      renderBackdrop: (commands) => {
+        const handleClose = () => {
+          commands.onClose();
+          $store.setKey('isFloatingMenuOpen', false);
+        };
+
+        return <Backdrop onClose={handleClose} />;
+      },
+    });
+    ```
+  </Tab>
+  <Tab label="FloatingMenu.tsx">
+    ```tsx
+    import { BasicFormattingPlugin } from '@kona/editor';
+
+    type Props = {
+      $store: MapStore<{
+        isFloatingMenuOpen: boolean;
+      }>;
+      editor: Editor;
+      commands: {
+        onClose: () => void;
+        onUpdate: () => void;
+      };
+    };
+
+    const getButtonClassName = (isActive: boolean) => {
+      return isActive ? [styles.button, styles.active].join(' ') : styles.button;
+    };
+
+    export const FloatingMenu = (props: Props) => {
+      const { editor } = props;
+
+      return (
+        <div>
+          <button
+            type="button"
+            className={getButtonClassName(BasicFormattingPlugin.isMarkActive(editor, 'bold'))}
+            onMouseDown={(event) => {
+              event.preventDefault();
+              BasicFormattingPlugin.toggleBold(editor)
+            }}
+          >
+            bold
+          </button>
+          <button
+            type="button"
+            className={getButtonClassName(BasicFormattingPlugin.isMarkActive(editor, 'italic'))}
+            onMouseDown={(event) => {
+              event.preventDefault();
+              BasicFormattingPlugin.toggleItalic(editor)
+            }}
+          >
+            italic
+          </button>
+          <button
+            type="button"
+            className={getButtonClassName(BasicFormattingPlugin.isMarkActive(editor, 'underline'))}
+            onMouseDown={(event) => {
+              event.preventDefault();
+              BasicFormattingPlugin.toggleUnderline(editor)
+            }}
+          >
+            underline
+          </button>
+        </div>
+      )
+    }
+    ```
+  </Tab>
+</Tabs>

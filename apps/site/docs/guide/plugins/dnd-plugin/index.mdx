@@ -1,0 +1,91 @@
+---
+title: DnDPlugin
+---
+import { Tab, Tabs } from 'rspress/theme';
+
+## Description
+
+This plugin wraps each node in a custom block, which allows reordering them.
+
+## Usage
+You need to provide the following parameters to the plugin:
+
+### renderBlock
+This is your block's wrapper, needed for adding drag handles as well as additional paddings and drag/drop refs.
+
+### ignoreNodes
+If you don't want to allow reordering particular blocks, you can add them here.
+
+### Example
+
+<Tabs>
+  <Tab label="Editor.tsx">
+    ```tsx
+    import { KonaEditor, DndPlugin } from '@kona/editor';
+
+    const dndPlugin =  new DnDPlugin({
+      renderBlock: (params) => {
+        return <DragBlock {...params} />;
+      },
+      ignoreNodes: [
+        CodeBlockPlugin.CODE_LINE_ELEMENT,
+        ListsPlugin.BULLETED_LIST_ELEMENT,
+        ListsPlugin.NUMBERED_LIST_ELEMENT,
+      ],
+    });
+
+    return (
+      <KonaEditor plugins={[dndPlugin]} />
+    )
+    ```
+  </Tab>
+  <Tab label="DragBlock.tsx">
+    ```tsx
+    type Props = {
+      props: RenderElementProps;
+      dragRef: ConnectDragSource;
+      dropRef: ConnectDropTarget;
+      previewRef: ConnectDragPreview;
+      position: 'top' | 'bottom' | null;
+    };
+
+    const DragBlock = (props: Props) => {
+      const {
+        props: { attributes, element, children },
+        dragRef: drag,
+        dropRef: drop,
+        previewRef: preview,
+        position,
+      } = props;
+
+      return (
+        <div
+          className={cn(styles.root, {
+          [styles.top]: position === 'top',
+          [styles.bottom]: position === 'bottom',
+        })}
+        {...attributes}
+        >
+          <div
+            className={styles.block}
+            ref={(e) => {
+              drop(preview(e));
+            }}
+          >
+            <div
+              className={styles.drag}
+              ref={(element) => {
+                drag(element);
+              }}
+              contentEditable={false}
+            >
+              <span {...attributes} element={element} />
+            </div>
+            <div>{children}</div>
+          </div>
+        </div>
+      );
+    }
+    ```
+  </Tab>
+</Tabs>
