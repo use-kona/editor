@@ -8,7 +8,7 @@
     "preview": "rspress preview"
   },
   "dependencies": {
-    "@kona/editor": "workspace:*",
+    "@use-kona/editor": "workspace:*",
     "rspress": "^1.40.2"
   },
   "devDependencies": {

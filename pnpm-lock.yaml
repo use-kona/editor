@@ -10,7 +10,7 @@ importers:
 
   apps/site:
     dependencies:
-      '@kona/editor':
+      '@use-kona/editor':
         specifier: workspace:*
         version: link:../../packages/editor
       rspress:

@@ -5,7 +5,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "build:site": "pnpm --filter @kona/site build"
+    "build:site": "pnpm --filter @kona/site build",
+    "build:editor": "pnpm --filter @use-kona/editor build"
   },
   "keywords": [],
   "author": "",
