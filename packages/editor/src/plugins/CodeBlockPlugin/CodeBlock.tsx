@@ -10,11 +10,13 @@ type Props = RenderElementProps & {
 
 export const CodeBlock = (props: Props) => {
   return (
-    <div {...props.attributes} className={styles.code} spellCheck={false}>
+    <div {...props.attributes} className={styles.root} spellCheck={false}>
       <div contentEditable={false}>
         {props.renderLanguageSelector(props.element)}
       </div>
-      <div className={styles.content}>{props.children}</div>
+      <div className={styles.content}>
+        <div className={styles.code}>{props.children}</div>
+      </div>
     </div>
   );
 };

@@ -1,11 +1,30 @@
-.code {
+.root {
   border: 1px solid var(--kona-editor-border-color, #eee);
   border-radius: 4px;
   overflow: hidden;
   font-family: monospace;
+  display: flex;
+  flex-direction: column;
 }
 
 .content {
-  padding: 8px;
+  display: flex;
   background-color: var(--kona-editor-background-color, #fff);
+}
+
+.line {
+  counter-increment: line;
+  padding-left: 50px;
+
+  &::before {
+    left: 0;
+    position: absolute;
+    content: counter(line);
+    display: inline-block;
+    width: max-content;
+    text-align: left;
+    padding-left: 16px;
+    color: var(--kona-editor-text-color, #444);
+    opacity: 0.65;
+  }
 }

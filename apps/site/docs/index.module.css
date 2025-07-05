@@ -13,5 +13,5 @@
 :global(html.dark) {
   --kona-editor-background-color: #222;
   --kona-editor-text-color: #eee;
-  --kona-editor-border-color: #111;
+  --kona-editor-border-color: #333;
 }
