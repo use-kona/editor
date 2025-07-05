@@ -1,0 +1,162 @@
+---
+title: Writing a plugin
+---
+
+Each plugin is a class that implements `IPlugin` interface. All the properties are optional because your plugin can extend
+some editor functionality without adding any additional blocks and vice versa.
+
+Here are the parameters that your plugin may provide:
+
+## `constructor`
+We don't use constructor internally in Kona Editor, but you can use it to initialize store or save the settings object
+to the plugin instance. This way each Editor instance will have their own settings.
+
+## `init`
+```ts
+init(editor: Editor) => Editor
+```
+This parameter is needed when you want to override or add some methods to the Editor. You should return
+the editor in the end, so the next plugin could make its own changes.
+
+### Example
+```ts
+class MyPlugin implements IPlugin {
+  init(editor) {
+    const { insertBreak } = editor;
+
+    editor.insertBreak = () => {
+      if (/* some condition */) {
+        // override default behavior
+      } else {
+        insertBreak(); // fallback to the default behavior
+      }
+    }
+
+    return editor;
+  }
+}
+```
+
+## `blocks`
+```ts
+blocks: Block[];
+```
+If you want to add some blocks to the editor, this is the place. Blocks have the following parameters:
+
+### `type`
+*Required*
+
+This is needed to store the block type in JSON. It should be unique. I like to add a static property to
+the plugin and use it in other places, like other plugins.
+
+### `render`
+*Required*
+
+```ts
+render: (
+  props: RenderElementProps & {
+    element: CustomElement & TBlock;
+  },
+  editor: TEditor,
+) => ReactElement | null;
+```
+This method is called by the Kona Editor to display your component for the user. You don't have to
+check for correct type of `props.element` - Kona Editor does it automatically.
+
+### `serialize`
+*Optional*
+
+```ts
+(node: Node, children?: string) => string | undefined;
+```
+This method tells us how to serialize your elements to HTML.
+
+### `deserialize`
+*Optional*
+
+```ts
+export type Deserialize = (
+  element: HTMLElement,
+  children?: (string | Descendant)[],
+) => Node | undefined;
+```
+This method tells us how to receive a Slate value for your element from the HTML.
+
+### `isVoid`
+*Optional, default `false`*
+
+Tells us if your element is void.
+
+
+### `isInline`
+*Optional, default `false`*
+
+Tells us if your element is void.
+
+### `onBeforeDelete`
+*Optional*
+
+```ts
+onBeforeDelete: (blocks: Block[]) => Promise<boolean>;
+```
+If you provide this method, we ask before deleting a node or nodes of this type.
+If you return `true`, node will be deleted, otherwise it won't.
+
+### `onDelete`
+*Optional*
+
+```ts
+onDelete: (blocks: TBlock[]) => void;
+```
+We call this callback (if you provide it) when the node or nodes have just been deleted.
+As an example, you can use it to delete a file from the server when the attachment has been deleted by the user.
+
+## `leafs`
+```ts
+leafs: Leaf[]
+```
+Leafs are inline elements inside your text. They have only two parameters:
+
+### `render`
+*Required*
+
+```tsx
+render: (
+  props: RenderLeafProps & {
+    leaf: CustomText & TLeaf;
+  },
+  editor: T,
+) => ReactElement | null;
+```
+This is where you tell us how to render a leaf. You have to check attributes of your leaf by yourself.
+
+### `isVoid`
+*Optional, default `false`*
+Tells us if a leaf is void.
+
+## `hotkeys`
+```ts
+type Hotkey = readonly [string, (event: KeyboardEvent, editor: Editor) => void];
+
+hotkeys: Hotkey[];
+```
+Here you can list all of the hotkeys for your plugin and do some action when a user hits them.
+
+## `handlers`
+*Optional*
+```tsx
+handlers?: {
+  onDrop?: (event: DragEvent, editor: Editor) => void;
+  onKeyDown?: (event: KeyboardEvent, editor: Editor) => void;
+  onPaste?: (event: ClipboardEvent, editor: Editor) => void;
+};
+```
+Using the handlers object, you can alter the default Editor's behavior.
+
+## `decorate`
+*Optional*
+Needed for decorating nodes and leaves. We use it in `CodeBlockPlugin` for syntax highlighting.
+
+## `ui`
+*Optional*
+Used to render some additional ui for Editor. For example, main menu, floating menu or table of contents.

@@ -28,6 +28,10 @@ export default defineConfig({
           link: '/guide/',
         },
         {
+          text: 'Writing a plugin',
+          link: '/guide/writing-a-plugin',
+        },
+        {
           text: 'Plugins',
           link: '/guide/plugins',
           items: [
