@@ -65,6 +65,34 @@ export default defineConfig({
             {
               text: 'HighlightsPlugin',
               link: '/guide/plugins/highlights-plugin',
+            },
+            {
+              text: 'LinksPlugin',
+              link: '/guide/plugins/links-plugin',
+            },
+            {
+              text: 'ListsPlugin',
+              link: '/guide/plugins/lists-plugin',
+            },
+            {
+              text: 'MenuPlugin',
+              link: '/guide/plugins/menu-plugin',
+            },
+            {
+              text: 'NodeIdPlugin',
+              link: '/guide/plugins/node-id-plugin',
+            },
+            {
+              text: 'PlaceholderPlugin',
+              link: '/guide/plugins/placeholder-plugin',
+            },
+            {
+              text: 'ShortcutsPlugin',
+              link: '/guide/plugins/shortcuts-plugin',
+            },
+            {
+              text: 'TableOfContentsPlugin',
+              link: '/guide/plugins/table-of-contents-plugin',
             }
           ]
         }

@@ -1,0 +1,24 @@
+---
+title: TableOfContentsPlugin
+---
+
+## Description
+This plugin adds a sticky block with headings and a quick navigation to each.
+
+## Usage
+### Example
+```tsx
+import { KonaEditor, TableOfContentsPlugin } from
+
+const tocPlugin = new TableOfContentsPlugin({
+  levels: {
+    [HeadingsPlugin.HeadingLevel1]: 1,
+    [HeadingsPlugin.HeadingLevel2]: 2,
+    [HeadingsPlugin.HeadingLevel3]: 3,
+  },
+});
+
+return (
+  <KonaEditor plugins={[tocPlugin]} />
+)
+```

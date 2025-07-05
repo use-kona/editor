@@ -1,7 +1,7 @@
-import { IPlugin, UiParams } from '../../types';
-import styles from './styles.module.css';
-import { Options } from './types';
+import type { IPlugin, UiParams } from '../../types';
 import { Menu } from './Menu';
+import styles from './styles.module.css';
+import type { Options } from './types';
 
 export class MenuPlugin implements IPlugin {
   constructor(private options: Options) {}

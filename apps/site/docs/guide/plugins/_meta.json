@@ -6,5 +6,12 @@
   "dnd-plugin/index",
   "floating-menu-plugin/index",
   "headings-plugin/index",
-  "highlights-plugin/index"
+  "highlights-plugin/index",
+  "links-plugin/index",
+  "lists-plugin/index",
+  "menu-plugin/index",
+  "node-id-plugin/index",
+  "placeholder-plugin/index",
+  "shortcuts-plugin/index",
+  "table-of-contents-plugin/index"
 ]

@@ -1,0 +1,26 @@
+---
+title: NodeIdPlugin
+---
+
+## Description
+This plugin adds a unique id for each block. I use it for keeping the reference to the block for subtasks,
+but now I'm not sure if this plugin is still necessary. You can safely ignore it.
+
+
+## Usage
+### Example
+
+You have to bring your own function for generating the id. I use [nanoid](https://github.com/ai/nanoid), but
+simple `Math.random().toString(36).substring(2, 15)` might be fine for your needs.
+
+```tsx
+import { KonaEditor, NodeIdPlugin } from '@kona/editor';
+
+const nodeIdPlugin = new NodeIdPlugin({
+  generateId: () => Math.random().toString(36).substring(2, 15)
+})
+
+return (
+  <KonaEditor plugins={[nodeIdPlugin]} />
+)
+```

@@ -1,0 +1,26 @@
+---
+title: PlaceholderPlugin
+---
+
+## Description
+This plugin shows the placeholder for the current node if it is empty.
+
+## Usage
+It has two parameters: `focused` and `unfocused` for both states of the editor. You can also
+provide a list of blocks where placeholder shouldn't be shown via `ignoreNodes` parameter.
+
+### Example
+```tsx
+import { KonaEditor, PlaceholderPlugin, CodeBlockPlugin } from "@kona/editor";
+
+const placeholderPlugin = new PlaceholderPlugin({
+  focused: 'Write / to open command menu',
+  unfocused: 'Add a note...',
+  ignoreNodes: [CodeBlockPlugin.CODE_LINE_ELEMENT],
+});
+
+return (
+  <KonaEditor plugins={[placeholderPlugin]} />
+)
+
+```

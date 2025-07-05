@@ -1,0 +1,26 @@
+---
+title: ListsPlugin
+---
+
+## Description
+It allows adding numbered and bulleted lists to the editor. Also controls indenting list items.
+
+
+## Usage
+### Example
+```tsx
+import { KonaEditor, ListsPlugin } from "@kona/editor";
+
+const listsPlugin = new ListsPlugin();
+
+return (
+  <KonaEditor plugins={[listsPlugin]} />
+)
+```
+
+### Static methods
+#### `ListsPlugin.toggleList(editor, listType)`
+Converts the current node to the list of a particular type.
+
+#### `ListsPlugin.isListActive(editor, listType)`
+Checks if the currently selected node is a list of a particular type.
