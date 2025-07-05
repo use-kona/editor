@@ -4,7 +4,7 @@
   overflow: hidden;
   max-height: 100vh;
   margin: 32px auto;
-  border: 1px solid var(--border-color);
+  border: 1px solid var(--kona-editor-border-color);
   border-radius: 8px;
 }
 
