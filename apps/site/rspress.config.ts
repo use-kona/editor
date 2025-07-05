@@ -3,13 +3,10 @@ import {defineConfig} from 'rspress/config';
 import {pluginFontOpenSans} from 'rspress-plugin-font-open-sans';
 
 
-const packagesDir = path.resolve(__dirname, '../../packages');
-
-console.log(path.resolve(packagesDir, 'editor'));
-
 export default defineConfig({
   root: path.join(__dirname, 'docs'),
   title: 'Kona Editor',
+  base: '/editor/',
   plugins: [
     pluginFontOpenSans()
   ],
