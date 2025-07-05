@@ -7,6 +7,9 @@ export default defineConfig({
   root: path.join(__dirname, 'docs'),
   title: 'Kona Editor',
   base: '/editor/',
+  head: [
+    '<script defer src="https://umami.kona.to/script.js" data-website-id="428b0290-b2dc-4810-8f84-d49d19d710ff"></script>'
+  ],
   plugins: [
     pluginFontOpenSans()
   ],
