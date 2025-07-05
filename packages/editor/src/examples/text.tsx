@@ -6,7 +6,12 @@ import {
   createText,
   type HyperscriptShorthands,
 } from 'slate-hyperscript';
-import { CodeBlockPlugin, HeadingsPlugin, ListsPlugin } from '../plugins';
+import {
+  CodeBlockPlugin,
+  HeadingsPlugin,
+  LinksPlugin,
+  ListsPlugin,
+} from '../plugins';
 
 const elements: HyperscriptShorthands = {
   paragraph: { type: 'paragraph' },
@@ -18,6 +23,7 @@ const elements: HyperscriptShorthands = {
   listItem: { type: ListsPlugin.LIST_ITEM_ELEMENT },
   codeBlock: { type: CodeBlockPlugin.CODE_ELEMENT },
   codeBlockLine: { type: CodeBlockPlugin.CODE_LINE_ELEMENT },
+  hlink: { type: LinksPlugin.LINK_TYPE },
 };
 
 const creators = {
@@ -33,9 +39,9 @@ export const text = (
       <htext bold italic>
         Kona Editor
       </htext>{' '}
-      is a text editor based on Slate.js that I use in Kona application for
-      notes and event descriptions. I decided to open-source the editor for a
-      few reasons:
+      is a text editor based on Slate.js that I use in{' '}
+      <hlink url="https://kona.to">Kona application</hlink> for notes and event
+      descriptions. I decided to open-source the editor for a few reasons:
     </paragraph>
     <numberedList>
       <listItem>
@@ -46,8 +52,8 @@ export const text = (
       </listItem>
       <listItem>
         I have always wanted to try to build something open-sourced, but there
-        were not enough good ideas on what to build. I think that an editor is a
-        pretty decent starting point.
+        have not been enough good ideas on what to build. I think that an editor
+        is a pretty decent starting point.
       </listItem>
     </numberedList>
     <heading2>Usage</heading2>

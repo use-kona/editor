@@ -3,7 +3,7 @@
   justify-content: space-between;
   column-gap: 8px;
   padding: 4px;
-  border-bottom: 1px solid #eee;
+  border-bottom: 1px solid var(--kona-editor-border-color);
 }
 
 .button {
@@ -29,8 +29,8 @@
   width: 200px;
   overflow-y: auto;
   position: absolute;
-  background-color: #fff;
-  border: 1px solid #eee;
+  background-color: var(--kona-editor-background-color);
+  border: 1px solid var(--kona-editor-border-color);
   z-index: 21;
   border-radius: 8px;
   font-size: 12px;

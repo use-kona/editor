@@ -2,7 +2,9 @@
   padding: 8px;
   display: flex;
   column-gap: 4px;
-  border-bottom: 1px dashed #ddd;
+  background-color: var(--kona-editor-background-color);
+  border-bottom: 1px dotted var(--kona-editor-border-color);
+  color: var(--kona-editor-text-color);
   width: 100%;
 }
 
@@ -19,15 +21,17 @@
   outline: none;
   background-color: transparent;
   border: none;
+  color: inherit;
+  opacity: 0.65;
 }
 
 .active {
-  background-color: #eee;
+  opacity: 1;
 }
 
 .divider {
   display: inline-block;
-  border-left: 1px solid #eee;
+  border-left: 1px solid var(--kona-editor-border-color);
   width: 1px;
   height: 20px;
 }

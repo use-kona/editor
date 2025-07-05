@@ -3,8 +3,8 @@ import { ReactEditor } from 'slate-react';
 import type { FloatingMenuPlugin, OptionsMethods } from '../plugins';
 import { EditIcon } from './icons/edit';
 import { ExternalIcon } from './icons/external';
+import styles from './LinksHint.module.css';
 import { $store } from './store';
-import styles from './styles.module.css';
 
 type Props = {
   methods: OptionsMethods;
@@ -15,9 +15,10 @@ export const LinksHint = (props: Props) => {
   const { methods, floatingMenuPlugin } = props;
 
   return (
-    <div className={styles.hint}>
+    <div className={styles.root}>
       <button
         type="button"
+        className={styles.button}
         onMouseDown={(event) => {
           event.preventDefault();
           const element = methods.getLinkElement();
@@ -43,6 +44,7 @@ export const LinksHint = (props: Props) => {
       </button>
       <button
         type="button"
+        className={styles.button}
         onMouseDown={(event) => {
           event.preventDefault();
           const url = methods.getUrl();

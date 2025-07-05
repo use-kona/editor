@@ -1,0 +1,27 @@
+.root {
+  display: flex;
+  border-radius: 4px;
+  background-color: var(--kona-editor-background-color, #fff);
+  border: 1px solid var(--kona-editor-border-color, #ddd);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.025);
+}
+
+.button {
+  width: 20px;
+  height: 20px;
+  border-radius: 4px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  padding: 0;
+  margin: 0;
+  outline: none;
+  background-color: transparent;
+  border: none;
+  opacity: 0.65;
+
+  &:hover {
+    opacity: 1;
+  }
+}

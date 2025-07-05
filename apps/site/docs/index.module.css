@@ -3,3 +3,15 @@
   margin: 0 auto;
   padding: 20px;
 }
+
+:root {
+  --kona-editor-background-color: #fff;
+  --kona-editor-text-color: #444;
+  --kona-editor-border-color: #ddd;
+}
+
+:global(html.dark) {
+  --kona-editor-background-color: #222;
+  --kona-editor-text-color: #eee;
+  --kona-editor-border-color: #111;
+}
