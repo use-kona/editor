@@ -58,7 +58,7 @@ export const text = (
     </numberedList>
     <heading2>Usage</heading2>
     <codeBlock language="tsx">
-      <codeBlockLine>{`import { KonaEditor } from '@kona/editor';`}</codeBlockLine>
+      <codeBlockLine>{`import { KonaEditor } from '@use-kona/editor';`}</codeBlockLine>
       <codeBlockLine> </codeBlockLine>
       <codeBlockLine>{`const App = () => {`}</codeBlockLine>
       <codeBlockLine>{`  return (`}</codeBlockLine>

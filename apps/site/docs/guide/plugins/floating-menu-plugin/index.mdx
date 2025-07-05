@@ -30,7 +30,7 @@ List the nodes in which the floating menu won't be opened. In our case it is cod
 <Tabs>
   <Tab label="Editor.tsx">
     ```tsx
-    import { KonaEditor, FloatingMenuPlugin } from '@kona/editor';
+    import { KonaEditor, FloatingMenuPlugin } from '@use-kona/editor';
 
     const floatingMenuPlugin = new FloatingMenuPlugin({
       ignoreNodes: [CodeBlockPlugin.CODE_ELEMENT],
@@ -52,7 +52,7 @@ List the nodes in which the floating menu won't be opened. In our case it is cod
   </Tab>
   <Tab label="FloatingMenu.tsx">
     ```tsx
-    import { BasicFormattingPlugin } from '@kona/editor';
+    import { BasicFormattingPlugin } from '@use-kona/editor';
 
     type Props = {
       $store: MapStore<{

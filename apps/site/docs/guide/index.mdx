@@ -12,7 +12,7 @@ the component as universal as possible, so I've tried to make each plugin less o
 
 ## Installing
 
-<PackageManagerTabs command="install @kona/editor" />
+<PackageManagerTabs command="install @use-kona/editor" />
 
 You will also need the following packages for some plugins to work:
 
@@ -25,7 +25,7 @@ I would recommend creating a custom wrapper around **Kona Editor** to use it in 
 most of the plugins need setting up before using, and it will be easier to do it in one place.
 
 ```tsx title="Editor.tsx"
-import { KonaEditor } from "@kona/editor";
+import { KonaEditor } from "@use-kona/editor";
 import { useMemo } from "react";
 import { getPlugins } from "./getPlugins";
 import { Descendant } from "slate";
