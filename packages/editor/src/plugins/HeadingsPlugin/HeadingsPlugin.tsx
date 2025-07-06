@@ -1,6 +1,7 @@
 import { Editor, Element, Transforms } from 'slate';
-import { RenderElementProps } from 'slate-react';
-import { IPlugin } from '../../types';
+import { jsx } from 'slate-hyperscript';
+import type { RenderElementProps } from 'slate-react';
+import type { IPlugin } from '../../types';
 
 export class HeadingsPlugin implements IPlugin {
   static HeadingLevel1 = 'h1';
@@ -13,17 +14,50 @@ export class HeadingsPlugin implements IPlugin {
       render: (props: RenderElementProps) => {
         return <h1 {...props.attributes}>{props.children}</h1>;
       },
+      deserialize: (element: HTMLElement, children) => {
+        const { nodeName } = element;
+
+        if (nodeName !== 'H1') {
+          return jsx(
+            'element',
+            { type: HeadingsPlugin.HeadingLevel1 },
+            children,
+          );
+        }
+      },
     },
     {
       type: HeadingsPlugin.HeadingLevel2,
       render: (props: RenderElementProps) => {
         return <h2 {...props.attributes}>{props.children}</h2>;
       },
+      deserialize: (element: HTMLElement, children) => {
+        const { nodeName } = element;
+
+        if (nodeName !== 'H2') {
+          return jsx(
+            'element',
+            { type: HeadingsPlugin.HeadingLevel2 },
+            children,
+          );
+        }
+      },
     },
     {
       type: HeadingsPlugin.HeadingLevel3,
       render: (props: RenderElementProps) => {
         return <h3 {...props.attributes}>{props.children}</h3>;
+      },
+      deserialize: (element: HTMLElement, children) => {
+        const { nodeName } = element;
+
+        if (nodeName !== 'H3') {
+          return jsx(
+            'element',
+            { type: HeadingsPlugin.HeadingLevel3 },
+            children,
+          );
+        }
       },
     },
   ];
