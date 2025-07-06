@@ -1,5 +1,5 @@
 import Prism from 'prismjs';
-import type { KeyboardEvent } from 'react';
+import type { KeyboardEvent, ReactNode } from 'react';
 import {
   type DecoratedRange,
   Editor,
@@ -44,10 +44,11 @@ import 'prismjs/components/prism-yaml';
 import 'prismjs/components/prism-markdown';
 
 type Options = {
-  renderLanguageSelector: (
-    value: string,
-    onChange: (value: string) => void,
+  renderCodeBlock: (
+    language: string,
+    onChange: (language: string) => void,
     params: {
+      Content: () => ReactNode;
       element: CodeElement;
     },
   ) => React.ReactNode;
@@ -189,25 +190,25 @@ export class CodeBlockPlugin implements IPlugin {
     {
       type: CodeBlockPlugin.CODE_ELEMENT,
       render: (props: RenderElementProps, editor: Editor) => {
+        const { language } = props.element as CodeElement;
         const onChange = (language: string) => {
           const path = ReactEditor.findPath(editor, props.element);
           Transforms.setNodes<CodeElement>(editor, { language }, { at: path });
         };
 
+        const Content = (): ReactNode => {
+          return (
+            <CodeBlock {...props} element={props.element as CodeElement} />
+          );
+        };
+
         return (
-          <CodeBlock
-            {...props}
-            element={props.element as CodeElement}
-            renderLanguageSelector={(element) =>
-              this.options.renderLanguageSelector(
-                (props.element as CodeElement).language,
-                onChange,
-                {
-                  element: element as CodeElement,
-                },
-              )
-            }
-          />
+          <>
+            {this.options.renderCodeBlock(language, onChange, {
+              element: props.element as CodeElement,
+              Content,
+            })}
+          </>
         );
       },
     },

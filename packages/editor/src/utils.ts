@@ -1,4 +1,4 @@
-import { Descendant, Text } from 'slate';
+import { type Descendant, Text } from 'slate';
 
 export const isEmpty = (children: Descendant[]) => {
   const [first] = children || [];

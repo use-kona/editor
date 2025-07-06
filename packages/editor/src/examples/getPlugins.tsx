@@ -19,12 +19,12 @@ import {
 } from '../plugins';
 import type { CodeElement } from '../plugins/CodeBlockPlugin/types';
 import { Backdrop } from './Backdrop';
+import { CodeBlock } from './CodeBlock';
 import { colors } from './colors';
 import { DragBlock } from './DragBlock';
 import { FloatingMenu } from './FloatingMenu';
 import { getCommands } from './getCommands';
 import { getShortcuts } from './getShortcuts';
-import { LanguageSelector } from './LanguageSelector';
 import { LinksHint } from './LinksHint';
 import { Menu } from './Menu';
 import { $store } from './store';
@@ -126,9 +126,9 @@ export const getPlugins = () => {
     }),
     new ListsPlugin({}),
     new CodeBlockPlugin({
-      renderLanguageSelector: (value, onChange, params) => {
+      renderCodeBlock: (value, onChange, params) => {
         return (
-          <LanguageSelector
+          <CodeBlock
             value={value}
             onChange={onChange}
             params={{

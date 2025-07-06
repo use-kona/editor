@@ -19,7 +19,8 @@ type Props = {
 };
 
 export const ExampleEditor = (props: Props) => {
-  const { initialValueType = 'kona-editor' } = props;
+  const { value: defaultValue = text, initialValueType = 'kona-editor' } =
+    props;
   const [plugins] = useState(getPlugins());
   const [value, setValue] = useState<Descendant[] | null>(null);
 
@@ -28,9 +29,9 @@ export const ExampleEditor = (props: Props) => {
   // biome-ignore lint/correctness/useExhaustiveDependencies: only on init
   useEffect(() => {
     if (initialValueType === 'kona-editor') {
-      setValue(props.value);
+      setValue(defaultValue);
     } else {
-      const parsed = deserialize(plugins)(props.value);
+      const parsed = deserialize(plugins)(defaultValue);
       parsed && setValue(parsed as Descendant[]);
       console.log(parsed);
     }

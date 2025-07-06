@@ -1,20 +1,12 @@
-import { forwardRef, useMemo } from 'react';
+import { forwardRef, type ReactNode, useMemo } from 'react';
 import { Node } from 'slate';
 import type { CustomElement } from '../../types';
+import styles from './CodeBlock.module.css';
 import { CheckIcon } from './icons/check';
 import { CopyIcon } from './icons/copy';
-import styles from './LanguageSelector.module.css';
 import { Button } from './ui/Button';
 import { Dropdown } from './ui/Dropdown';
 import { Menu as MenuBase, type MenuConfig } from './ui/Menu';
-
-type Props = {
-  value: string;
-  onChange: (value: string) => void;
-  params: {
-    element: CustomElement;
-  };
-};
 
 const languages = [
   { value: 'javascript', label: 'JavaScript' },
@@ -40,11 +32,24 @@ const languages = [
   { value: 'plaintext', label: 'Plain Text' },
 ];
 
-export const LanguageSelector = (props: Props) => {
-  const { value: language, onChange, params } = props;
+type Props = {
+  value: string;
+  onChange: (value: string) => void;
+  params: {
+    element: CustomElement;
+    Content: () => ReactNode;
+  };
+};
+
+export const CodeBlock = (props: Props) => {
+  const {
+    value: language,
+    onChange,
+    params: { element, Content },
+  } = props;
 
   const handleCopyClick = () => {
-    const text = Array.from(Node.texts(params.element))
+    const text = Array.from(Node.texts(element))
       .map((nodeEntry) => nodeEntry[0].text)
       .join('\n');
 
@@ -72,28 +77,33 @@ export const LanguageSelector = (props: Props) => {
   );
   return (
     <div className={styles.root}>
-      <Dropdown
-        config={menuConfig}
-        Menu={forwardRef<HTMLDivElement, { className: string }>(
-          (props, ref) => (
-            <div
-              {...props}
-              ref={ref}
-              className={[styles.customMenu, props.className].join(' ')}
-            />
-          ),
-        )}
-      >
-        {({ ref, onClick }) => (
-          <Button ref={ref} size="sm" onClick={onClick}>
-            {languages.find((l) => l.value === language)?.label ||
-              'Select language'}
-          </Button>
-        )}
-      </Dropdown>
-      <Button size="sm" type="button" onClick={handleCopyClick}>
-        <CopyIcon size={16} />
-      </Button>
+      <div className={styles.menu}>
+        <Dropdown
+          config={menuConfig}
+          Menu={forwardRef<HTMLDivElement, { className: string }>(
+            (props, ref) => (
+              <div
+                {...props}
+                ref={ref}
+                className={[styles.customMenu, props.className].join(' ')}
+              />
+            ),
+          )}
+        >
+          {({ ref, onClick }) => (
+            <Button ref={ref} size="sm" onClick={onClick}>
+              {languages.find((l) => l.value === language)?.label ||
+                'Select language'}
+            </Button>
+          )}
+        </Dropdown>
+        <Button size="sm" type="button" onClick={handleCopyClick}>
+          <CopyIcon size={16} />
+        </Button>
+      </div>
+      <div className={styles.content}>
+        <Content />
+      </div>
     </div>
   );
 };

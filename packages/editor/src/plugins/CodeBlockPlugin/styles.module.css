@@ -1,6 +1,4 @@
 .root {
-  border: 1px solid var(--kona-editor-border-color, #eee);
-  border-radius: 4px;
   overflow: hidden;
   font-family: monospace;
   display: flex;
@@ -9,7 +7,6 @@
 
 .content {
   display: flex;
-  background-color: var(--kona-editor-background-color, #fff);
 }
 
 .line {
