@@ -60,6 +60,7 @@ export type Leaf<T extends Editor, TLeaf extends CustomText = CustomText> = {
     editor: T,
   ) => ReactElement | null;
   isVoid?: boolean;
+  deserialize?: Deserialize;
 };
 
 type Hotkey = readonly [string, (event: KeyboardEvent, editor: Editor) => void];
@@ -84,4 +85,4 @@ export type Serialize = (node: Node, children?: string) => string | undefined;
 export type Deserialize = (
   element: HTMLElement,
   children?: (string | Descendant)[],
-) => Node | undefined;
+) => CustomElement | CustomText[] | undefined;

@@ -8,6 +8,7 @@ import {
   type Path,
   Transforms,
 } from 'slate';
+import { jsx } from 'slate-hyperscript';
 import type { RenderElementProps } from 'slate-react';
 import type { CustomElement } from '../../../types';
 import { getPrev } from '../../core/queries';
@@ -133,6 +134,16 @@ export class ListsPlugin implements IPlugin {
           </ul>
         );
       },
+      deserialize: (element: HTMLElement, children) => {
+        const { nodeName } = element;
+        if (nodeName === 'UL') {
+          return jsx(
+            'element',
+            { type: ListsPlugin.BULLETED_LIST_ELEMENT },
+            children,
+          );
+        }
+      },
     },
     {
       type: ListsPlugin.NUMBERED_LIST_ELEMENT,
@@ -143,6 +154,16 @@ export class ListsPlugin implements IPlugin {
           </ol>
         );
       },
+      deserialize: (element: HTMLElement, children) => {
+        const { nodeName } = element;
+        if (nodeName === 'OL') {
+          return jsx(
+            'element',
+            { type: ListsPlugin.NUMBERED_LIST_ELEMENT },
+            children,
+          );
+        }
+      },
     },
     {
       type: ListsPlugin.LIST_ITEM_ELEMENT,
@@ -152,6 +173,16 @@ export class ListsPlugin implements IPlugin {
             {props.children}
           </li>
         );
+      },
+      deserialize: (element: HTMLElement, children) => {
+        const { nodeName } = element;
+        if (nodeName === 'LI') {
+          return jsx(
+            'element',
+            { type: ListsPlugin.LIST_ITEM_ELEMENT },
+            children,
+          );
+        }
       },
     },
   ];

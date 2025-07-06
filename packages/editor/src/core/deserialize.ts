@@ -1,5 +1,6 @@
 import { type Descendant, Element, type Node } from 'slate';
 import { jsx } from 'slate-hyperscript';
+import { CustomElement, CustomText } from '../../types';
 import type { IPlugin } from '../types';
 
 export const deserialize =
@@ -35,13 +36,16 @@ export const deserialize =
       return jsx('element', { type: 'paragraph' }, children);
     }
 
-    let result: Node | null = null;
+    let result: CustomElement | CustomText[] | null = null;
     for (const plugin of plugins) {
       if (plugin.blocks?.some((b) => b.deserialize)) {
         plugin.blocks.forEach((e) => {
           if (e.deserialize) {
-            // Cast children to match the expected type in Deserialize interface
-            const childrenAsDescendants = children as (string | Descendant)[];
+            const childrenAsDescendants = (result || children) as (
+              | string
+              | Descendant
+            )[];
+
             const newResult = e.deserialize(element, childrenAsDescendants);
             if (newResult) {
               result = newResult;
@@ -49,9 +53,26 @@ export const deserialize =
           }
         });
       }
-      if (result) {
-        return result;
+
+      if (plugin.leafs?.some((b) => b.deserialize)) {
+        plugin.leafs.forEach((e) => {
+          if (e.deserialize) {
+            const childrenAsDescendants = (result || children) as (
+              | string
+              | Descendant
+            )[];
+            const newResult = e.deserialize(element, childrenAsDescendants);
+            if (newResult) {
+              result = newResult;
+            }
+          }
+        });
       }
     }
+
+    if (result) {
+      return result;
+    }
+
     return children.filter((child) => child !== null);
   };

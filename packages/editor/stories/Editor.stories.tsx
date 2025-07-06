@@ -1,6 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react';
-import { fn } from '@storybook/test';
-import { ExampleEditor } from '../src/examples/Editor';
+import { ExampleEditor } from '../src';
 
 // More on how to set up stories at: https://storybook.js.org/docs/writing-stories#default-export
 const meta = {
@@ -12,21 +11,42 @@ const meta = {
   },
   // This component will have an automatically generated Autodocs entry: https://storybook.js.org/docs/writing-docs/autodocs
   tags: ['autodocs'],
-  // More on argTypes: https://storybook.js.org/docs/api/argtypes
-  argTypes: {
-    backgroundColor: { control: 'color' },
-  },
-  // Use `fn` to spy on the onClick arg, which will appear in the actions panel once invoked: https://storybook.js.org/docs/essentials/actions#action-args
-  args: { onClick: fn() },
 } satisfies Meta<typeof ExampleEditor>;
 
 export default meta;
 type Story = StoryObj<typeof meta>;
 
+const defaultValue = [
+  {
+    type: 'paragraph',
+    children: [{ text: 'Default text' }],
+  },
+];
+
 // More on writing stories with args: https://storybook.js.org/docs/writing-stories/args
 export const Primary: Story = {
-  args: {
-    primary: true,
-    label: 'Button',
+  name: 'Editor',
+  render: () => {
+    return (
+      <div className="root">
+        <ExampleEditor value={defaultValue} />
+      </div>
+    );
+  },
+};
+
+export const Deserialize: Story = {
+  name: 'Deserialize',
+  render: () => {
+    const value = new DOMParser().parseFromString(
+      `<p>Test <strong>test</strong></p><h1>Heading 1</h1><ul><li>1</li></ul>`,
+      'text/html',
+    );
+
+    return (
+      <div className="root">
+        <ExampleEditor initialValueType="html" value={value.body} />
+      </div>
+    );
   },
 };

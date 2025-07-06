@@ -17,7 +17,7 @@ export class HeadingsPlugin implements IPlugin {
       deserialize: (element: HTMLElement, children) => {
         const { nodeName } = element;
 
-        if (nodeName !== 'H1') {
+        if (nodeName === 'H1') {
           return jsx(
             'element',
             { type: HeadingsPlugin.HeadingLevel1 },
@@ -34,7 +34,7 @@ export class HeadingsPlugin implements IPlugin {
       deserialize: (element: HTMLElement, children) => {
         const { nodeName } = element;
 
-        if (nodeName !== 'H2') {
+        if (nodeName === 'H2') {
           return jsx(
             'element',
             { type: HeadingsPlugin.HeadingLevel2 },
@@ -51,7 +51,7 @@ export class HeadingsPlugin implements IPlugin {
       deserialize: (element: HTMLElement, children) => {
         const { nodeName } = element;
 
-        if (nodeName !== 'H3') {
+        if (nodeName === 'H3') {
           return jsx(
             'element',
             { type: HeadingsPlugin.HeadingLevel3 },

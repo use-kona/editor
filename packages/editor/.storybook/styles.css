@@ -1,0 +1,6 @@
+.root {
+  font-family: "Open Sans", sans-serif;
+  --kona-editor-background-color: #fff;
+  --kona-editor-border-color: #e3e3e3;
+  --kona-editor-text-color: #444;
+}

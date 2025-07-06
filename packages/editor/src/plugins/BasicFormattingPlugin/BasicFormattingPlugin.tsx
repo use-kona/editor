@@ -1,4 +1,5 @@
 import { Editor } from 'slate';
+import { jsx } from 'slate-hyperscript';
 import type { CustomElement, CustomText } from '../../../types';
 import type { IPlugin } from '../../types';
 
@@ -62,6 +63,36 @@ export class BasicFormattingPlugin
         }
 
         return <span {...attributes}>{content}</span>;
+      },
+      deserialize: (element: HTMLElement, children) => {
+        const { nodeName } = element;
+
+        let attrs: Record<string, boolean> | null = null;
+        switch (nodeName) {
+          case 'EM':
+          case 'I': {
+            attrs = { italic: true };
+            break;
+          }
+          case 'STRONG': {
+            attrs = { bold: true };
+            break;
+          }
+          case 'U': {
+            attrs = { underline: true };
+            break;
+          }
+          case 'S': {
+            attrs = { strikethrough: true };
+            break;
+          }
+        }
+
+        if (attrs) {
+          return children?.map((child) => jsx('text', attrs, child));
+        }
+
+        return undefined;
       },
     },
   ];
