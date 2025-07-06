@@ -1,6 +1,8 @@
 import isUrl from 'is-url';
 import { Editor, Element, Range, Transforms } from 'slate';
+import { jsx } from 'slate-hyperscript';
 import type { RenderElementProps } from 'slate-react';
+import { deserialize } from '../../core/deserialize';
 import type { IPlugin } from '../../types';
 import { LINK_ELEMENT } from './constants';
 import { Link } from './Link';
@@ -53,6 +55,19 @@ export class LinksPlugin implements IPlugin {
             renderHint={this.options.renderHint}
           />
         );
+      },
+      deserialize: (element: HTMLElement, children) => {
+        if (element.tagName === 'A') {
+          const url = element.getAttribute('href') || '';
+          return jsx(
+            'element',
+            {
+              type: LinksPlugin.LINK_TYPE,
+              url,
+            },
+            children,
+          );
+        }
       },
     },
   ];

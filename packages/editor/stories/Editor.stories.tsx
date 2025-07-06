@@ -39,7 +39,7 @@ export const Deserialize: Story = {
   name: 'Deserialize',
   render: () => {
     const value = new DOMParser().parseFromString(
-      `<p>Test <strong>test</strong></p><h1>Heading 1</h1><ul><li>1</li></ul>`,
+      `<p><a href="http://localhost">Test</a> <strong>test</strong></p><h1>Heading 1</h1><ul><li>1</li></ul>`,
       'text/html',
     );
 
