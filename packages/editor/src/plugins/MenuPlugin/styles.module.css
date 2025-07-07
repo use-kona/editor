@@ -3,8 +3,8 @@
   display: flex;
   flex-direction: row;
   justify-content: space-between;
-  color: var(--text-color, #444);
-  background-color: var(--background-color, #fff);
+  color: var(--kona-editor-text-color, #444);
+  background-color: var(--kona-editor-background-color, #fff);
 }
 
 .editor {
