@@ -19,9 +19,9 @@ This plugin allows adding code blocks to the editor. You need to bring your own 
       import { KonaEditor, CodeBlockPlugin } from "@use-kona/editor";
 
       const codeBlockPlugin = new CodeBlockPlugin({
-        renderLanguageSelector: (value, onChange, params) => {
+        renderCodeBlock: (value, onChange, params) => {
           return (
-            <LanguageSelector value={value} onChange={onChange} params={params} />
+            <CodeBlock value={value} onChange={onChange} params={params} />
           )
         },
       });
@@ -33,13 +33,14 @@ This plugin allows adding code blocks to the editor. You need to bring your own 
       )
     ```
   </Tab>
-  <Tab label="LanguageSelector.tsx">
+  <Tab label="CodeBlock.tsx">
     ```tsx
     type Props = {
       value: string;
       onChange: (value: string) => void;
       params: {
         element: CustomElement;
+        Content: () => ReactNode;
       };
     };
 
@@ -67,16 +68,21 @@ This plugin allows adding code blocks to the editor. You need to bring your own 
       { value: 'plaintext', label: 'Plain Text' },
     ];
 
-    export const LanguageSelector = (props: Props) => {
-      const { value, onChange, params } = props;
+    export const CodeBlock = (props: Props) => {
+      const { value, onChange, params: { element, Content } } = props;
 
       return (
         <div>
-          <select value={value} onChange={onChange}>
-            {languages.map(({ label, value }) => (
-              <option value={value}>{label}</option>
-            ))}
-          </select>
+          <div>
+            <select value={value} onChange={onChange}>
+              {languages.map(({ label, value }) => (
+                <option value={value}>{label}</option>
+              ))}
+            </select>
+          </div>
+          <div>
+            <Content />
+          </div>
         </div>
       )
     }

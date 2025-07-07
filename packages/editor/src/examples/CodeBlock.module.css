@@ -35,6 +35,7 @@
   background-color: var(--kona-editor-background-color);
   border-radius: 6px;
   padding: 8px 4px;
+  font-size: 14px;
 }
 
 .customMenu {

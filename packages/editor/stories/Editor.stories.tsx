@@ -56,7 +56,7 @@ export const Serialize: Story = {
   name: 'Serialize',
   render: () => {
     const ref = useRef(null);
-    const [value, setValue] = useState();
+    const [value, setValue] = useState([]);
     const [html, setHtml] = useState('');
 
     return (
