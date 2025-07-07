@@ -8,6 +8,11 @@ export const frontmatter = {
 export default () => {
   return (
     <div className={styles.root}>
+      <pre>
+        <code>
+          npm install @use-kona/editor
+        </code>
+      </pre>
       <ExampleEditor />
     </div>
   )
