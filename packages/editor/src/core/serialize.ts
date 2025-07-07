@@ -5,11 +5,14 @@ import type { IPlugin } from '../types';
 
 export const serialize =
   (plugins: IPlugin[]) =>
-  (
-    node: CustomElement | CustomElement[] | CustomText | CustomText[],
-  ): string => {
+  (node: CustomElement | CustomText): string => {
     const serializers = plugins
       .flatMap((plugin) => plugin.blocks?.map((element) => element.serialize))
+      .concat(
+        plugins.flatMap((plugin) =>
+          plugin.leafs?.map((element) => element.serialize),
+        ),
+      )
       .filter(Boolean);
 
     if (Array.isArray(node)) {
@@ -21,11 +24,11 @@ export const serialize =
         return current?.(node) || prev;
       }, escapeHtml(node.text));
     } else {
-      const children: string = node.children
+      const children: string = node?.children
         ?.map((n) => serialize(plugins)(n))
         .join('');
 
-      if (node.type === 'paragraph') {
+      if (node?.type === 'paragraph') {
         return `<p>${children}</p>`;
       }
 

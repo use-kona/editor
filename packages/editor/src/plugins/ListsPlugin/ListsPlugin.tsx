@@ -134,6 +134,11 @@ export class ListsPlugin implements IPlugin {
           </ul>
         );
       },
+      serialize: (element, children) => {
+        if (element.type === ListsPlugin.BULLETED_LIST_ELEMENT) {
+          return `<ul>${children}</ul>`;
+        }
+      },
       deserialize: (element: HTMLElement, children) => {
         const { nodeName } = element;
         if (nodeName === 'UL') {
@@ -154,6 +159,11 @@ export class ListsPlugin implements IPlugin {
           </ol>
         );
       },
+      serialize: (element, children) => {
+        if (element.type === ListsPlugin.NUMBERED_LIST_ELEMENT) {
+          return `<ol>${children}</ol>`;
+        }
+      },
       deserialize: (element: HTMLElement, children) => {
         const { nodeName } = element;
         if (nodeName === 'OL') {
@@ -173,6 +183,11 @@ export class ListsPlugin implements IPlugin {
             {props.children}
           </li>
         );
+      },
+      serialize: (element, children) => {
+        if (element.type === ListsPlugin.BULLETED_LIST_ELEMENT) {
+          return `<li>${children}</li>`;
+        }
       },
       deserialize: (element: HTMLElement, children) => {
         const { nodeName } = element;

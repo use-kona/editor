@@ -1,4 +1,5 @@
-import { Editor } from 'slate';
+import escapeHtml from 'escape-html';
+import { Editor, Text } from 'slate';
 import { jsx } from 'slate-hyperscript';
 import type { CustomElement, CustomText } from '../../../types';
 import type { IPlugin } from '../../types';
@@ -63,6 +64,26 @@ export class BasicFormattingPlugin
         }
 
         return <span {...attributes}>{content}</span>;
+      },
+      serialize: (node: CustomElement | CustomLeaf) => {
+        if (Text.isText(node)) {
+          let text = escapeHtml(node.text);
+
+          if (node.bold) {
+            text = `<strong>${text}</strong>`;
+          }
+          if (node.italic) {
+            text = `<em>${text}</em>`;
+          }
+          if (node.underline) {
+            text = `<u>${text}</u>`;
+          }
+          if (node.strikethrough) {
+            text = `<s>${text}</s>`;
+          }
+
+          return text;
+        }
       },
       deserialize: (element: HTMLElement, children) => {
         const { nodeName } = element;

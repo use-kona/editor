@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react';
+import { useRef, useState } from 'react';
 import { ExampleEditor } from '../src';
 
 // More on how to set up stories at: https://storybook.js.org/docs/writing-stories#default-export
@@ -46,6 +47,37 @@ export const Deserialize: Story = {
     return (
       <div className="root">
         <ExampleEditor initialValueType="html" value={value.body} />
+      </div>
+    );
+  },
+};
+
+export const Serialize: Story = {
+  name: 'Serialize',
+  render: () => {
+    const ref = useRef(null);
+    const [value, setValue] = useState();
+    const [html, setHtml] = useState('');
+
+    return (
+      <div className="root">
+        <button
+          type="button"
+          onClick={() => {
+            setHtml(ref.current.serialize(value));
+          }}
+        >
+          serialize
+        </button>
+        {html}
+        <ExampleEditor
+          ref={ref}
+          initialValueType="kona-editor"
+          value={defaultValue}
+          onChange={(value) => {
+            setValue(value);
+          }}
+        />
       </div>
     );
   },

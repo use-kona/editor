@@ -1,9 +1,16 @@
-import { useEffect, useRef, useState } from 'react';
+import {
+  forwardRef,
+  useEffect,
+  useImperativeHandle,
+  useRef,
+  useState,
+} from 'react';
 import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import type { Descendant } from 'slate';
 import type { CustomElement } from '../../types';
 import { deserialize } from '../core/deserialize';
+import { serialize } from '../core/serialize';
 import { KonaEditor } from '../editor';
 import type { EditorRef } from '../types';
 import styles from './Editor.module.css';
@@ -18,13 +25,21 @@ type Props = {
   onChange?: (value: Descendant[]) => void;
 };
 
-export const ExampleEditor = (props: Props) => {
+export const ExampleEditor = forwardRef((props: Props, ref) => {
   const { value: defaultValue = text, initialValueType = 'kona-editor' } =
     props;
   const [plugins] = useState(getPlugins());
   const [value, setValue] = useState<Descendant[] | null>(null);
 
-  const ref = useRef<EditorRef>(null);
+  const editorRef = useRef<EditorRef>(null);
+
+  useImperativeHandle(
+    ref,
+    () => ({
+      serialize: serialize(plugins),
+    }),
+    [plugins],
+  );
 
   // biome-ignore lint/correctness/useExhaustiveDependencies: only on init
   useEffect(() => {
@@ -33,7 +48,6 @@ export const ExampleEditor = (props: Props) => {
     } else {
       const parsed = deserialize(plugins)(defaultValue);
       parsed && setValue(parsed as Descendant[]);
-      console.log(parsed);
     }
   }, []);
 
@@ -42,7 +56,7 @@ export const ExampleEditor = (props: Props) => {
       <div className={[styles.root].join(' ')}>
         {value && (
           <KonaEditor
-            ref={ref}
+            ref={editorRef}
             initialValue={value || (initialValue as CustomElement[])}
             plugins={plugins}
             onChange={props.onChange || console.log}
@@ -51,4 +65,4 @@ export const ExampleEditor = (props: Props) => {
       </div>
     </DndProvider>
   );
-};
+});

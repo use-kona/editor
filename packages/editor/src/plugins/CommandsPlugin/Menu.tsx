@@ -111,7 +111,6 @@ export const Menu = (props: Props) => {
         case 'Escape': {
           event.stopPropagation();
           $store.setKey('isOpen', false);
-          close();
           break;
         }
       }
@@ -166,7 +165,14 @@ export const Menu = (props: Props) => {
   return createPortal(
     renderMenu(
       <>
-        {store.isOpen && <div className={styles.backdrop} onClick={close} />}
+        {store.isOpen && (
+          <div
+            className={styles.backdrop}
+            onClick={() => {
+              $store.setKey('isOpen', false);
+            }}
+          />
+        )}
         <div
           ref={handleMenuLayout}
           style={style}

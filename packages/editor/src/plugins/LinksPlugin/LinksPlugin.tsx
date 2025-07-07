@@ -56,6 +56,14 @@ export class LinksPlugin implements IPlugin {
           />
         );
       },
+      serialize: (element, children) => {
+        if (
+          Element.isElement(element) &&
+          element.type === LinksPlugin.LINK_TYPE
+        ) {
+          return `<a href="${(element as LinkElement).url}">${children}</a>`;
+        }
+      },
       deserialize: (element: HTMLElement, children) => {
         if (element.tagName === 'A') {
           const url = element.getAttribute('href') || '';

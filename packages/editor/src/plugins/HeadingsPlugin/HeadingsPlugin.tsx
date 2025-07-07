@@ -1,4 +1,4 @@
-import { Editor, Element, Transforms } from 'slate';
+import { Descendant, Editor, Element, Transforms } from 'slate';
 import { jsx } from 'slate-hyperscript';
 import type { RenderElementProps } from 'slate-react';
 import type { IPlugin } from '../../types';
@@ -25,6 +25,14 @@ export class HeadingsPlugin implements IPlugin {
           );
         }
       },
+      serialize: (node: Descendant, children) => {
+        if (
+          Element.isElement(node) &&
+          node.type === HeadingsPlugin.HeadingLevel1
+        ) {
+          return `<h1>${children}</h1>`;
+        }
+      },
     },
     {
       type: HeadingsPlugin.HeadingLevel2,
@@ -42,6 +50,14 @@ export class HeadingsPlugin implements IPlugin {
           );
         }
       },
+      serialize: (node: Descendant, children) => {
+        if (
+          Element.isElement(node) &&
+          node.type === HeadingsPlugin.HeadingLevel2
+        ) {
+          return `<h2>${children}</h2>`;
+        }
+      },
     },
     {
       type: HeadingsPlugin.HeadingLevel3,
@@ -57,6 +73,14 @@ export class HeadingsPlugin implements IPlugin {
             { type: HeadingsPlugin.HeadingLevel3 },
             children,
           );
+        }
+      },
+      serialize: (node: Descendant, children) => {
+        if (
+          Element.isElement(node) &&
+          node.type === HeadingsPlugin.HeadingLevel3
+        ) {
+          return `<h3>${children}</h3>`;
         }
       },
     },

@@ -1,11 +1,5 @@
 import type { KeyboardEvent, ReactElement, ReactNode } from 'react';
-import type {
-  DecoratedRange,
-  Descendant,
-  Editor,
-  Node,
-  NodeEntry,
-} from 'slate';
+import type { DecoratedRange, Descendant, Editor, NodeEntry } from 'slate';
 import type { RenderElementProps, RenderLeafProps } from 'slate-react';
 import type { CustomElement, CustomText } from '../types';
 
@@ -60,6 +54,7 @@ export type Leaf<T extends Editor, TLeaf extends CustomText = CustomText> = {
     editor: T,
   ) => ReactElement | null;
   isVoid?: boolean;
+  serialize?: Serialize;
   deserialize?: Deserialize;
 };
 
@@ -72,15 +67,16 @@ export type UiParams = {
 };
 
 export type EditorRef = {
-  serialize: (
-    node: CustomElement | CustomElement[] | CustomText | CustomText[],
-  ) => string;
+  serialize: (node: CustomElement | CustomText) => string;
   deserialize: (
     element: HTMLElement,
   ) => (Descendant | string)[] | string | Descendant | null;
 };
 
-export type Serialize = (node: Node, children?: string) => string | undefined;
+export type Serialize = (
+  node: CustomElement | CustomText,
+  children?: string,
+) => string | undefined;
 
 export type Deserialize = (
   element: HTMLElement,

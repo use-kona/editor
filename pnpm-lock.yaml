@@ -105,6 +105,9 @@ importers:
       '@testing-library/react':
         specifier: ^16.3.0
         version: 16.3.0(@testing-library/dom@10.4.0)(@types/react-dom@18.3.7)(@types/react@19.1.8)(react-dom@18.3.1)(react@18.3.1)
+      '@types/escape-html':
+        specifier: ^1.0.4
+        version: 1.0.4
       '@types/is-url':
         specifier: ^1.2.32
         version: 1.2.32
@@ -2129,6 +2132,10 @@ packages:
 
   /@types/doctrine@0.0.9:
     resolution: {integrity: sha512-eOIHzCUSH7SMfonMG1LsC2f8vxBFtho6NGBznK41R84YzPuvSBzrhEps33IsQiOW9+VL6NQ9DbjQJznk/S4uRA==}
+    dev: true
+
+  /@types/escape-html@1.0.4:
+    resolution: {integrity: sha512-qZ72SFTgUAZ5a7Tj6kf2SHLetiH5S6f8G5frB2SPQ3EyF02kxdyBFf4Tz4banE3xCgGnKgWLt//a6VuYHKYJTg==}
     dev: true
 
   /@types/eslint-scope@3.7.7:

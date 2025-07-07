@@ -40,7 +40,7 @@ export const text = (
         Kona Editor
       </htext>{' '}
       is a text editor based on Slate.js that I use in{' '}
-      <hlink url="https://kona.to">Kona application</hlink> for notes and event
+      <hlink url="https://kona.to">Kona calendar</hlink> for notes and event
       descriptions. I decided to open-source the editor for a few reasons:
     </paragraph>
     <numberedList>
