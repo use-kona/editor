@@ -36,6 +36,21 @@
   border-radius: 6px;
   padding: 8px 4px;
   font-size: 14px;
+  max-height: 200px;
+  overflow: auto;
+
+  &::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background-color: rgba(0, 0, 0, 0.25);
+    border-radius: 10px;
+  }
 }
 
 .customMenu {
