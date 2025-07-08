@@ -20,7 +20,7 @@ init({
           id: 'kona',
           name: 'Kona',
           keywords: ['kona'],
-          skins: [{ src: '/kona.svg' }],
+          skins: [{ src: '/editor/kona.svg' }],
         },
       ],
     },
