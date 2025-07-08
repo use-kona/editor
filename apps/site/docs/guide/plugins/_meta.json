@@ -13,5 +13,6 @@
   "node-id-plugin/index",
   "placeholder-plugin/index",
   "shortcuts-plugin/index",
-  "table-of-contents-plugin/index"
+  "table-of-contents-plugin/index",
+  "emoji-plugin/index"
 ]

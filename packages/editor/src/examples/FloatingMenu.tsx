@@ -21,11 +21,15 @@ import { UnderlineIcon } from './icons/underline';
 type Mode = 'main' | 'link' | 'colors';
 
 type Props = {
-  $store: MapStore<{
-    isFloatingMenuOpen: boolean;
-    floatingMenuMode: Mode;
-    url?: string;
-  }>;
+  $store: MapStore<
+    {
+      isFloatingMenuOpen: boolean;
+      floatingMenuMode: Mode;
+      url?: string;
+    } & {
+      [key: string]: unknown;
+    }
+  >;
   editor: Editor;
   commands: {
     onClose: () => void;

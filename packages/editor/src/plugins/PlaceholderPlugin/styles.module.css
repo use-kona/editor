@@ -1,5 +1,5 @@
-.absolute {
-  /*position: absolute;*/
+.hidden.placeholder {
+  display: none;
 }
 
 .placeholder {

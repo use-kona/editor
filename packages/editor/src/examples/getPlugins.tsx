@@ -1,3 +1,4 @@
+import { useStore } from '@nanostores/react';
 import type { Editor } from 'slate';
 import {
   BasicFormattingPlugin,
@@ -6,6 +7,7 @@ import {
   type Commands,
   CommandsPlugin,
   DnDPlugin,
+  EmojiPlugin,
   FloatingMenuPlugin,
   HeadingsPlugin,
   HighlightsPlugin,
@@ -22,6 +24,8 @@ import { Backdrop } from './Backdrop';
 import { CodeBlock } from './CodeBlock';
 import { colors } from './colors';
 import { DragBlock } from './DragBlock';
+import { Emoji } from './Emoji';
+import { EmojiSelector } from './EmojiSelector';
 import { FloatingMenu } from './FloatingMenu';
 import { getCommands } from './getCommands';
 import { getShortcuts } from './getShortcuts';
@@ -62,6 +66,23 @@ export const getPlugins = () => {
 
   return [
     new BasicFormattingPlugin(),
+    new EmojiPlugin({
+      ignoreNodes: [CodeBlockPlugin.CODE_LINE_ELEMENT],
+      onSearch: (query) => $store.setKey('emojiSearch', query),
+      renderMenu: ({ insertEmoji }) => {
+        return (
+          <EmojiSelector
+            onConfirm={(...params) => {
+              insertEmoji(...params);
+              $store.setKey('emojiSearch', '');
+            }}
+          />
+        );
+      },
+      renderEmoji: (emoji) => {
+        return <Emoji id={emoji} />;
+      },
+    }),
     new PlaceholderPlugin({
       focused: 'Write / to open command menu',
       unfocused: 'Write / to open command menu',

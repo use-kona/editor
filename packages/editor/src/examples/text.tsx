@@ -24,6 +24,7 @@ const elements: HyperscriptShorthands = {
   codeBlock: { type: CodeBlockPlugin.CODE_ELEMENT },
   codeBlockLine: { type: CodeBlockPlugin.CODE_LINE_ELEMENT },
   hlink: { type: LinksPlugin.LINK_TYPE },
+  hemoji: { type: 'emoji' },
 };
 
 const creators = {
@@ -40,6 +41,7 @@ export const text = (
         Kona Editor
       </htext>{' '}
       is a text editor based on Slate.js that I use in{' '}
+      <hemoji emoji="kona">'</hemoji>
       <hlink url="https://kona.to">Kona calendar</hlink> for notes and event
       descriptions. I decided to open-source the editor for a few reasons:
     </paragraph>
@@ -129,5 +131,8 @@ export const text = (
 
     <heading3>TableOfContentsPlugin</heading3>
     <paragraph>Shows a quick map of headings inside the document</paragraph>
+
+    <heading3>EmojiPlugin</heading3>
+    <paragraph>Allows paste emoji to the text</paragraph>
   </fragment>
 );

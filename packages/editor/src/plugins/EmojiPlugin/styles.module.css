@@ -1,0 +1,10 @@
+.root {
+  position: absolute;
+  z-index: 2;
+}
+
+.emoji-root {
+  vertical-align: text-bottom;
+  height: 24px;
+  display: inline-flex;
+}

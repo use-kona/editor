@@ -1,0 +1,37 @@
+---
+title: EmojiPlguin
+---
+import { Badge } from '@theme';
+
+**Status:** <Badge text="wip" type="warning" />
+
+## Description
+With this plugin you can add emojis to the text by typing `:text` where `text` is you search query for emojis.
+
+## Usage
+### Example
+```tsx
+import { KonaEditor, EmojiPlugin, CodeBlockPlugin } from '@use-kona/editor'
+
+const emojiPlugin = new EmojiPlugin({
+  ignoreNodes: [CodeBlockPlugin.CODE_LINE_ELEMENT],
+  onSearch: (query) => $store.setKey('emojiSearch', query),
+  renderMenu: ({ insertEmoji }) => {
+    return (
+      <EmojiSelector
+        onConfirm={(...params) => {
+          insertEmoji(...params);
+          $store.setKey('emojiSearch', '');
+        }}
+      />
+    );
+  },
+  renderEmoji: (emoji) => {
+    return <Emoji id={emoji} />;
+  },
+});
+
+return (
+  <KonaEditor plugins={[emojiPlugin]} />
+)
+```

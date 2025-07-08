@@ -4,6 +4,7 @@ export { BreaksPlugin } from './BreaksPlugin';
 export { CodeBlockPlugin } from './CodeBlockPlugin';
 export { type Command, CommandsPlugin } from './CommandsPlugin';
 export { DnDPlugin } from './DnDPlugin';
+export { EmojiPlugin } from './EmojiPlugin';
 export { type Commands, FloatingMenuPlugin } from './FloatingMenuPlugin';
 export { HeadingsPlugin } from './HeadingsPlugin';
 export { HighlightsPlugin } from './HighlightsPlugin';

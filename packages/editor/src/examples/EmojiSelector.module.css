@@ -1,0 +1,35 @@
+.root {
+  display: flex;
+  gap: 4px;
+  background-color: var(--kona-editor-background-color);
+  border: 1px solid var(--kona-editor-border-color);
+  border-radius: 8px;
+  padding: 4px 4px;
+}
+
+.emoji {
+  width: 24px;
+  height: 24px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  border-radius: 4px;
+  vertical-align: text-bottom;
+
+  & span {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    height: 20px;
+    width: 20px;
+  }
+
+  &:hover {
+    background-color: var(--kona-editor-alt-background-color);
+  }
+}
+
+.selected {
+  background-color: var(--kona-editor-alt-background-color);
+}

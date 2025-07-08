@@ -100,6 +100,10 @@ export default defineConfig({
             {
               text: 'TableOfContentsPlugin',
               link: '/guide/plugins/table-of-contents-plugin',
+            },
+            {
+              text: 'EmojiPlugin',
+              link: '/guide/plugins/emoji-plugin',
             }
           ]
         }

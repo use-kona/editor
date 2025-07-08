@@ -1,0 +1,1 @@
+export { EmojiPlugin } from './EmojiPlugin';

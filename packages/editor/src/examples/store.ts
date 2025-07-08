@@ -6,9 +6,11 @@ type Store = {
   isFloatingMenuOpen: boolean;
   floatingMenuMode: FloatingMenuMode;
   url?: string;
+  emojiSearch: string;
 };
 
 export const $store = map<Store>({
   isFloatingMenuOpen: false,
   floatingMenuMode: 'main',
+  emojiSearch: '',
 });

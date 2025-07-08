@@ -44,7 +44,10 @@ export class PlaceholderPlugin implements IPlugin {
           return Editor.isVoid(editor, n as Element);
         });
 
-        const isEmpty = (!entity || Node.string(entity[0]) === '') && !hasVoids;
+        const isEmpty =
+          (!entity || Node.string(entity[0]) === '') &&
+          !hasVoids &&
+          !Editor.isVoid(editor, entity?.[0] as Element);
 
         const isEditorEmpty =
           !firstEntity ||
@@ -57,7 +60,7 @@ export class PlaceholderPlugin implements IPlugin {
           <>
             <span {...props.attributes}>
               <span
-                className={isVisible ? styles.placeholder : undefined}
+                className={isVisible ? styles.placeholder : styles.hidden}
                 data-placeholder={
                   isFocused ? this.options.focused : this.options.unfocused
                 }
