@@ -5,6 +5,11 @@
   border-radius: 4px;
   overflow: hidden;
   z-index: 2;
+  box-shadow: 0 1px 3px 2px rgba(0, 0, 0, 0.05);
+}
+
+:global(html.dark) .root {
+  box-shadow: 0 1px 3px 2px rgba(0, 0, 0, 0.55);
 }
 
 .button {
@@ -21,11 +26,22 @@
   justify-content: center;
   color: inherit;
   transition: opacity 0.25s;
-  opacity: 0.65;
+}
+
+.button:hover {
+  background-color: rgba(0, 0, 0, 0.03);
 }
 
 .button.active {
-  opacity: 1;
+  background-color: rgba(0, 0, 0, 0.05);
+}
+
+:global(html.dark) .button.active {
+  background-color: rgba(0, 0, 0, 0.7);
+}
+
+:global(html.dark) .button:hover {
+  background-color: rgba(0, 0, 0, 0.4);
 }
 
 .button:first-child {
