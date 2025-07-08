@@ -221,6 +221,17 @@ export const FloatingMenu = (props: Props) => {
             style={{ backgroundColor: colors[Color.Yellow] }}
           />
         </button>
+        <button
+          type="button"
+          className={styles.button}
+          onMouseDown={(event) => {
+            event.preventDefault();
+            HighlightsPlugin.removeHighlight(editor);
+            $store.setKey('floatingMenuMode', 'main');
+          }}
+        >
+          <CrossIcon size={16} />
+        </button>
       </>
     );
   };

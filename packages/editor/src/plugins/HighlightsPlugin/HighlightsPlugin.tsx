@@ -27,6 +27,10 @@ export class HighlightsPlugin implements IPlugin {
     return marks ? marks.highlight === color : false;
   }
 
+  static removeHighlight(editor: Editor) {
+    Editor.removeMark(editor, 'highlight');
+  }
+
   leafs = [
     {
       render: (props: RenderLeafProps) => {

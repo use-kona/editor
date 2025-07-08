@@ -5,7 +5,7 @@ export enum Color {
 }
 
 export const colors = {
-  [Color.Red]: '#ff000055',
-  [Color.Blue]: '#0000ff55',
-  [Color.Yellow]: '#ffff0055',
+  [Color.Red]: 'rgba(252,14,14,0.75)',
+  [Color.Blue]: 'rgba(0,166,255,0.67)',
+  [Color.Yellow]: 'rgba(241,241,14,0.6)',
 };
