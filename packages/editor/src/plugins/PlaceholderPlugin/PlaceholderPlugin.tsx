@@ -1,4 +1,4 @@
-import { Editor, Node } from 'slate';
+import { type Descendant, Editor, type Element, Node } from 'slate';
 import {
   type RenderLeafProps,
   useFocused,
@@ -26,7 +26,9 @@ export class PlaceholderPlugin implements IPlugin {
         const isFocused = useFocused();
 
         const entity = Editor.above<CustomElement>(editor, {
+          at: editor.selection?.focus,
           mode: 'lowest',
+          voids: true,
         });
 
         const firstEntity = Editor.above(editor, {
@@ -38,7 +40,12 @@ export class PlaceholderPlugin implements IPlugin {
           return props.children;
         }
 
-        const isEmpty = !entity || Node.string(entity[0]) === '';
+        const hasVoids = entity?.[0].children.some((n: Descendant) => {
+          return Editor.isVoid(editor, n as Element);
+        });
+
+        const isEmpty = (!entity || Node.string(entity[0]) === '') && !hasVoids;
+
         const isEditorEmpty =
           !firstEntity ||
           (Node.string(firstEntity[0]) === '' && editor.children.length <= 1);
