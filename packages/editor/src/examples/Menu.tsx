@@ -1,5 +1,6 @@
 import type { Editor } from 'slate';
-import { HeadingsPlugin, ListsPlugin } from '../plugins';
+import { CodeBlockPlugin, HeadingsPlugin, ListsPlugin } from '../plugins';
+import { CodeIcon } from './icons/code';
 import { Heading1Icon } from './icons/heading1';
 import { Heading2Icon } from './icons/heading2';
 import { Heading3Icon } from './icons/heading3';
@@ -70,6 +71,19 @@ export const Menu = (props: Props) => {
         }}
       >
         <OlIcon size={16} />
+      </button>
+      <span className={styles.divider} />
+      <button
+        type="button"
+        className={getButtonClassName(
+          CodeBlockPlugin.isCodeBlockActive(editor),
+        )}
+        onMouseDown={(event) => {
+          event.preventDefault();
+          CodeBlockPlugin.toggleCodeBlock(editor);
+        }}
+      >
+        <CodeIcon size={16} />
       </button>
     </div>
   );

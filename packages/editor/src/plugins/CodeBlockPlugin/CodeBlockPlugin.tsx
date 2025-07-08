@@ -249,57 +249,60 @@ export class CodeBlockPlugin implements IPlugin {
   }
 
   static toggleCodeBlock = (editor: Editor) => {
-    Editor.withoutNormalizing(editor, () => {
-      const node = Editor.above<CustomElement>(editor, {
-        match: (n) =>
-          !Editor.isEditor(n) &&
-          (n as CustomElement).type === CodeBlockPlugin.CODE_ELEMENT,
-        mode: 'highest',
-      });
+    if (!editor.selection) {
+      return;
+    }
 
-      if (node) {
-        Transforms.setNodes(
-          editor,
-          { type: 'paragraph' },
-          {
-            at: node[1],
-            match: (n) =>
-              (n as CustomElement).type === CodeBlockPlugin.CODE_LINE_ELEMENT,
-            mode: 'lowest',
-          },
-        );
-        Transforms.unwrapNodes(editor, {
+    const node = Editor.above<CustomElement>(editor, {
+      match: (n) =>
+        !Editor.isEditor(n) &&
+        (n as CustomElement).type === CodeBlockPlugin.CODE_ELEMENT,
+      mode: 'highest',
+    });
+
+    if (node) {
+      Transforms.setNodes(
+        editor,
+        { type: 'paragraph' },
+        {
           at: node[1],
           match: (n) =>
-            (n as CustomElement).type === CodeBlockPlugin.CODE_ELEMENT,
-          split: true,
-        });
-      } else {
-        Transforms.setNodes(
-          editor,
-          {
-            type: CodeBlockPlugin.CODE_LINE_ELEMENT,
-            children: [{ text: '' }],
-          },
-          {
-            match: (n) =>
-              Editor.isBlock(editor, n as CustomElement) &&
-              (n as CustomElement).type === 'paragraph',
-          },
-        );
-        Transforms.wrapNodes(
-          editor,
-          {
-            type: CodeBlockPlugin.CODE_ELEMENT,
-            language: 'javascript',
-            children: [],
-          } as CodeElement,
-          {
-            match: (n) =>
-              (n as CustomElement).type === CodeBlockPlugin.CODE_LINE_ELEMENT,
-          },
-        );
-      }
-    });
+            (n as CustomElement).type === CodeBlockPlugin.CODE_LINE_ELEMENT,
+          mode: 'lowest',
+        },
+      );
+      Transforms.unwrapNodes(editor, {
+        at: node[1],
+        match: (n) =>
+          (n as CustomElement).type === CodeBlockPlugin.CODE_ELEMENT,
+        split: true,
+      });
+    } else {
+      Transforms.setNodes(
+        editor,
+        {
+          type: CodeBlockPlugin.CODE_LINE_ELEMENT,
+          children: [{ text: '' }],
+        },
+        {
+          mode: 'lowest',
+        },
+      );
+
+      Transforms.wrapNodes(
+        editor,
+        {
+          type: CodeBlockPlugin.CODE_ELEMENT,
+          language: 'javascript',
+          children: [],
+        } as CodeElement,
+        {
+          mode: 'highest',
+          match: (n) =>
+            (n as CustomElement).type === CodeBlockPlugin.CODE_LINE_ELEMENT,
+          at: editor.selection.focus,
+        },
+      );
+    }
   };
 }

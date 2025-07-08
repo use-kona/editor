@@ -1,4 +1,10 @@
-import { type Command, HeadingsPlugin, ListsPlugin } from '../plugins';
+import {
+  CodeBlockPlugin,
+  type Command,
+  HeadingsPlugin,
+  ListsPlugin,
+} from '../plugins';
+import { CodeIcon } from './icons/code';
 import { Heading1Icon } from './icons/heading1';
 import { Heading2Icon } from './icons/heading2';
 import { Heading3Icon } from './icons/heading3';
@@ -70,6 +76,16 @@ export const getCommands = (): Command[] => {
           ListsPlugin.NUMBERED_LIST_ELEMENT,
           ListsPlugin.LIST_ITEM_ELEMENT,
         );
+      },
+    },
+    {
+      name: 'code',
+      title: 'Code',
+      commandName: 'code',
+      icon: <CodeIcon size={16} />,
+      action: (actions, editor) => {
+        actions.removeCommand();
+        CodeBlockPlugin.toggleCodeBlock(editor);
       },
     },
   ];
