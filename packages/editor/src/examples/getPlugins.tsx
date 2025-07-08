@@ -1,4 +1,3 @@
-import { useStore } from '@nanostores/react';
 import type { Editor } from 'slate';
 import {
   BasicFormattingPlugin,
@@ -20,7 +19,6 @@ import {
   TableOfContentsPlugin,
 } from '../plugins';
 import type { CodeElement } from '../plugins/CodeBlockPlugin/types';
-import { Backdrop } from './Backdrop';
 import { CodeBlock } from './CodeBlock';
 import { colors } from './colors';
 import { DragBlock } from './DragBlock';
@@ -40,14 +38,6 @@ export const getPlugins = () => {
       return (
         <FloatingMenu $store={$store} editor={editor} commands={commands} />
       );
-    },
-    renderBackdrop: (commands) => {
-      const handleClose = () => {
-        commands.onClose();
-        $store.setKey('isFloatingMenuOpen', false);
-      };
-
-      return <Backdrop onClose={handleClose} />;
     },
     onShow: () => {
       $store.setKey('isFloatingMenuOpen', true);

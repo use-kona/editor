@@ -117,28 +117,19 @@ export const FloatingMenu = (props: Props) => {
   }
 
   return createPortal(
-    <>
-      <div
-        onMouseDown={() => {
-          setStyle(undefined);
-        }}
-      >
-        {options.renderBackdrop?.({ onClose, onUpdate: handleUpdate })}
-      </div>
-      <div
-        ref={ref}
-        style={{
-          ...style,
-          display: 'block',
-        }}
-        className={styles.root}
-        onMouseDown={(event) => {
-          event.preventDefault();
-        }}
-      >
-        {options.renderMenu(editor, { onClose, onUpdate: handleUpdate })}
-      </div>
-    </>,
+    <div
+      ref={ref}
+      style={{
+        ...style,
+        display: 'block',
+      }}
+      className={styles.root}
+      onMouseDown={(event) => {
+        event.preventDefault();
+      }}
+    >
+      {options.renderMenu(editor, { onClose, onUpdate: handleUpdate })}
+    </div>,
     document.body,
   );
 };

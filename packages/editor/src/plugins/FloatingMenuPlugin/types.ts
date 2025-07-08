@@ -4,7 +4,10 @@ import type { Editor } from 'slate';
 export type Options = {
   ignoreNodes?: string[];
   renderMenu: (editor: Editor, commands: Commands) => ReactNode;
-  renderBackdrop: (commands: {
+  /**
+   * @deprecated
+   */
+  renderBackdrop?: (commands: {
     onClose: () => void;
     onUpdate: () => void;
   }) => ReactNode;
