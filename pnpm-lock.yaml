@@ -10,12 +10,42 @@ importers:
 
   apps/site:
     dependencies:
+      '@emoji-mart/data':
+        specifier: ^1.2.1
+        version: 1.2.1
+      '@nanostores/react':
+        specifier: ^1.0.0
+        version: 1.0.0(nanostores@1.0.1)(react@18.3.1)
       '@use-kona/editor':
         specifier: workspace:*
         version: link:../../packages/editor
+      clsx:
+        specifier: ^2.1.1
+        version: 2.1.1
+      emoji-mart:
+        specifier: ^5.6.0
+        version: 5.6.0
+      nanostores:
+        specifier: ^1.0.1
+        version: 1.0.1
+      react-dnd:
+        specifier: ^16.0.1
+        version: 16.0.1(@types/node@18.19.115)(@types/react@19.1.8)(react@18.3.1)
+      react-dnd-html5-backend:
+        specifier: ^16.0.1
+        version: 16.0.1
       rspress:
         specifier: ^1.40.2
         version: 1.44.0(webpack@5.99.9)
+      slate:
+        specifier: ^0.117.2
+        version: 0.117.2
+      slate-hyperscript:
+        specifier: ^0.100.0
+        version: 0.100.0(slate@0.117.2)
+      slate-react:
+        specifier: ^0.117.3
+        version: 0.117.3(react-dom@18.3.1)(react@18.3.1)(slate-dom@0.116.0)(slate@0.117.2)
     devDependencies:
       '@types/node':
         specifier: ^18.11.17
@@ -50,28 +80,10 @@ importers:
       prismjs:
         specifier: ^1.30.0
         version: 1.30.0
-      slate:
-        specifier: ^0.117.2
-        version: 0.117.2
-      slate-history:
-        specifier: ^0.113.1
-        version: 0.113.1(slate@0.117.2)
-      slate-hyperscript:
-        specifier: ^0.100.0
-        version: 0.100.0(slate@0.117.2)
-      slate-react:
-        specifier: ^0.117.3
-        version: 0.117.3(react-dom@18.3.1)(react@18.3.1)(slate-dom@0.116.0)(slate@0.117.2)
     devDependencies:
       '@biomejs/biome':
         specifier: 2.0.0
         version: 2.0.0
-      '@emoji-mart/data':
-        specifier: ^1.2.1
-        version: 1.2.1
-      '@emoji-mart/react':
-        specifier: ^1.1.1
-        version: 1.1.1(emoji-mart@5.6.0)(react@18.3.1)
       '@rsbuild/core':
         specifier: ~1.4.0
         version: 1.4.3
@@ -123,9 +135,6 @@ importers:
       '@types/react-dom':
         specifier: '18'
         version: 18.3.7(@types/react@19.1.8)
-      emoji-mart:
-        specifier: ^5.6.0
-        version: 5.6.0
       jsdom:
         specifier: ^26.1.0
         version: 26.1.0
@@ -134,13 +143,25 @@ importers:
         version: 18.3.1
       react-dnd:
         specifier: ^16.0.1
-        version: 16.0.1(@types/react@19.1.8)(react@18.3.1)
+        version: 16.0.1(@types/node@18.19.115)(@types/react@19.1.8)(react@18.3.1)
       react-dnd-html5-backend:
         specifier: ^16.0.1
         version: 16.0.1
       react-dom:
         specifier: '18'
         version: 18.3.1(react@18.3.1)
+      slate:
+        specifier: ^0.117.2
+        version: 0.117.2
+      slate-history:
+        specifier: ^0.113.1
+        version: 0.113.1(slate@0.117.2)
+      slate-hyperscript:
+        specifier: ^0.100.0
+        version: 0.100.0(slate@0.117.2)
+      slate-react:
+        specifier: ^0.117.3
+        version: 0.117.3(react-dom@18.3.1)(react@18.3.1)(slate-dom@0.116.0)(slate@0.117.2)
       storybook:
         specifier: ^9.0.13
         version: 9.0.15(@testing-library/dom@10.4.0)
@@ -593,17 +614,7 @@ packages:
 
   /@emoji-mart/data@1.2.1:
     resolution: {integrity: sha512-no2pQMWiBy6gpBEiqGeU77/bFejDqUTRY7KX+0+iur13op3bqUsXdnwoZs6Xb1zbv0gAj5VvS1PWoUUckSr5Dw==}
-    dev: true
-
-  /@emoji-mart/react@1.1.1(emoji-mart@5.6.0)(react@18.3.1):
-    resolution: {integrity: sha512-NMlFNeWgv1//uPsvLxvGQoIerPuVdXwK/EUek8OOkJ6wVOWPUizRBJU0hDqWZCOROVpfBgCemaC3m6jDOXi03g==}
-    peerDependencies:
-      emoji-mart: ^5.2
-      react: ^16.8 || ^17 || ^18
-    dependencies:
-      emoji-mart: 5.6.0
-      react: 18.3.1
-    dev: true
+    dev: false
 
   /@esbuild/aix-ppc64@0.25.5:
     resolution: {integrity: sha512-9o3TMmpmftaCMepOdA5k/yDw8SfInyzWWTjYTFCX3kPSDJMROQTb8jg+h9Cnwnmm1vOzvxN7gIfB5V2ewpjtGA==}
@@ -885,7 +896,6 @@ packages:
 
   /@juggle/resize-observer@3.4.0:
     resolution: {integrity: sha512-dfLbk+PwWvFzSxwk3n5ySL0hfBog779o8h68wK/7/APo/7cgyWp5jcXockbxdk5kFRkbeXWm4Fbi9FrdN381sA==}
-    dev: false
 
   /@mdx-js/loader@2.3.0(webpack@5.99.9):
     resolution: {integrity: sha512-IqsscXh7Q3Rzb+f5DXYk0HU71PK+WuFsEhf+mSV3fOhpLcEpgsHvTQ2h0T6TlZ5gHOaBeFjkXwB52by7ypMyNg==}
@@ -1045,15 +1055,12 @@ packages:
 
   /@react-dnd/asap@5.0.2:
     resolution: {integrity: sha512-WLyfoHvxhs0V9U+GTsGilGgf2QsPl6ZZ44fnv0/b8T3nQyvzxidxsg/ZltbWssbsRDlYW8UKSQMTGotuTotZ6A==}
-    dev: true
 
   /@react-dnd/invariant@4.0.2:
     resolution: {integrity: sha512-xKCTqAK/FFauOM9Ta2pswIyT3D8AQlfrYdOi/toTPEhqCuAs1v5tcJ3Y08Izh1cJ5Jchwy9SeAXmMg6zrKs2iw==}
-    dev: true
 
   /@react-dnd/shallowequal@4.0.2:
     resolution: {integrity: sha512-/RVXdLvJxLg4QKvMoM5WlwNR9ViO9z8B/qPcc+C0Sa/teJY7QG7kJ441DwzOjMYEY7GmU4dj5EcGHIkKZiQZCA==}
-    dev: true
 
   /@remix-run/router@1.23.0:
     resolution: {integrity: sha512-O3rHJzAQKamUz1fvE0Qaw0xSFqsA/yafi2iqeE0pvdFtCO1viYx8QL6f3Ln/aCCTLxs68SLf0KPM9eSeM8yBnA==}
@@ -2802,7 +2809,6 @@ packages:
 
   /compute-scroll-into-view@3.1.1:
     resolution: {integrity: sha512-VRhuHOLoKYOy4UbilLbUzbYg93XLjv2PncJC50EuTWPA3gaja1UjBsUP/D/9/juV3vQFr6XBEzn9KCAHdUvOHw==}
-    dev: false
 
   /concat-map@0.0.1:
     resolution: {integrity: sha512-/Srv4dswyQNBfohGpz9o6Yb3Gz3SrUDqBH5rTuhGR7ahtlbYKnVxw2bCFMRljaA7EXHaXZ8wsHdodFvbkhKmqg==}
@@ -2921,7 +2927,6 @@ packages:
   /direction@1.0.4:
     resolution: {integrity: sha512-GYqKi1aH7PJXxdhTeZBFrg8vUBeKXi+cNprXsC1kpJcbcVnV9wBsrOu1cQEdG0WeQwlfHiy3XvnKfIrJ2R0NzQ==}
     hasBin: true
-    dev: false
 
   /dnd-core@16.0.1:
     resolution: {integrity: sha512-HK294sl7tbw6F6IeuK16YSBUoorvHpY8RHO+9yFfaJyCDVb6n7PRcezrOEOa2SBCqiYpemh5Jx20ZcjKdFAVng==}
@@ -2929,7 +2934,6 @@ packages:
       '@react-dnd/asap': 5.0.2
       '@react-dnd/invariant': 4.0.2
       redux: 4.2.1
-    dev: true
 
   /doctrine@3.0.0:
     resolution: {integrity: sha512-yS+Q5i3hBf7GBkd4KG8a7eBNNWNGLTaEwwYWUijIYM7zrlYDM0BFXHjjPWlWZ1Rg7UaddZeIDmi9jF3HmqiQ2w==}
@@ -3017,7 +3021,7 @@ packages:
 
   /emoji-mart@5.6.0:
     resolution: {integrity: sha512-eJp3QRe79pjwa+duv+n7+5YsNhRcMl812EcFVwrnRvYKoNPoQb5qxU8DG6Bgwji0akHdp6D4Ln6tYLG58MFSow==}
-    dev: true
+    dev: false
 
   /emojis-list@3.0.0:
     resolution: {integrity: sha512-/kyM18EfinwXZbno9FyUGeFh87KC8HRQBQGildHZbEuRyWFOmv1U10o9BBp8XVZDVNNuQKyIGIu5ZYAAXJ0V2Q==}
@@ -3564,7 +3568,6 @@ packages:
     resolution: {integrity: sha512-/gGivxi8JPKWNm/W0jSmzcMPpfpPLc3dY/6GxhX2hQ9iGj3aDfklV4ET7NjKpSinLpJ5vafa9iiGIEZg10SfBw==}
     dependencies:
       react-is: 16.13.1
-    dev: true
 
   /html-encoding-sniffer@4.0.0:
     resolution: {integrity: sha512-Y22oTqIU4uuPgEemfz7NDJz6OeKf12Lsu+QC+s3BVpda64lTiMYCyGwg5ki4vFxkMwQdeZDl2adZoqUgdFuTgQ==}
@@ -3662,7 +3665,6 @@ packages:
 
   /immer@10.1.1:
     resolution: {integrity: sha512-s2MPrmjovJcoMaHtx6K11Ra7oD05NT97w1IC5zpMkT6Atjr7H8LjaDd81iIxUYpMKSRRNMJE703M1Fhr/TctHw==}
-    dev: false
 
   /immutable@5.1.3:
     resolution: {integrity: sha512-+chQdDfvscSF1SJqv2gn4SRO2ZyS3xL3r7IW/wWEEzrzLisnOlKiQu5ytC/BVNcS15C39WT2Hg/bjKjDMcu+zg==}
@@ -3802,7 +3804,6 @@ packages:
 
   /is-hotkey@0.2.0:
     resolution: {integrity: sha512-UknnZK4RakDmTgz4PI1wIph5yxSs/mvChWs9ifnlXsKuXgWmOkY/hAE0H/k2MIqH0RlRye0i1oC07MCRSD28Mw==}
-    dev: false
 
   /is-number@7.0.0:
     resolution: {integrity: sha512-41Cifkg6e8TylSpdtTpeLVMqvSBEVzTttHvERD741+pnZ8ANv0004MRL43QKPDlK9cGvNp6NZWZUBlbGXYxxng==}
@@ -3816,7 +3817,6 @@ packages:
   /is-plain-object@5.0.0:
     resolution: {integrity: sha512-VRSzKkbMm5jMDoKLbltAkFQ5Qr7VDiTFGXxYFXXowVj387GeGNOCsOH6Msy00SGZ3Fp84b1Naa1psqgcCIEP5Q==}
     engines: {node: '>=0.10.0'}
-    dev: false
 
   /is-potential-custom-element-name@1.0.1:
     resolution: {integrity: sha512-bCYeRA2rVibKZd+s2625gGnGF/t7DSqDs4dP7CrLA1m7jKWz6pps0LpYLJN8Q64HtmPKJ1hrN3nzPNKFEKOUiQ==}
@@ -4995,9 +4995,8 @@ packages:
     resolution: {integrity: sha512-Wu3dw5aDJmOGw8WjH1I1/yTH+vlXEL4vmjk5p+MHxP8HuHJS1lAGeIdG/hze1AvNeXWo/JgULV87LyQOr+r5jw==}
     dependencies:
       dnd-core: 16.0.1
-    dev: true
 
-  /react-dnd@16.0.1(@types/react@19.1.8)(react@18.3.1):
+  /react-dnd@16.0.1(@types/node@18.19.115)(@types/react@19.1.8)(react@18.3.1):
     resolution: {integrity: sha512-QeoM/i73HHu2XF9aKksIUuamHPDvRglEwdHL4jsp784BgUuWcg6mzfxT0QDdQz8Wj0qyRKx2eMg8iZtWvU4E2Q==}
     peerDependencies:
       '@types/hoist-non-react-statics': '>= 3.3.1'
@@ -5014,12 +5013,12 @@ packages:
     dependencies:
       '@react-dnd/invariant': 4.0.2
       '@react-dnd/shallowequal': 4.0.2
+      '@types/node': 18.19.115
       '@types/react': 19.1.8
       dnd-core: 16.0.1
       fast-deep-equal: 3.1.3
       hoist-non-react-statics: 3.3.2
       react: 18.3.1
-    dev: true
 
   /react-docgen-typescript@2.4.0(typescript@5.8.3):
     resolution: {integrity: sha512-ZtAp5XTO5HRzQctjPU0ybY0RRCQO19X/8fxn3w7y2VVTUbGHDKULPTL4ky3vB05euSgG5NpALhEhDPvQ56wvXg==}
@@ -5165,7 +5164,6 @@ packages:
     resolution: {integrity: sha512-LAUYz4lc+Do8/g7aeRa8JkyDErK6ekstQaqWQrNRW//MY1TvCEpMtpTWvlQ+FPbWCx+Xixu/6SHt5N0HR+SB4w==}
     dependencies:
       '@babel/runtime': 7.27.6
-    dev: true
 
   /refractor@3.6.0:
     resolution: {integrity: sha512-MY9W41IOWxxk31o+YvFCNyNzdkc9M20NoZK5vq6jkv4I/uh2zkWcfudj0Q1fovjUQJrNewS9NMzeTtqPf+n5EA==}
@@ -5636,7 +5634,6 @@ packages:
     resolution: {integrity: sha512-49oNpRjWRvnU8NyGVmUaYG4jtTkNonFZI86MmGRDqBphEK2EXT9gdEUoQPZhuBM8yWHxCWbobltqYO5M4XrUvQ==}
     dependencies:
       compute-scroll-into-view: 3.1.1
-    dev: false
 
   /section-matter@1.0.0:
     resolution: {integrity: sha512-vfD3pmTzGpufjScBh50YHKzEu2lxBWhVEHsNGoEXmCmn2hKGfeNLYMzCJpe8cD7gqX7TJluOVpBkAequ6dgMmA==}
@@ -5750,7 +5747,6 @@ packages:
       scroll-into-view-if-needed: 3.1.0
       slate: 0.117.2
       tiny-invariant: 1.3.1
-    dev: false
 
   /slate-history@0.113.1(slate@0.117.2):
     resolution: {integrity: sha512-J9NSJ+UG2GxoW0lw5mloaKcN0JI0x2IA5M5FxyGiInpn+QEutxT1WK7S/JneZCMFJBoHs1uu7S7e6pxQjubHmQ==}
@@ -5759,7 +5755,7 @@ packages:
     dependencies:
       is-plain-object: 5.0.0
       slate: 0.117.2
-    dev: false
+    dev: true
 
   /slate-hyperscript@0.100.0(slate@0.117.2):
     resolution: {integrity: sha512-fb2KdAYg6RkrQGlqaIi4wdqz3oa0S4zKNBJlbnJbNOwa23+9FLD6oPVx9zUGqCSIpy+HIpOeqXrg0Kzwh/Ii4A==}
@@ -5768,7 +5764,6 @@ packages:
     dependencies:
       is-plain-object: 5.0.0
       slate: 0.117.2
-    dev: false
 
   /slate-react@0.117.3(react-dom@18.3.1)(react@18.3.1)(slate-dom@0.116.0)(slate@0.117.2):
     resolution: {integrity: sha512-jn3pJ7hRcbZ8ImkXwq/Yosfm0wnVfW/ROAjb2exK2UswuEiRV5SAVVxvEKm6l4uY+qVtXoFn3A2ajfQmJxoQTQ==}
@@ -5788,14 +5783,12 @@ packages:
       slate: 0.117.2
       slate-dom: 0.116.0(slate@0.117.2)
       tiny-invariant: 1.3.1
-    dev: false
 
   /slate@0.117.2:
     resolution: {integrity: sha512-vHfMHrb8WJ6TFfl7yLXT+UlTzdbUQHpAfdGV0tJfECvbRMAOwAKkjgtAMI8FBmJ1t6BKUgX3ybXk3Y2JxQ2R1w==}
     dependencies:
       immer: 10.1.1
       tiny-warning: 1.0.3
-    dev: false
 
   /source-map-js@1.2.1:
     resolution: {integrity: sha512-UXWMKhLOwVKb728IUtQPXxfYU+usdybtUrK/8uGE8CQMvrhOpwvzDBwj0QhSL7MQc7vIsISBG8VQ8+IDQxpfQA==}
@@ -6115,7 +6108,6 @@ packages:
 
   /tiny-invariant@1.3.1:
     resolution: {integrity: sha512-AD5ih2NlSssTCwsMznbvwMZpJ1cbhkGd2uueNxzv2jDlEeZdU04JQfRnggJQ8DrcVBGjAsCKwFBbDlVNtEMlzw==}
-    dev: false
 
   /tiny-invariant@1.3.3:
     resolution: {integrity: sha512-+FbBPE1o9QAYvviau/qC5SE3caw21q3xkvWKBtja5vgqOWIHHJ3ioaq1VPfn/Szqctz2bU/oYeKd9/z5BL+PVg==}
@@ -6123,7 +6115,6 @@ packages:
 
   /tiny-warning@1.0.3:
     resolution: {integrity: sha512-lBN9zLN/oAf68o3zNXYrdCt1kP8WsiGW8Oo2ka41b2IM5JL/S1CTyX1rW0mb/zSuJun0ZUrDxx4sqvYS2FWzPA==}
-    dev: false
 
   /tinybench@2.9.0:
     resolution: {integrity: sha512-0+DUvqWMValLmha6lr4kD8iAMK1HzV0/aKnCtWb9v9641TnP/MFb7Pc2bxoxQjTXAErryXVgUOfv2YqNllqGeg==}

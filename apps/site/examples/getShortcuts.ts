@@ -1,5 +1,5 @@
 import { Editor, Transforms } from 'slate';
-import { type ChangeMatch, HeadingsPlugin, type Shortcut } from '../plugins';
+import { type ChangeMatch, HeadingsPlugin, type Shortcut } from '@use-kona/editor';
 
 export const getShortcuts = (): Shortcut[] => {
   return [

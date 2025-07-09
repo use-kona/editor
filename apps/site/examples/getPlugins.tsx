@@ -17,8 +17,8 @@ import {
   PlaceholderPlugin,
   ShortcutsPlugin,
   TableOfContentsPlugin,
-} from '../plugins';
-import type { CodeElement } from '../plugins/CodeBlockPlugin/types';
+} from '@use-kona/editor';
+import type { CodeElement } from '@use-kona/editor';
 import { CodeBlock } from './CodeBlock';
 import { colors } from './colors';
 import { DragBlock } from './DragBlock';

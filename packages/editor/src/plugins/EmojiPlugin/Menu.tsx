@@ -1,7 +1,7 @@
 import {
   type CSSProperties,
   type ReactNode,
-  useLayoutEffect,
+  useLayoutEffect, useRef,
   useState,
 } from 'react';
 import { createPortal } from 'react-dom';
@@ -18,6 +18,7 @@ export const Menu = (props: Props) => {
 
   const isFocused = useFocused();
   const selection = useSlateSelection();
+  const ref = useRef<HTMLDivElement>(null);
 
   const [style, setStyle] = useState<CSSProperties | undefined>({});
 
@@ -48,7 +49,8 @@ export const Menu = (props: Props) => {
     }, 0);
   }, [selection, isFocused, isOpen]);
 
-  const handleMenuLayout = (element: HTMLDivElement) => {
+  useLayoutEffect(() => {
+    const element = ref.current;
     if (element) {
       const { height, top } = element.getBoundingClientRect();
 
@@ -63,10 +65,11 @@ export const Menu = (props: Props) => {
         }));
       }
     }
-  };
+  }, []);
+
 
   return createPortal(
-    <div ref={handleMenuLayout} style={style} className={styles.root}>
+    <div ref={ref} style={style} className={styles.root}>
       {children}
     </div>,
     document.body,

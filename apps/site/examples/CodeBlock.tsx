@@ -1,6 +1,6 @@
 import { forwardRef, type ReactNode, useMemo } from 'react';
 import { Node } from 'slate';
-import type { CustomElement } from '../../types';
+import type { CustomElement } from '@use-kona/editor';
 import styles from './CodeBlock.module.css';
 import { CheckIcon } from './icons/check';
 import { CopyIcon } from './icons/copy';

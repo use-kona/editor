@@ -35,6 +35,7 @@ export const Menu = (props: Props) => {
   const selection = useSlateSelection();
   const editor = useSlate() as Editor;
   const isFocused = useFocused();
+  const ref = useRef<HTMLDivElement>(null)
 
   const entry = Editor.above<CustomElement>(editor, {
     match: (n) => Editor.isBlock(editor, n as CustomElement),
@@ -137,7 +138,8 @@ export const Menu = (props: Props) => {
     }
   }, [store.filter]);
 
-  const handleMenuLayout = (element: HTMLDivElement) => {
+  useLayoutEffect(() => {
+    const element = ref.current;
     if (element) {
       const { height, top } = element.getBoundingClientRect();
 
@@ -152,7 +154,7 @@ export const Menu = (props: Props) => {
         }));
       }
     }
-  };
+  }, []);
 
   if (!commands.length) {
     return null;
@@ -174,7 +176,7 @@ export const Menu = (props: Props) => {
           />
         )}
         <div
-          ref={handleMenuLayout}
+          ref={ref}
           style={style}
           className={styles.menu}
           onMouseDown={(event) => {

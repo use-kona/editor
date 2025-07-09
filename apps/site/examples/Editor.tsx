@@ -8,11 +8,11 @@ import {
 import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import type { Descendant } from 'slate';
-import type { CustomElement } from '../../types';
-import { deserialize } from '../core/deserialize';
-import { serialize } from '../core/serialize';
-import { KonaEditor } from '../editor';
-import type { EditorRef } from '../types';
+import type { CustomElement } from '@use-kona/editor';
+import { deserialize } from '@use-kona/editor';
+import { serialize } from '@use-kona/editor';
+import { KonaEditor } from '@use-kona/editor';
+import type { EditorRef } from '@use-kona/editor';
 import styles from './Editor.module.css';
 import { getPlugins } from './getPlugins';
 import { text } from './text';

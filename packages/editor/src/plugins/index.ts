@@ -1,7 +1,7 @@
 export { AttachmentsPlugin } from './AttachmentsPlugin';
 export { BasicFormattingPlugin } from './BasicFormattingPlugin';
 export { BreaksPlugin } from './BreaksPlugin';
-export { CodeBlockPlugin } from './CodeBlockPlugin';
+export { CodeBlockPlugin, type CodeElement } from './CodeBlockPlugin';
 export { type Command, CommandsPlugin } from './CommandsPlugin';
 export { DnDPlugin } from './DnDPlugin';
 export { EmojiPlugin } from './EmojiPlugin';

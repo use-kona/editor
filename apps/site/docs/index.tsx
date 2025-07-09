@@ -1,5 +1,5 @@
 import styles from './index.module.css';
-import { ExampleEditor } from '@use-kona/editor';
+import { ExampleEditor } from '../examples/Editor';
 
 export const frontmatter = {
   pageType: 'custom',

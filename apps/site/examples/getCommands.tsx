@@ -3,7 +3,7 @@ import {
   type Command,
   HeadingsPlugin,
   ListsPlugin,
-} from '../plugins';
+} from '@use-kona/editor';
 import { CodeIcon } from './icons/code';
 import { Heading1Icon } from './icons/heading1';
 import { Heading2Icon } from './icons/heading2';

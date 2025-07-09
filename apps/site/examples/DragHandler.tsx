@@ -1,5 +1,5 @@
 import type { RenderElementProps } from 'slate-react';
-import { HeadingsPlugin, ListsPlugin } from '../plugins';
+import { HeadingsPlugin, ListsPlugin } from '@use-kona/editor';
 import styles from './DragHandler.module.css';
 import { DragIcon } from './icons/drag';
 

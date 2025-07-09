@@ -7,6 +7,7 @@ import { useEffect, useState } from 'react';
 import { useSlateStatic } from 'slate-react';
 import styles from './EmojiSelector.module.css';
 import { $store } from './store';
+import {Editor} from "slate";
 
 init({
   data,
@@ -40,7 +41,7 @@ declare module 'react/jsx-runtime' {
 }
 
 type Props = {
-  onConfirm: (emoji, query, editor) => void;
+  onConfirm: (emoji: string, query: string, editor: Editor) => void;
 };
 
 export const EmojiSelector = (props: Props) => {

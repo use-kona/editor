@@ -11,7 +11,7 @@ import {
   HeadingsPlugin,
   LinksPlugin,
   ListsPlugin,
-} from '../plugins';
+} from '@use-kona/editor';
 
 const elements: HyperscriptShorthands = {
   paragraph: { type: 'paragraph' },

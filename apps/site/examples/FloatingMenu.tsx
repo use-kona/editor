@@ -6,7 +6,7 @@ import {
   BasicFormattingPlugin,
   HighlightsPlugin,
   LinksPlugin,
-} from '../plugins';
+} from '@use-kona/editor';
 import { Color, colors } from './colors';
 import styles from './FloatingMenu.module.css';
 import { BoldIcon } from './icons/bold';
