@@ -67,7 +67,7 @@ export class ShortcutsPlugin implements IPlugin {
               );
 
               // Check if the text before cursor matches the pattern
-              matchBefore = new RegExp(shortcut.before.source, 'g').exec(
+              matchBefore = new RegExp(`${shortcut.before.source}`, 'g').exec(
                 textBeforeCursor,
               );
             }
@@ -77,7 +77,7 @@ export class ShortcutsPlugin implements IPlugin {
               const currentPoint = Range.start(selection);
               const [currentNode] = Editor.node(editor, currentPoint.path);
               const textBetweenMatches = Node.string(currentNode).slice(
-                matchBefore.index,
+                matchBefore.index + matchBefore[0].length,
                 currentPoint.offset,
               );
 
@@ -110,13 +110,10 @@ export class ShortcutsPlugin implements IPlugin {
               shortcut.change(editor, {
                 before: matchBefore,
                 after: matchAfter,
-                text: matchAfter.input,
+                text: matchBefore.input.slice(matchBefore.index),
                 cleanText: matchBefore.input.slice(
                   matchBefore.index + matchBefore[0].length,
-                  matchBefore.index +
-                    matchBefore[0].length +
-                    matchAfter.index -
-                    matchAfter[0].length,
+                  matchBefore.input.length - matchAfter[0].length,
                 ),
               });
               return;
