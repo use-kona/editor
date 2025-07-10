@@ -1,6 +1,5 @@
-import { type Descendant, Element, type Node } from 'slate';
+import { type Descendant, Element } from 'slate';
 import { jsx } from 'slate-hyperscript';
-import { CustomElement, CustomText } from '../../types';
 import type { IPlugin } from '../types';
 
 export const deserialize =
@@ -36,7 +35,8 @@ export const deserialize =
       return jsx('element', { type: 'paragraph' }, children);
     }
 
-    let result: CustomElement | CustomText[] | null = null;
+    let result: (Descendant | string)[] | string | Descendant | null = null;
+
     for (const plugin of plugins) {
       if (plugin.blocks?.some((b) => b.deserialize)) {
         plugin.blocks.forEach((e) => {
@@ -61,7 +61,9 @@ export const deserialize =
               | string
               | Descendant
             )[];
+
             const newResult = e.deserialize(element, childrenAsDescendants);
+
             if (newResult) {
               result = newResult;
             }

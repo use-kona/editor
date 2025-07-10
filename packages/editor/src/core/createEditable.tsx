@@ -1,5 +1,6 @@
 import isHotkey from 'is-hotkey';
 import React, {
+  type ClipboardEvent,
   isValidElement,
   type JSX,
   type KeyboardEvent,
@@ -7,7 +8,13 @@ import React, {
   type ReactNode,
   useCallback,
 } from 'react';
-import type { DecoratedRange, Editor, NodeEntry } from 'slate';
+import {
+  DecoratedRange,
+  Descendant,
+  Editor,
+  NodeEntry,
+  Transforms,
+} from 'slate';
 import {
   Editable,
   type RenderElementProps,
@@ -16,6 +23,7 @@ import {
 } from 'slate-react';
 import { BaseElement } from '../elements/BaseElement';
 import type { IPlugin } from '../types';
+import { deserialize } from './deserialize';
 import styles from './styles.module.css';
 
 const SUPPORTED_HANDLERS = ['onDrop', 'onKeyDown', 'onPaste'];
@@ -84,6 +92,17 @@ export const createEditable =
       }
     };
 
+    const handlePaste = (event: ClipboardEvent<HTMLDivElement>) => {
+      const html = event.clipboardData?.getData('text/html');
+      if (!html) return;
+
+      const parsed = new DOMParser().parseFromString(html, 'text/html');
+      const value = deserialize(plugins)(parsed.body);
+      event.preventDefault();
+
+      Transforms.insertNodes(editor, value as Descendant);
+    };
+
     const decorate = (entry: NodeEntry) => {
       const decorators: IPlugin[] = plugins.filter(
         (plugin) => !!plugin.decorate,
@@ -117,6 +136,7 @@ export const createEditable =
       },
       {
         onKeyDown: handleHotkey,
+        onPaste: handlePaste,
       },
     );
 

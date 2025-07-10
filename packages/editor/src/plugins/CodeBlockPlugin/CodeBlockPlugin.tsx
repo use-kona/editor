@@ -42,6 +42,7 @@ import 'prismjs/components/prism-bash';
 import 'prismjs/components/prism-sql';
 import 'prismjs/components/prism-yaml';
 import 'prismjs/components/prism-markdown';
+import { jsx } from 'slate-hyperscript';
 
 type Options = {
   renderCodeBlock: (
@@ -210,6 +211,21 @@ export class CodeBlockPlugin implements IPlugin {
             })}
           </>
         );
+      },
+      deserialize: (el: HTMLElement, children) => {
+        const { nodeName } = el;
+
+        if (nodeName === 'PRE') {
+          const lines = children.join('').split('\n');
+
+          return jsx(
+            'element',
+            { type: CodeBlockPlugin.CODE_ELEMENT },
+            lines.map((line) =>
+              jsx('element', { type: CodeBlockPlugin.CODE_LINE_ELEMENT }, line),
+            ),
+          );
+        }
       },
     },
     {
