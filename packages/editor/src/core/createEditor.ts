@@ -119,7 +119,7 @@ export const createEditor = (plugins: IPlugin[]) => () => {
           const result = matchedBlock.onBeforeDelete
             ? await matchedBlock?.onBeforeDelete?.([node])
             : true;
-          if (result) {
+          if (result && Editor.isVoid(editorWithPlugins, node)) {
             Transforms.removeNodes(editorWithPlugins, { at: path });
             matchedBlock.onDelete?.([node]);
           }
@@ -139,23 +139,23 @@ export const createEditor = (plugins: IPlugin[]) => () => {
     }
 
     if (Range.isCollapsed(selection)) {
-      const firstEntry = Editor.above<CustomElement>(editorWithPlugins, {
+      const currentEntry = Editor.above<CustomElement>(editorWithPlugins, {
         at: selection.anchor,
         match: (n) => Editor.isBlock(editorWithPlugins, n as CustomElement),
         mode: 'lowest',
       });
-      const secondEntry = Editor.above<CustomElement>(editorWithPlugins, {
+      const previousEntry = Editor.above<CustomElement>(editorWithPlugins, {
         at: Editor.before(editorWithPlugins, selection.anchor),
         match: (n) => Editor.isBlock(editorWithPlugins, n as CustomElement),
         mode: 'lowest',
       });
 
-      if (!firstEntry || !secondEntry) {
+      if (!currentEntry || !previousEntry) {
         return;
       }
 
-      const [_, currentPath] = firstEntry;
-      const [node, path] = secondEntry;
+      const [_, currentPath] = currentEntry;
+      const [node, path] = previousEntry;
 
       if (
         node &&
@@ -170,11 +170,11 @@ export const createEditor = (plugins: IPlugin[]) => () => {
           const result = matchedBlock.onBeforeDelete
             ? await matchedBlock.onBeforeDelete([node])
             : true;
-          if (result) {
+          if (result && Editor.isVoid(editorWithPlugins, node)) {
             Transforms.removeNodes(editorWithPlugins, { at: path });
             matchedBlock.onDelete?.([node]);
+            return;
           }
-          return;
         }
       }
     }
