@@ -80,6 +80,10 @@ export const createEditable =
     };
 
     const handleHotkey = (event: KeyboardEvent) => {
+      if (event.key === 'Tab') {
+        event.preventDefault();
+      }
+
       for (const plugin of plugins) {
         if (plugin.hotkeys) {
           for (const hotkey of plugin.hotkeys) {

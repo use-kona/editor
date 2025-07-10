@@ -88,6 +88,33 @@ export class ListsPlugin implements IPlugin {
         }
       }
 
+      if (this.isList(editor, node as CustomElement)) {
+        const prevListItemPath = Editor.before(editor, path, {
+          unit: 'block',
+        });
+
+        const prevList = Editor.above(editor, {
+          at: prevListItemPath,
+          match: (n) => this.isList(editor, n as CustomElement),
+        });
+
+        if (prevList) {
+          const currentDepth = this.getListDepth(editor, path);
+          const prevDepth = this.getListDepth(editor, prevList[1]);
+
+          if (
+            this.isList(editor, prevList[0] as CustomElement) &&
+            currentDepth === prevDepth
+          ) {
+            try {
+              Transforms.mergeNodes(editor, {
+                match: (n) => this.isList(editor, n as CustomElement),
+              });
+            } catch (e) {}
+          }
+        }
+      }
+
       normalizeNode(entry);
     };
 
@@ -249,17 +276,25 @@ export class ListsPlugin implements IPlugin {
               return;
             }
 
-            const prevListItem = getPrev(editor, currentListItem);
+            const prevListItemPath = Editor.before(editor, currentListItem[1], {
+              unit: 'block',
+            });
 
-            if (!prevListItem) {
-              return;
-            }
+            if (currentListItem && prevListItemPath) {
+              const prevListItem = Editor.above(editor, {
+                at: prevListItemPath,
+                match: (n) => this.isListItem(editor, n as CustomElement),
+              });
 
-            if (currentListItem && prevListItem) {
+              if (!prevListItem) {
+                return;
+              }
+
               const currentDepth = this.getListItemDepth(
                 editor,
                 currentListItem[1],
               );
+
               const prevDepth = this.getListItemDepth(editor, prevListItem[1]);
 
               if (prevListItem && prevDepth >= currentDepth) {
@@ -370,17 +405,37 @@ export class ListsPlugin implements IPlugin {
     if (item) {
       let count = 0;
       let parent = Editor.parent(editor, item[1]);
-      while (
-        parent !== null &&
-        this.isList(editor, parent[0] as CustomElement)
-      ) {
+      do {
         parent = Editor.parent(editor, parent[1]);
         count++;
-      }
+      } while (
+        parent !== null &&
+        this.isList(editor, parent[0] as CustomElement)
+      );
 
       return count;
     }
 
+    return 0;
+  };
+
+  private getListDepth = (editor: Editor, path?: Path) => {
+    if (path) {
+      const node = Node.get(editor, path) as CustomElement;
+      if (!this.isList(editor, node)) {
+        return 0;
+      }
+
+      let count = 0;
+      let parent = Editor.parent(editor, path);
+
+      while (parent && this.isList(editor, parent[0] as CustomElement)) {
+        count++;
+        parent = Editor.parent(editor, parent[1]);
+      }
+
+      return count;
+    }
     return 0;
   };
 
