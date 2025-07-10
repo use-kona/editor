@@ -13,6 +13,18 @@ import {
   ListsPlugin,
 } from '@use-kona/editor';
 
+declare global {
+  namespace JSX {
+    interface IntrinsicElements {
+      [key: string]: any;
+
+      htext: {
+        [key: string]: any;
+      };
+    }
+  }
+}
+
 const elements: HyperscriptShorthands = {
   paragraph: { type: 'paragraph' },
   heading1: { type: HeadingsPlugin.HeadingLevel1 },
