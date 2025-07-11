@@ -93,10 +93,12 @@ export class ListsPlugin implements IPlugin {
           unit: 'block',
         });
 
-        const prevList = Editor.above(editor, {
-          at: prevListItemPath,
-          match: (n) => this.isList(editor, n as CustomElement),
-        });
+        const prevList =
+          prevListItemPath &&
+          Editor.above(editor, {
+            at: prevListItemPath,
+            match: (n) => this.isList(editor, n as CustomElement),
+          });
 
         if (prevList) {
           const currentDepth = this.getListDepth(editor, path);
