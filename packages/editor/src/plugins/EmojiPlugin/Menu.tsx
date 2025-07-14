@@ -26,7 +26,7 @@ export const Menu = (props: Props) => {
 
   useLayoutEffect(() => {
     if (!selection || !isFocused) {
-      setStyle(undefined);
+      setStyle({opacity: 0});
       return;
     }
 
