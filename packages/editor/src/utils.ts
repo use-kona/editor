@@ -8,7 +8,7 @@ export const isEmpty = (children: Descendant[]) => {
   }
 
   if (children && children.length <= 1 && Text.isText(first?.children?.[0])) {
-    return first.children.every((child) => child.text.trim() === '');
+    return first.children.every((child) => child.text?.trim() === '');
   }
 
   return false;
