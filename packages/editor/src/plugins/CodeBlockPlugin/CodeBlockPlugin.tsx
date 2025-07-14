@@ -216,7 +216,10 @@ export class CodeBlockPlugin implements IPlugin {
         const { nodeName } = el;
 
         if (nodeName === 'PRE') {
-          const lines = children.join('').split('\n');
+          const lines = children
+            .join('')
+            .split('\n')
+            .filter((line) => Boolean(line));
 
           return jsx(
             'element',
