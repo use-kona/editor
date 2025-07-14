@@ -3,6 +3,7 @@ import {
   Editor,
   Path,
   Range,
+  Text,
   Transforms,
 } from 'slate';
 import { withHistory } from 'slate-history';
@@ -196,40 +197,51 @@ export const createEditor = (plugins: IPlugin[]) => () => {
       deleteFragment(options);
       return;
     }
+
     const nodes = Array.from(
       Editor.nodes<CustomElement>(editorWithPlugins, {
         at: selection,
         match: (n) =>
           !Editor.isEditor(n) &&
           Editor.isBlock(editorWithPlugins, n as CustomElement),
+        reverse: true,
+        mode: 'highest',
+        voids: true,
       }),
-    ).reverse();
+    );
+
 
     for (const entry of nodes) {
       const [node, path] = entry;
 
-      const plugin = plugins.find((plugin) =>
-        plugin.blocks?.find((b) => b.type === node.type),
-      );
-      if (plugin) {
-        const match = plugin.blocks?.find((b) => b.type === node.type);
-        const result = match?.onBeforeDelete
-          ? await match.onBeforeDelete([node])
-          : true;
-        if (result) {
+      if (Text.isText(node)) {
+        Transforms.removeNodes(editorWithPlugins, {
+          at: path,
+        });
+      } else {
+        const plugin = plugins.find((plugin) =>
+          plugin.blocks?.find((b) => b.type === node.type),
+        );
+        if (plugin) {
+          const match = plugin.blocks?.find((b) => b.type === node.type);
+          const result = match?.onBeforeDelete
+            ? await match.onBeforeDelete([node])
+            : true;
+          if (result) {
+            Transforms.removeNodes(editorWithPlugins, {
+              at: path,
+              match: (n) => (n as CustomElement).type === node.type,
+            });
+            match?.onDelete?.([node]);
+          } else {
+            return;
+          }
+        } else {
           Transforms.removeNodes(editorWithPlugins, {
             at: path,
             match: (n) => (n as CustomElement).type === node.type,
           });
-          match?.onDelete?.([node]);
-        } else {
-          return;
         }
-      } else {
-        Transforms.removeNodes(editorWithPlugins, {
-          at: path,
-          match: (n) => (n as CustomElement).type === node.type,
-        });
       }
     }
 

@@ -1,7 +1,8 @@
 import {
   type CSSProperties,
   type ReactNode,
-  useLayoutEffect, useRef,
+  useLayoutEffect,
+  useRef,
   useState,
 } from 'react';
 import { createPortal } from 'react-dom';
@@ -11,10 +12,11 @@ import styles from './styles.module.css';
 type Props = {
   isOpen: boolean;
   children: ReactNode;
+  portalTarget?: Element | null;
 };
 
 export const Menu = (props: Props) => {
-  const { isOpen, children } = props;
+  const { isOpen, children, portalTarget } = props;
 
   const isFocused = useFocused();
   const selection = useSlateSelection();
@@ -67,11 +69,10 @@ export const Menu = (props: Props) => {
     }
   }, []);
 
-
   return createPortal(
     <div ref={ref} style={style} className={styles.root}>
       {children}
     </div>,
-    document.body,
+    portalTarget || document.body,
   );
 };

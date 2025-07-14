@@ -7,6 +7,7 @@ import {
 } from 'slate-react';
 import type { CustomElement } from '../../../types';
 import type { IPlugin } from '../../types';
+import { isEmpty as isEditorEmptyFn } from '../../utils';
 import styles from './styles.module.css';
 
 type Options = {
@@ -49,9 +50,7 @@ export class PlaceholderPlugin implements IPlugin {
           !hasVoids &&
           !Editor.isVoid(editor, entity?.[0] as Element);
 
-        const isEditorEmpty =
-          !firstEntity ||
-          (Node.string(firstEntity[0]) === '' && editor.children.length <= 1);
+        const isEditorEmpty = isEditorEmptyFn(editor.children)
 
         const isVisible =
           (isEmpty && !isReadOnly && isSelected) || isEditorEmpty;

@@ -15,6 +15,7 @@ type Options = {
   }) => ReactNode;
   renderEmoji: (emoji: string) => ReactNode;
   ignoreNodes?: string[];
+  portalTarget?: Element | null;
 };
 
 export class EmojiPlugin implements IPlugin {
@@ -80,7 +81,7 @@ export class EmojiPlugin implements IPlugin {
     }
 
     return (
-      <Menu isOpen={isOpen}>
+      <Menu isOpen={isOpen} portalTarget={this.options.portalTarget}>
         {this.options.renderMenu({
           insertEmoji: (emoji, query, editor) => {
             this.$store.setKey('isOpen', false);
