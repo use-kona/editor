@@ -63,7 +63,14 @@ export class BasicFormattingPlugin
           content = <s>{content}</s>;
         }
 
-        return <span {...attributes}>{content}</span>;
+        /**
+         * https://github.com/ianstormtaylor/slate/issues/4704#issuecomment-1006696364
+         */
+        return (
+          <span {...attributes} style={{ paddingRight: '0.001em' }}>
+            {content}
+          </span>
+        );
       },
       serialize: (node: CustomElement | CustomLeaf) => {
         if (Text.isText(node)) {
