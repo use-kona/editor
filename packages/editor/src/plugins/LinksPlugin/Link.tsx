@@ -1,8 +1,12 @@
 import React, { useLayoutEffect, useRef, useState } from 'react';
-import { RenderElementProps, useSlateStatic } from 'slate-react';
-import styles from './styles.module.css';
 import { createPortal } from 'react-dom';
-import { LinkElement, Options } from './types';
+import {
+  type RenderElementProps,
+  useReadOnly,
+  useSlateStatic,
+} from 'slate-react';
+import styles from './styles.module.css';
+import type { LinkElement, Options } from './types';
 
 type Props = {
   as?: React.ElementType;
@@ -13,14 +17,23 @@ type Props = {
 
 export const Link = (props: Props) => {
   const editor = useSlateStatic();
-  const { attributes, as: Component = 'span', children, element, renderHint } = props;
+  const {
+    attributes,
+    as: Component = 'span',
+    children,
+    element,
+    renderHint,
+  } = props;
   const [isOpen, setOpen] = useState(false);
   const [style, setStyle] = useState({ top: 0, left: 0 });
   const ref = useRef<HTMLSpanElement>(null);
+  const isReadOnly = useReadOnly();
 
   const handleLinkClick = (event: React.MouseEvent<HTMLAnchorElement>) => {
-    event.preventDefault();
-    setOpen(true);
+    if (isReadOnly) {
+      event.preventDefault();
+      setOpen(true);
+    }
   };
 
   const handleMenuClick = (event: React.MouseEvent<HTMLDivElement>) => {
