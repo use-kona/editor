@@ -30,7 +30,7 @@ export const Link = (props: Props) => {
   const isReadOnly = useReadOnly();
 
   const handleLinkClick = (event: React.MouseEvent<HTMLAnchorElement>) => {
-    if (isReadOnly) {
+    if (!isReadOnly) {
       event.preventDefault();
       setOpen(true);
     }
