@@ -34,9 +34,10 @@
 
 .link {
   position: relative;
+  padding-right: 1px;
 
   a {
-    color: var(--link-color, #21afec);
+    color: #21afec;
   }
 }
 
@@ -69,5 +70,5 @@
   left: 0;
   right: 0;
   bottom: 0;
-  z-index: 2
+  z-index: 2;
 }

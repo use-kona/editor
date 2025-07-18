@@ -1,19 +1,19 @@
-import type { KeyboardEvent } from 'react';
+import type { KeyboardEvent } from "react";
 import {
   type Ancestor,
   Editor,
   Element,
   Node,
   type NodeEntry,
-  type Path,
+  Path,
   Transforms,
-} from 'slate';
-import { jsx } from 'slate-hyperscript';
-import type { RenderElementProps } from 'slate-react';
-import type { CustomElement } from '../../../types';
-import { getPrev } from '../../core/queries';
-import type { IPlugin } from '../../types';
-import styles from './styles.module.css';
+} from "slate";
+import { jsx } from "slate-hyperscript";
+import type { RenderElementProps } from "slate-react";
+import type { CustomElement } from "../../../types";
+import { getPrev } from "../../core/queries";
+import type { IPlugin } from "../../types";
+import styles from "./styles.module.css";
 
 type Options = {
   listTypes?: string[];
@@ -23,9 +23,9 @@ type Options = {
 export class ListsPlugin implements IPlugin {
   options: Options;
 
-  static BULLETED_LIST_ELEMENT = 'ul';
-  static NUMBERED_LIST_ELEMENT = 'ol';
-  static LIST_ITEM_ELEMENT = 'li';
+  static BULLETED_LIST_ELEMENT = "ul";
+  static NUMBERED_LIST_ELEMENT = "ol";
+  static LIST_ITEM_ELEMENT = "li";
 
   constructor(options: Options = {}) {
     const { listTypes = [], listItemTypes = [] } = options;
@@ -81,7 +81,7 @@ export class ListsPlugin implements IPlugin {
             {
               at: path,
               match: (n) => this.isListItem(editor, n as CustomElement),
-              mode: 'all',
+              mode: "all",
               split: true,
             },
           );
@@ -89,8 +89,13 @@ export class ListsPlugin implements IPlugin {
       }
 
       if (this.isList(editor, node as CustomElement)) {
+        if (!Path.hasPrevious(path)) {
+          normalizeNode(entry);
+          return;
+        }
+
         const prevListItemPath = Editor.before(editor, path, {
-          unit: 'block',
+          unit: "block",
         });
 
         const prevList =
@@ -123,7 +128,7 @@ export class ListsPlugin implements IPlugin {
     editor.insertBreak = () => {
       const ancestor = Editor.above<CustomElement>(editor, {
         match: (n) => Editor.isBlock(editor, n as CustomElement),
-        mode: 'lowest',
+        mode: "lowest",
       });
 
       if (!ancestor) {
@@ -135,7 +140,7 @@ export class ListsPlugin implements IPlugin {
       if (this.isListItem(editor, element)) {
         if (Editor.isEmpty(editor, element)) {
           Transforms.setNodes(editor, {
-            type: 'paragraph',
+            type: "paragraph",
           });
 
           Transforms.unwrapNodes(editor, {
@@ -170,9 +175,9 @@ export class ListsPlugin implements IPlugin {
       },
       deserialize: (element: HTMLElement, children) => {
         const { nodeName } = element;
-        if (nodeName === 'UL') {
+        if (nodeName === "UL") {
           return jsx(
-            'element',
+            "element",
             { type: ListsPlugin.BULLETED_LIST_ELEMENT },
             children,
           );
@@ -195,9 +200,9 @@ export class ListsPlugin implements IPlugin {
       },
       deserialize: (element: HTMLElement, children) => {
         const { nodeName } = element;
-        if (nodeName === 'OL') {
+        if (nodeName === "OL") {
           return jsx(
-            'element',
+            "element",
             { type: ListsPlugin.NUMBERED_LIST_ELEMENT },
             children,
           );
@@ -220,9 +225,9 @@ export class ListsPlugin implements IPlugin {
       },
       deserialize: (element: HTMLElement, children) => {
         const { nodeName } = element;
-        if (nodeName === 'LI') {
+        if (nodeName === "LI") {
           return jsx(
-            'element',
+            "element",
             { type: ListsPlugin.LIST_ITEM_ELEMENT },
             children,
           );
@@ -240,7 +245,7 @@ export class ListsPlugin implements IPlugin {
         }),
       );
 
-      if (event.key === 'Backspace') {
+      if (event.key === "Backspace") {
         if (
           selection &&
           match &&
@@ -253,16 +258,16 @@ export class ListsPlugin implements IPlugin {
           });
 
           Transforms.setNodes(editor, {
-            type: 'paragraph',
+            type: "paragraph",
           });
         }
       }
 
-      if (event.key === 'Tab') {
+      if (event.key === "Tab") {
         if (match) {
           const [newMatch] = Array.from(
             Editor.nodes(editor, {
-              mode: 'lowest',
+              mode: "lowest",
               match: (n) => this.isList(editor, n as CustomElement),
             }),
           );
@@ -279,7 +284,7 @@ export class ListsPlugin implements IPlugin {
             }
 
             const prevListItemPath = Editor.before(editor, currentListItem[1], {
-              unit: 'block',
+              unit: "block",
             });
 
             if (currentListItem && prevListItemPath) {
@@ -391,7 +396,7 @@ export class ListsPlugin implements IPlugin {
           },
         );
       } else {
-        Transforms.setNodes(editor, { type: listItemType }, { mode: 'lowest' });
+        Transforms.setNodes(editor, { type: listItemType }, { mode: "lowest" });
         Transforms.wrapNodes(
           editor,
           { type: listType, children: [] },
@@ -450,7 +455,7 @@ export class ListsPlugin implements IPlugin {
     }
 
     return Editor.above(editor, {
-      mode: 'lowest',
+      mode: "lowest",
       at: path,
       match: (n) => this.isListItem(editor, n as CustomElement),
     });
