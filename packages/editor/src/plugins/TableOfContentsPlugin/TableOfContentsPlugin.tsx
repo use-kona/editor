@@ -77,6 +77,7 @@ export class TableOfContentsPlugin implements IPlugin {
           ) as HTMLElement;
           element?.scrollIntoView({
             behavior: 'smooth',
+            block: 'nearest'
           });
         };
 
