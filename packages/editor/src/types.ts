@@ -1,5 +1,5 @@
 import type { KeyboardEvent, ReactElement, ReactNode } from 'react';
-import type { DecoratedRange, Descendant, Editor, NodeEntry } from 'slate';
+import type {DecoratedRange, Descendant, Editor, NodeEntry, NodeMatch} from 'slate';
 import type { RenderElementProps, RenderLeafProps } from 'slate-react';
 import type { CustomElement, CustomText } from '../types';
 
@@ -71,6 +71,9 @@ export type EditorRef = {
   deserialize: (
     element: HTMLElement,
   ) => (Descendant | string)[] | string | Descendant | null;
+  isEmpty: () => boolean;
+  deleteNode: (match: NodeMatch<CustomElement>) => void;
+  focus: (mode?: 'end') => void;
 };
 
 export type Serialize = (
