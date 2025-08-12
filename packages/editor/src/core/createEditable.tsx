@@ -154,14 +154,16 @@ export const createEditable =
         }
 
         return (
-          <>
+          <div onClick={(event) => {
+            event.stopPropagation();
+          }}>
             {ui.map((p, index) => (
               <React.Fragment key={index}>
                 {p.ui!({ readOnly, children, editor })}
               </React.Fragment>
             ))}
             <div className={styles.editor}>{children}</div>
-          </>
+          </div>
         );
       },
       [editor, plugins.filter],
