@@ -53,7 +53,9 @@ export const ExampleEditor = forwardRef((props: Props, ref) => {
 
   return (
     <DndProvider backend={HTML5Backend}>
-      <div className={[styles.root].join(' ')}>
+      <div className={[styles.root].join(' ')} onClick={() => {
+        editorRef.current?.focus('end')
+      }}>
         {value && (
           <KonaEditor
             ref={editorRef}

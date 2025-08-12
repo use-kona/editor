@@ -8,8 +8,13 @@
   background-color: var(--kona-editor-background-color, #fff);
 }
 
+.ui {
+  height: 100%;
+}
+
 .editor {
   outline: none;
+  height: 100%;
   overflow: auto;
 
   &::-webkit-scrollbar {

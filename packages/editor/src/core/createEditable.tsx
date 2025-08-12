@@ -154,7 +154,7 @@ export const createEditable =
         }
 
         return (
-          <div onClick={(event) => {
+          <div className={styles.ui} onClick={(event) => {
             event.stopPropagation();
           }}>
             {ui.map((p, index) => (
