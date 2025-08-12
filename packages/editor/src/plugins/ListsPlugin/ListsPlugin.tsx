@@ -44,7 +44,7 @@ export class ListsPlugin implements IPlugin {
 
     editor.normalizeNode = (entry: NodeEntry) => {
       const [node, path] = entry;
-
+      //
       if (this.isList(editor, node as CustomElement)) {
         /* Unwrap lists around non-list-items */
         for (const [child, childPath] of Array.from(
@@ -99,7 +99,7 @@ export class ListsPlugin implements IPlugin {
 
         const prevList =
           prevListItemPath &&
-          Editor.above(editor, {
+          Editor.above<CustomElement>(editor, {
             at: prevListItemPath,
             match: (n) => this.isList(editor, n as CustomElement),
           });
@@ -110,10 +110,12 @@ export class ListsPlugin implements IPlugin {
 
           if (
             this.isList(editor, prevList[0] as CustomElement) &&
-            currentDepth === prevDepth
+            currentDepth === prevDepth &&
+            prevList[0].type === (node as CustomElement).type
           ) {
             try {
               Transforms.mergeNodes(editor, {
+                at: path,
                 match: (n) => this.isList(editor, n as CustomElement),
               });
             } catch (e) {}
@@ -395,11 +397,39 @@ export class ListsPlugin implements IPlugin {
           },
         );
       } else {
-        Transforms.setNodes(editor, { type: listItemType }, { mode: 'lowest' });
+        const { selection } = editor;
+
+        if (!selection) {
+          return;
+        }
+
+        const nodes = Array.from(
+          Editor.nodes(editor, {
+            at: Editor.unhangRange(editor, selection),
+            match: (n) => Element.isElement(n),
+            mode: 'highest',
+          }),
+        );
+
+        if (!nodes.length) {
+          return;
+        }
+
         Transforms.wrapNodes(
           editor,
           { type: listType, children: [] },
-          { match: (n) => (n as CustomElement).type === listItemType },
+          {
+            mode: 'highest',
+            match: (n) => {
+              return Element.isElement(n) && n.type === listItemType;
+            },
+          },
+        );
+
+        Transforms.setNodes(
+          editor,
+          { type: listItemType },
+          { at: nodes[0][1], split: true },
         );
       }
     });
