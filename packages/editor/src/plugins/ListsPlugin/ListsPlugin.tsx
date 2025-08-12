@@ -218,7 +218,7 @@ export class ListsPlugin implements IPlugin {
         );
       },
       serialize: (element, children) => {
-        if (element.type === ListsPlugin.BULLETED_LIST_ELEMENT) {
+        if (element.type === ListsPlugin.LIST_ITEM_ELEMENT) {
           return `<li>${children}</li>`;
         }
       },
