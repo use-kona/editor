@@ -9,7 +9,8 @@
     "resolveJsonModule": true,
     "moduleResolution": "bundler",
     "useDefineForClassFields": true,
-    "noImplicitAny": false
+    "noImplicitAny": false,
+    "types": ["@use-kona/editor-test-utils"]
   },
   "include": ["src"]
 }
