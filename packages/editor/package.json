@@ -44,15 +44,15 @@
     "react-dnd": "^16.0.1",
     "react-dnd-html5-backend": "^16.0.1",
     "react-dom": "18",
+    "slate": "^0.117.2",
+    "slate-history": "^0.113.1",
+    "slate-hyperscript": "^0.100.0",
+    "slate-react": "^0.117.3",
     "storybook": "^9.0.13",
     "storybook-addon-rslib": "^2.0.2",
     "storybook-react-rsbuild": "^2.0.2",
     "typescript": "^5.8.3",
-    "vitest": "^3.2.4",
-    "slate": "^0.117.2",
-    "slate-history": "^0.113.1",
-    "slate-hyperscript": "^0.100.0",
-    "slate-react": "^0.117.3"
+    "vitest": "^3.2.4"
   },
   "peerDependencies": {
     "react": ">=16.9.0",
