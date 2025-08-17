@@ -10,7 +10,6 @@
     "moduleResolution": "bundler",
     "useDefineForClassFields": true,
     "noImplicitAny": false,
-    "types": ["@use-kona/editor-test-utils"]
   },
   "include": ["src"]
 }
