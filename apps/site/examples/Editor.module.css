@@ -1,14 +1,24 @@
+
 .root {
   width: 600px;
   height: calc(100vh - 128px * 2);
   overflow: hidden;
-  max-height: 100vh;
   border: 1px solid var(--kona-editor-border-color);
   border-radius: 8px;
-}
 
-.root {
-  [role="textbox"] {
+  & > div {
+    flex-grow: 1;
+    min-height: 0;
+
+    & > div {
+      display: flex;
+      flex-direction: column;
+    }
+  }
+
+  & [data-slate-editor] {
+    overflow-y: auto;
+    flex-grow: 1;
     outline: none;
     padding: 16px 16px;
   }
