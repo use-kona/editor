@@ -57,7 +57,7 @@ describe('ListsPlugin', () => {
     expect(editor.children).toEqual(output.children);
   });
 
-  it.fails('should change current block to numbered list', () => {
+  it('should change current block to numbered list', () => {
     const editor = createEditorWithPlugin(
       <paragraph>
         <cursor />
