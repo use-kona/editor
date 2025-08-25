@@ -5,11 +5,11 @@ import {
   Range,
   Text,
   Transforms,
-} from 'slate';
-import { withHistory } from 'slate-history';
-import { withReact } from 'slate-react';
-import type { CustomElement } from '../../types';
-import type { Block, IPlugin } from '../types';
+} from "slate";
+import { withHistory } from "slate-history";
+import { withReact } from "slate-react";
+import type { CustomElement } from "../../types";
+import type { Block, IPlugin } from "../types";
 
 export const createEditor = (plugins: IPlugin[]) => () => {
   const baseEditor = withHistory(withReact(createBaseEditor()));
@@ -36,10 +36,10 @@ export const createEditor = (plugins: IPlugin[]) => () => {
 
     const lastElement =
       editorWithPlugins.children[editorWithPlugins.children.length - 1];
-    if (!lastElement || (lastElement as CustomElement).type !== 'paragraph') {
+    if (!lastElement || (lastElement as CustomElement).type !== "paragraph") {
       const paragraph = {
-        type: 'paragraph',
-        children: [{ text: '' }],
+        type: "paragraph",
+        children: [{ text: "" }],
       };
       Transforms.insertNodes(editorWithPlugins, paragraph, {
         at: [editorWithPlugins.children.length],
@@ -52,7 +52,7 @@ export const createEditor = (plugins: IPlugin[]) => () => {
   editorWithPlugins.isVoid = (element) => {
     const result = plugins.reduce<boolean | undefined>((result, plugin) => {
       const match = plugin.blocks?.find((el) => element?.type === el.type);
-      if (match && 'isVoid' in match) {
+      if (match && "isVoid" in match) {
         return match.isVoid;
       }
 
@@ -65,7 +65,7 @@ export const createEditor = (plugins: IPlugin[]) => () => {
   editorWithPlugins.isInline = (element) => {
     const result = plugins.reduce<boolean | undefined>((result, plugin) => {
       const match = plugin.blocks?.find((el) => element?.type === el.type);
-      if (match && 'isInline' in match) {
+      if (match && "isInline" in match) {
         return match.isInline;
       }
 
@@ -86,7 +86,7 @@ export const createEditor = (plugins: IPlugin[]) => () => {
       const firstEntry = Editor.above<CustomElement>(editorWithPlugins, {
         at: selection.anchor,
         match: (n) => Editor.isBlock(editorWithPlugins, n as CustomElement),
-        mode: 'lowest',
+        mode: "lowest",
       });
 
       if (!firstEntry) {
@@ -98,7 +98,7 @@ export const createEditor = (plugins: IPlugin[]) => () => {
       const secondEntry = Editor.above<CustomElement>(editorWithPlugins, {
         at: Editor.after(editorWithPlugins, selection.anchor),
         match: (n) => Editor.isBlock(editorWithPlugins, n as CustomElement),
-        mode: 'lowest',
+        mode: "lowest",
       });
 
       if (!secondEntry) {
@@ -143,12 +143,12 @@ export const createEditor = (plugins: IPlugin[]) => () => {
       const currentEntry = Editor.above<CustomElement>(editorWithPlugins, {
         at: selection.anchor,
         match: (n) => Editor.isBlock(editorWithPlugins, n as CustomElement),
-        mode: 'lowest',
+        mode: "lowest",
       });
       const previousEntry = Editor.above<CustomElement>(editorWithPlugins, {
         at: Editor.before(editorWithPlugins, selection.anchor),
         match: (n) => Editor.isBlock(editorWithPlugins, n as CustomElement),
-        mode: 'lowest',
+        mode: "lowest",
       });
 
       if (!currentEntry || !previousEntry) {
@@ -201,15 +201,23 @@ export const createEditor = (plugins: IPlugin[]) => () => {
     const nodes = Array.from(
       Editor.nodes<CustomElement>(editorWithPlugins, {
         at: selection,
-        match: (n) =>
-          !Editor.isEditor(n) &&
-          Editor.isBlock(editorWithPlugins, n as CustomElement),
+        match: (n) => {
+          console.log(
+            "nodes n",
+            n,
+            !Editor.isEditor(n),
+            Editor.isBlock(editorWithPlugins, n as CustomElement)
+          );
+          return (
+            !Editor.isEditor(n) &&
+            Editor.isBlock(editorWithPlugins, n as CustomElement)
+          );
+        },
         reverse: true,
-        mode: 'highest',
+        mode: "highest",
         voids: true,
-      }),
+      })
     );
-
 
     for (const entry of nodes) {
       const [node, path] = entry;
@@ -220,13 +228,15 @@ export const createEditor = (plugins: IPlugin[]) => () => {
         });
       } else {
         const plugin = plugins.find((plugin) =>
-          plugin.blocks?.find((b) => b.type === node.type),
+          plugin.blocks?.find((b) => b.type === node.type)
         );
+
         if (plugin) {
           const match = plugin.blocks?.find((b) => b.type === node.type);
           const result = match?.onBeforeDelete
             ? await match.onBeforeDelete([node])
-            : true;
+            : false;
+
           if (result) {
             Transforms.removeNodes(editorWithPlugins, {
               at: path,
@@ -234,6 +244,7 @@ export const createEditor = (plugins: IPlugin[]) => () => {
             });
             match?.onDelete?.([node]);
           } else {
+            deleteFragment(options);
             return;
           }
         } else {
