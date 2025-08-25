@@ -1,16 +1,18 @@
-import type { Editor } from 'slate';
-import { CodeBlockPlugin, HeadingsPlugin, ListsPlugin } from '@use-kona/editor';
-import { CodeIcon } from './icons/code';
-import { Heading1Icon } from './icons/heading1';
-import { Heading2Icon } from './icons/heading2';
-import { Heading3Icon } from './icons/heading3';
-import { OlIcon } from './icons/ol';
-import { UlIcon } from './icons/ul';
-import styles from './Menu.module.css';
+import type { Editor } from "slate";
+import { CodeBlockPlugin, HeadingsPlugin, ListsPlugin } from "@use-kona/editor";
+import { CodeIcon } from "./icons/code";
+import { Heading1Icon } from "./icons/heading1";
+import { Heading2Icon } from "./icons/heading2";
+import { Heading3Icon } from "./icons/heading3";
+import { OlIcon } from "./icons/ol";
+import { UlIcon } from "./icons/ul";
+import styles from "./Menu.module.css";
 
 type Props = {
   editor: Editor;
 };
+
+const listPlugin = new ListsPlugin();
 
 export const Menu = (props: Props) => {
   const { editor } = props;
@@ -51,11 +53,11 @@ export const Menu = (props: Props) => {
       <button
         type="button"
         className={getButtonClassName(
-          ListsPlugin.isListActive(editor, ListsPlugin.BULLETED_LIST_ELEMENT),
+          ListsPlugin.isListActive(editor, ListsPlugin.BULLETED_LIST_ELEMENT)
         )}
         onMouseDown={(event) => {
           event.preventDefault();
-          ListsPlugin.toggleList(editor, ListsPlugin.BULLETED_LIST_ELEMENT);
+          listPlugin.toggleList(editor, ListsPlugin.BULLETED_LIST_ELEMENT);
         }}
       >
         <UlIcon size={16} />
@@ -63,11 +65,11 @@ export const Menu = (props: Props) => {
       <button
         type="button"
         className={getButtonClassName(
-          ListsPlugin.isListActive(editor, ListsPlugin.NUMBERED_LIST_ELEMENT),
+          ListsPlugin.isListActive(editor, ListsPlugin.NUMBERED_LIST_ELEMENT)
         )}
         onMouseDown={(event) => {
           event.preventDefault();
-          ListsPlugin.toggleList(editor, ListsPlugin.NUMBERED_LIST_ELEMENT);
+          listPlugin.toggleList(editor, ListsPlugin.NUMBERED_LIST_ELEMENT);
         }}
       >
         <OlIcon size={16} />
@@ -76,7 +78,7 @@ export const Menu = (props: Props) => {
       <button
         type="button"
         className={getButtonClassName(
-          CodeBlockPlugin.isCodeBlockActive(editor),
+          CodeBlockPlugin.isCodeBlockActive(editor)
         )}
         onMouseDown={(event) => {
           event.preventDefault();
@@ -90,5 +92,5 @@ export const Menu = (props: Props) => {
 };
 
 const getButtonClassName = (isActive: boolean) => {
-  return isActive ? [styles.button, styles.active].join(' ') : styles.button;
+  return isActive ? [styles.button, styles.active].join(" ") : styles.button;
 };
