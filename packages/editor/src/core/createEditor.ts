@@ -233,16 +233,21 @@ export const createEditor = (plugins: IPlugin[]) => () => {
 
         if (plugin) {
           const match = plugin.blocks?.find((b) => b.type === node.type);
-          const result = match?.onBeforeDelete
-            ? await match.onBeforeDelete([node])
-            : false;
 
-          if (result) {
-            Transforms.removeNodes(editorWithPlugins, {
-              at: path,
-              match: (n) => (n as CustomElement).type === node.type,
-            });
-            match?.onDelete?.([node]);
+          const hasOnBeforeDelete = match?.onBeforeDelete;
+
+          if (hasOnBeforeDelete) {
+            const result = await match.onBeforeDelete!([node]);
+
+            if (result) {
+              Transforms.removeNodes(editorWithPlugins, {
+                at: path,
+                match: (n) => (n as CustomElement).type === node.type,
+              });
+              match?.onDelete?.([node]);
+            } else {
+              return;
+            }
           } else {
             deleteFragment(options);
             return;
@@ -258,9 +263,9 @@ export const createEditor = (plugins: IPlugin[]) => () => {
 
     if (nodes.length > 0) {
       return;
-    } else {
-      deleteFragment(options);
     }
+
+    deleteFragment(options);
   };
 
   return editorWithPlugins;
