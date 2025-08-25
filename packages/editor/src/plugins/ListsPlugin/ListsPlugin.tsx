@@ -292,11 +292,6 @@ export class ListsPlugin implements IPlugin {
               const prevListItem = Editor.above(editor, {
                 at: prevListItemPath,
                 match: (n) => {
-                  console.log(
-                    "prevListItem n",
-                    n,
-                    this.isListItem(editor, n as CustomElement)
-                  );
                   return this.isListItem(editor, n as CustomElement);
                 },
               });
@@ -375,26 +370,16 @@ export class ListsPlugin implements IPlugin {
     );
   };
 
-  static toggleList = (
+  toggleList = (
     editor: Editor,
     listType: string,
     listItemType = ListsPlugin.LIST_ITEM_ELEMENT,
     defaultType = "paragraph"
   ) => {
-    function isList(node: CustomElement) {
-      return (
-        Element.isElement(node) &&
-        [
-          ListsPlugin.BULLETED_LIST_ELEMENT,
-          ListsPlugin.NUMBERED_LIST_ELEMENT,
-        ].includes(node.type)
-      );
-    }
-
     Editor.withoutNormalizing(editor, () => {
       const listEntry = Editor.above(editor, {
         match: (n) => {
-          return isList(n as CustomElement);
+          return this.isList(editor, n as CustomElement);
         },
         mode: "lowest",
       });
@@ -444,7 +429,7 @@ export class ListsPlugin implements IPlugin {
           {
             at: range,
             match: (n) => {
-              return Element.isElement(n) && n.type === defaultType;
+              return Element.isElement(n) && Editor.isBlock(editor, n);
             },
           }
         );
