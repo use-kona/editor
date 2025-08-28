@@ -9,7 +9,7 @@
     "resolveJsonModule": true,
     "moduleResolution": "bundler",
     "useDefineForClassFields": true,
-    "noImplicitAny": false,
+    "noImplicitAny": false
   },
   "include": ["src"]
 }

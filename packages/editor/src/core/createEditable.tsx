@@ -154,9 +154,12 @@ export const createEditable =
         }
 
         return (
-          <div className={styles.ui} onClick={(event) => {
-            event.stopPropagation();
-          }}>
+          <div
+            className={styles.ui}
+            onClick={(event) => {
+              event.stopPropagation();
+            }}
+          >
             {ui.map((p, index) => (
               <React.Fragment key={index}>
                 {p.ui!({ readOnly, children, editor })}
