@@ -1,3 +1,5 @@
+import type { CustomElement, EditorRef } from '@use-kona/editor';
+import { deserialize, KonaEditor, serialize } from '@use-kona/editor';
 import {
   forwardRef,
   useEffect,
@@ -8,11 +10,6 @@ import {
 import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import type { Descendant } from 'slate';
-import type { CustomElement } from '@use-kona/editor';
-import { deserialize } from '@use-kona/editor';
-import { serialize } from '@use-kona/editor';
-import { KonaEditor } from '@use-kona/editor';
-import type { EditorRef } from '@use-kona/editor';
 import styles from './Editor.module.css';
 import { getPlugins } from './getPlugins';
 import { text } from './text';
@@ -41,7 +38,6 @@ export const ExampleEditor = forwardRef((props: Props, ref) => {
     [plugins],
   );
 
-  // biome-ignore lint/correctness/useExhaustiveDependencies: only on init
   useEffect(() => {
     if (initialValueType === 'kona-editor') {
       setValue(defaultValue);
@@ -53,9 +49,12 @@ export const ExampleEditor = forwardRef((props: Props, ref) => {
 
   return (
     <DndProvider backend={HTML5Backend}>
-      <div className={[styles.root].join(' ')} onClick={() => {
-        editorRef.current?.focus('end')
-      }}>
+      <div
+        className={[styles.root].join(' ')}
+        onClick={() => {
+          editorRef.current?.focus('end');
+        }}
+      >
         {value && (
           <KonaEditor
             ref={editorRef}
