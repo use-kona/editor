@@ -6,7 +6,7 @@ import type {
 } from 'react-dnd';
 import type { RenderElementProps } from 'slate-react';
 import styles from './DragBlock.module.css';
-import { DragHandler } from './DragHandler';
+import DragHandler from './DragHandler';
 
 type Props = {
   props: RenderElementProps;
@@ -16,7 +16,7 @@ type Props = {
   position: 'top' | 'bottom' | null;
 };
 
-export const DragBlock = (props: Props) => {
+const DragBlock = (props: Props) => {
   const {
     props: { attributes, element, children },
     dragRef: drag,
@@ -55,3 +55,5 @@ export const DragBlock = (props: Props) => {
     </div>
   );
 };
+
+export default DragBlock;

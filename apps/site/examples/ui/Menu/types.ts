@@ -6,7 +6,7 @@ export type MenuConfig = {
   footer?: () => ReactNode;
   onOpen?: () => void;
   onFocus?: () => void;
-}
+};
 
 export type MenuItem = {
   render: () => ReactNode;
@@ -15,4 +15,4 @@ export type MenuItem = {
   config?: MenuConfig;
   danger?: boolean;
   onSelect?: () => void;
-}
+};

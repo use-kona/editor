@@ -1,9 +1,9 @@
 import type { RenderElementProps } from 'slate-react';
 import { HeadingsPlugin, ListsPlugin } from '@use-kona/editor';
 import styles from './DragHandler.module.css';
-import { DragIcon } from './icons/drag';
+import { DragIcon } from '../../icons';
 
-export const DragHandler = (props: RenderElementProps) => {
+const DragHandler = (props: RenderElementProps) => {
   switch (props.element.type) {
     case ListsPlugin.LIST_ITEM_ELEMENT:
       return (
@@ -37,3 +37,5 @@ export const DragHandler = (props: RenderElementProps) => {
       );
   }
 };
+
+export default DragHandler;

@@ -1,12 +1,13 @@
 import { forwardRef, type ReactNode, useMemo } from 'react';
-import { Node } from 'slate';
 import type { CustomElement } from '@use-kona/editor';
+import { Node } from 'slate';
+
+import { CheckIcon, CopyIcon } from '../../icons';
+import { Button } from '../../ui/Button';
+import { Dropdown } from '../../ui/Dropdown';
+import { Menu as MenuBase, type MenuConfig } from '../../ui/Menu';
+
 import styles from './CodeBlock.module.css';
-import { CheckIcon } from './icons/check';
-import { CopyIcon } from './icons/copy';
-import { Button } from './ui/Button';
-import { Dropdown } from './ui/Dropdown';
-import { Menu as MenuBase, type MenuConfig } from './ui/Menu';
 
 const languages = [
   { value: 'javascript', label: 'JavaScript' },
@@ -41,7 +42,7 @@ type Props = {
   };
 };
 
-export const CodeBlock = (props: Props) => {
+const CodeBlock = (props: Props) => {
   const {
     value: language,
     onChange,
@@ -107,3 +108,5 @@ export const CodeBlock = (props: Props) => {
     </div>
   );
 };
+
+export default CodeBlock;

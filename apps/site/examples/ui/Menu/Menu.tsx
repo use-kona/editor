@@ -9,7 +9,7 @@ import {
   useState,
 } from 'react';
 import { createPortal } from 'react-dom';
-import { ChevronRightIcon } from '../../icons/chevronRight';
+import { ChevronRightIcon } from '../../icons';
 import { useMenuPosition } from '../useMenuPosition';
 import { useMergeRefs } from '../useMergeRefs';
 import { MenuDelimiter } from './MenuDelimiter';

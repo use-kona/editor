@@ -50,7 +50,10 @@ class Context {
   };
 }
 
-export const useMenuPosition = (point: Point, transform: (context: Context) => Point) => {
+export const useMenuPosition = (
+  point: Point,
+  transform: (context: Context) => Point,
+) => {
   const [coords, setCoords] = useState<Point>(point);
 
   const ref = useCallback(
