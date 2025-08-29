@@ -1,5 +1,5 @@
 import { useReadOnly, useSlate } from 'slate-react';
-import { Options } from './types';
+import type { Options } from './types';
 
 export const Menu = (props: Options) => {
   const editor = useSlate();

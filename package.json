@@ -6,9 +6,13 @@
   "main": "index.js",
   "scripts": {
     "build:site": "pnpm --filter @kona/site build",
-    "build:editor": "pnpm --filter @use-kona/editor build"
+    "build:editor": "pnpm --filter @use-kona/editor build",
+    "lint": "biome lint --write"
   },
   "keywords": [],
   "author": "",
-  "license": "MIT"
+  "license": "MIT",
+  "devDependencies": {
+    "@biomejs/biome": "^2.2.2"
+  }
 }

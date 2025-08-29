@@ -1,4 +1,4 @@
-import { IconProps } from './types';
+import type { IconProps } from './types';
 
 export const Heading2Icon = ({ size }: IconProps) => (
   <svg

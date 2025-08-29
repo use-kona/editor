@@ -1,2 +1,2 @@
 export { LinksPlugin } from './LinksPlugin';
-export { type OptionsMethods } from './types';
+export type { OptionsMethods } from './types';

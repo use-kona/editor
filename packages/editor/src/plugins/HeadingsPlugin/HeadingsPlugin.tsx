@@ -1,4 +1,4 @@
-import { Descendant, Editor, Element, Transforms } from 'slate';
+import { type Descendant, Editor, Element, Transforms } from 'slate';
 import { jsx } from 'slate-hyperscript';
 import type { RenderElementProps } from 'slate-react';
 import type { IPlugin } from '../../types';

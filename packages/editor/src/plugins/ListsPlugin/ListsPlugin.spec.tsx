@@ -4,7 +4,7 @@
 import {
   createHyperscript,
   createText,
-  HyperscriptShorthands,
+  type HyperscriptShorthands,
 } from 'slate-hyperscript';
 import { describe, expect, it } from 'vitest';
 import { createEditor } from '../../core/createEditor';

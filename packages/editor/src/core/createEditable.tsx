@@ -9,10 +9,10 @@ import React, {
   useCallback,
 } from 'react';
 import {
-  DecoratedRange,
-  Descendant,
-  Editor,
-  NodeEntry,
+  type DecoratedRange,
+  type Descendant,
+  type Editor,
+  type NodeEntry,
   Transforms,
 } from 'slate';
 import {

@@ -1,6 +1,6 @@
-import { Editor } from 'slate';
-import { RenderElementProps } from 'slate-react';
-import { ReactNode } from 'react';
+import type { Editor } from 'slate';
+import type { RenderElementProps } from 'slate-react';
+import type { ReactNode } from 'react';
 
 export type Options = {
   onDragEnter?: () => void;

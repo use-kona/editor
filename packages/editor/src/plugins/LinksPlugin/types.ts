@@ -1,6 +1,6 @@
-import { LINK_ELEMENT } from './constants';
-import { Editor } from 'slate';
-import { ReactNode } from 'react';
+import type { LINK_ELEMENT } from './constants';
+import type { Editor } from 'slate';
+import type { ReactNode } from 'react';
 
 export type LinkElement = {
   type: typeof LINK_ELEMENT;
