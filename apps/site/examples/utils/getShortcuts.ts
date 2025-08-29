@@ -1,9 +1,14 @@
 import { Editor, Transforms } from 'slate';
-import {type ChangeMatch, CodeBlockPlugin, HeadingsPlugin, ListsPlugin, type Shortcut} from '@use-kona/editor';
+import {
+  type ChangeMatch,
+  CodeBlockPlugin,
+  HeadingsPlugin,
+  ListsPlugin,
+  type Shortcut,
+} from '@use-kona/editor';
 
 export const getShortcuts = (): Shortcut[] => {
   return [
-
     // bold
     {
       trigger: ' ',
@@ -35,7 +40,7 @@ export const getShortcuts = (): Shortcut[] => {
       before: /``/g,
       change(editor: Editor, match) {
         replaceWithCodeBlock(editor, match);
-      }
+      },
     },
     {
       trigger: ' ',
@@ -64,7 +69,7 @@ export const getShortcuts = (): Shortcut[] => {
       before: /\*/g,
       change(editor: Editor, match) {
         replaceWithList(editor, match, ListsPlugin.BULLETED_LIST_ELEMENT);
-      }
+      },
     },
     // Numbered list
     {
@@ -72,7 +77,7 @@ export const getShortcuts = (): Shortcut[] => {
       before: /\d+\./g,
       change(editor: Editor, match) {
         replaceWithList(editor, match, ListsPlugin.NUMBERED_LIST_ELEMENT);
-      }
+      },
     },
   ];
 };
@@ -144,7 +149,7 @@ const replaceWithList = (
 
     Transforms.delete(editor, {
       at: editor.selection?.focus,
-      distance: (match.before?.[0].length || 0),
+      distance: match.before?.[0].length || 0,
       reverse: true,
       unit: 'character',
     });
@@ -155,15 +160,12 @@ const replaceWithList = (
 
     Transforms.wrapNodes(editor, {
       type: listType,
-      children: []
+      children: [],
     });
-  })
-}
+  });
+};
 
-const replaceWithCodeBlock = (
-  editor: Editor,
-  match: ChangeMatch,
-) => {
+const replaceWithCodeBlock = (editor: Editor, match: ChangeMatch) => {
   Editor.withoutNormalizing(editor, () => {
     if (!editor.selection) {
       return;
@@ -171,7 +173,7 @@ const replaceWithCodeBlock = (
 
     Transforms.delete(editor, {
       at: editor.selection?.focus,
-      distance: (match.before?.[0].length || 0),
+      distance: match.before?.[0].length || 0,
       reverse: true,
       unit: 'character',
     });
@@ -182,7 +184,7 @@ const replaceWithCodeBlock = (
 
     Transforms.wrapNodes(editor, {
       type: CodeBlockPlugin.CODE_ELEMENT,
-      children: []
+      children: [],
     });
-  })
-}
+  });
+};

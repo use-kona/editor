@@ -1,12 +1,13 @@
+/** biome-ignore-all lint/nursery/useUniqueElementIds: em-emoji uses id */
 import data from '@emoji-mart/data';
 import { useStore } from '@nanostores/react';
 import clsx from 'clsx';
 import { init, SearchIndex } from 'emoji-mart';
 import { useEffect, useState } from 'react';
-import type { Editor } from 'slate';
 import { useSlateStatic } from 'slate-react';
-import styles from './EmojiSelector.module.css';
-import { $store } from './store';
+import styles from './styles.module.css';
+import { $store } from '../../store';
+import type { Editor } from 'slate';
 
 init({
   data,

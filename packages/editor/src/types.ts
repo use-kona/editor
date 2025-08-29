@@ -1,5 +1,11 @@
 import type { KeyboardEvent, ReactElement, ReactNode } from 'react';
-import type {DecoratedRange, Descendant, Editor, NodeEntry, NodeMatch} from 'slate';
+import type {
+  DecoratedRange,
+  Descendant,
+  Editor,
+  NodeEntry,
+  NodeMatch,
+} from 'slate';
 import type { RenderElementProps, RenderLeafProps } from 'slate-react';
 import type { CustomElement, CustomText } from '../types';
 

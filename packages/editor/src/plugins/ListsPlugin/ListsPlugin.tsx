@@ -291,7 +291,9 @@ export class ListsPlugin implements IPlugin {
             if (currentListItem && prevListItemPath) {
               const prevListItem = Editor.above(editor, {
                 at: prevListItemPath,
-                match: (n) => this.isListItem(editor, n as CustomElement),
+                match: (n) => {
+                  return this.isListItem(editor, n as CustomElement);
+                },
               });
 
               if (!prevListItem) {
@@ -368,68 +370,80 @@ export class ListsPlugin implements IPlugin {
     );
   };
 
-  static toggleList = (
+  toggleList = (
     editor: Editor,
     listType: string,
     listItemType = ListsPlugin.LIST_ITEM_ELEMENT,
+    defaultType = 'paragraph',
   ) => {
     Editor.withoutNormalizing(editor, () => {
-      const node = Editor.above(editor, {
-        match: (n) =>
-          [
-            ListsPlugin.BULLETED_LIST_ELEMENT,
-            ListsPlugin.NUMBERED_LIST_ELEMENT,
-          ].includes((n as CustomElement).type),
+      const listEntry = Editor.above(editor, {
+        match: (n) => {
+          return this.isList(editor, n as CustomElement);
+        },
+        mode: 'lowest',
       });
 
-      if (node) {
-        Transforms.setNodes(
-          editor,
-          {
-            type: listType,
-          },
-          {
-            match: (n) =>
-              [
-                ListsPlugin.BULLETED_LIST_ELEMENT,
-                ListsPlugin.NUMBERED_LIST_ELEMENT,
-              ].includes((n as CustomElement).type),
-          },
-        );
-      } else {
-        const { selection } = editor;
+      const { selection } = editor;
 
+      if (listEntry) {
+        if (!selection) return;
+
+        const [node, path] = listEntry;
+        const currentListType = (node as CustomElement).type;
+
+        const range = Editor.unhangRange(editor, selection);
+
+        if (currentListType === listType) {
+          Transforms.setNodes(
+            editor,
+            { type: defaultType },
+            {
+              at: range,
+              match: (n) => {
+                return Element.isElement(n) && n.type === listItemType;
+              },
+              mode: 'highest',
+            },
+          );
+        } else {
+          Transforms.setNodes(
+            editor,
+            { type: listType, children: [] },
+            {
+              at: path,
+              match: (n) => node === n,
+            },
+          );
+        }
+      } else {
         if (!selection) {
           return;
         }
 
-        const nodes = Array.from(
-          Editor.nodes(editor, {
-            at: Editor.unhangRange(editor, selection),
-            match: (n) => Element.isElement(n),
-            mode: 'highest',
-          }),
-        );
+        const range = Editor.unhangRange(editor, selection);
 
-        if (!nodes.length) {
-          return;
-        }
+        Transforms.setNodes(
+          editor,
+          { type: listItemType },
+          {
+            at: range,
+            match: (n) => {
+              return Element.isElement(n) && Editor.isBlock(editor, n);
+            },
+          },
+        );
 
         Transforms.wrapNodes(
           editor,
           { type: listType, children: [] },
           {
-            mode: 'highest',
+            at: range,
             match: (n) => {
-              return Element.isElement(n) && n.type === listItemType;
+              return Element.isElement(n as CustomElement);
             },
+            mode: 'highest',
           },
-        );
-
-        Transforms.setNodes(
-          editor,
-          { type: listItemType },
-          { at: nodes[0][1], split: true },
         );
       }
     });

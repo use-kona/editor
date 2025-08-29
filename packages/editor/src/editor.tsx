@@ -1,5 +1,5 @@
 import { forwardRef, useCallback, useImperativeHandle, useState } from 'react';
-import {type Descendant, Editor, type NodeMatch, Transforms} from 'slate';
+import { type Descendant, Editor, type NodeMatch, Transforms } from 'slate';
 import { ReactEditor, Slate } from 'slate-react';
 import type { CustomElement } from '../types';
 import { createEditable } from './core/createEditable';
@@ -38,8 +38,8 @@ export const KonaEditor = forwardRef<EditorRef, KonaEditorProps>(
         },
         focus: (mode?: 'end') => {
           if (mode === 'end') {
-            const endPoint = Editor.end(editor, [])
-            Transforms.select(editor, endPoint)
+            const endPoint = Editor.end(editor, []);
+            Transforms.select(editor, endPoint);
           }
 
           ReactEditor.focus(editor);

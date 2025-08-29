@@ -11,7 +11,7 @@ import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import type { Descendant } from 'slate';
 import styles from './Editor.module.css';
-import { getPlugins } from './getPlugins';
+import { getPlugins } from './utils';
 import { text } from './text';
 
 const initialValue = text;

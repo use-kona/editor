@@ -4,20 +4,27 @@ import {
   HeadingsPlugin,
   ListsPlugin,
 } from '@use-kona/editor';
-import { CodeIcon } from './icons/code';
-import { Heading1Icon } from './icons/heading1';
-import { Heading2Icon } from './icons/heading2';
-import { Heading3Icon } from './icons/heading3';
-import { OlIcon } from './icons/ol';
-import { TextIcon } from './icons/text';
-import { UlIcon } from './icons/ul';
+import {
+  CodeIcon,
+  Heading1Icon,
+  Heading2Icon,
+  Heading3Icon,
+  OlIcon,
+  TextIcon,
+  UlIcon,
+} from '../icons';
+import { createElement } from 'react';
 
-export const getCommands = (): Command[] => {
+export const getCommands = ({
+  listsPlugin,
+}: {
+  listsPlugin: ListsPlugin;
+}): Command[] => {
   return [
     {
       name: 'paragraph',
       title: 'Paragraph',
-      icon: <TextIcon size={16} />,
+      icon: createElement(TextIcon, { size: 16 }),
       commandName: 'paragraph',
       action: (actions) => {
         actions.set({ type: 'paragraph' });
@@ -27,7 +34,7 @@ export const getCommands = (): Command[] => {
       name: 'heading-1',
       title: 'Heading 1',
       commandName: 'heading1',
-      icon: <Heading1Icon size={16} />,
+      icon: createElement(Heading1Icon, { size: 16 }),
       action: (actions) => {
         actions.set({ type: HeadingsPlugin.HeadingLevel1 });
       },
@@ -36,7 +43,7 @@ export const getCommands = (): Command[] => {
       name: 'heading-2',
       title: 'Heading 2',
       commandName: 'heading2',
-      icon: <Heading2Icon size={16} />,
+      icon: createElement(Heading2Icon, { size: 16 }),
       action: (actions) => {
         actions.set({ type: HeadingsPlugin.HeadingLevel2 });
       },
@@ -45,7 +52,7 @@ export const getCommands = (): Command[] => {
       name: 'heading-3',
       title: 'Heading 3',
       commandName: 'heading3',
-      icon: <Heading3Icon size={16} />,
+      icon: createElement(Heading3Icon, { size: 16 }),
       action: (actions) => {
         actions.set({ type: HeadingsPlugin.HeadingLevel3 });
       },
@@ -54,10 +61,10 @@ export const getCommands = (): Command[] => {
       name: 'ul',
       title: 'Bulleted list',
       commandName: 'bulleted list',
-      icon: <UlIcon size={16} />,
+      icon: createElement(UlIcon, { size: 16 }),
       action: (actions, editor) => {
         actions.removeCommand();
-        ListsPlugin.toggleList(
+        listsPlugin.toggleList(
           editor,
           ListsPlugin.BULLETED_LIST_ELEMENT,
           ListsPlugin.LIST_ITEM_ELEMENT,
@@ -68,10 +75,10 @@ export const getCommands = (): Command[] => {
       name: 'ol',
       title: 'Numbered list',
       commandName: 'numbered list',
-      icon: <OlIcon size={16} />,
+      icon: createElement(OlIcon, { size: 16 }),
       action: (actions, editor) => {
         actions.removeCommand();
-        ListsPlugin.toggleList(
+        listsPlugin.toggleList(
           editor,
           ListsPlugin.NUMBERED_LIST_ELEMENT,
           ListsPlugin.LIST_ITEM_ELEMENT,
@@ -82,7 +89,7 @@ export const getCommands = (): Command[] => {
       name: 'code',
       title: 'Code',
       commandName: 'code',
-      icon: <CodeIcon size={16} />,
+      icon: createElement(CodeIcon, { size: 16 }),
       action: (actions, editor) => {
         actions.removeCommand();
         CodeBlockPlugin.toggleCodeBlock(editor);

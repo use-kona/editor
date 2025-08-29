@@ -35,7 +35,7 @@ export const Menu = (props: Props) => {
   const selection = useSlateSelection();
   const editor = useSlate() as Editor;
   const isFocused = useFocused();
-  const ref = useRef<HTMLDivElement>(null)
+  const ref = useRef<HTMLDivElement>(null);
 
   const entry = Editor.above<CustomElement>(editor, {
     match: (n) => Editor.isBlock(editor, n as CustomElement),

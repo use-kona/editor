@@ -50,7 +50,7 @@ export class PlaceholderPlugin implements IPlugin {
           !hasVoids &&
           !Editor.isVoid(editor, entity?.[0] as Element);
 
-        const isEditorEmpty = isEditorEmptyFn(editor.children)
+        const isEditorEmpty = isEditorEmptyFn(editor.children);
 
         const isVisible =
           (isEmpty && !isReadOnly && isSelected) || isEditorEmpty;

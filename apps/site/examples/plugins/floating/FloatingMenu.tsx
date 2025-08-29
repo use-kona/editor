@@ -7,16 +7,18 @@ import {
   HighlightsPlugin,
   LinksPlugin,
 } from '@use-kona/editor';
-import { Color, colors } from './colors';
-import styles from './FloatingMenu.module.css';
-import { BoldIcon } from './icons/bold';
-import { CheckIcon } from './icons/check';
-import { ColorIcon } from './icons/color';
-import { CrossIcon } from './icons/cross';
-import { ItalicIcon } from './icons/italic';
-import { LinkIcon } from './icons/link';
-import { StrikethroughIcon } from './icons/strikethrough';
-import { UnderlineIcon } from './icons/underline';
+import { Color, colors } from '../../utils';
+import {
+  BoldIcon,
+  CheckIcon,
+  ColorIcon,
+  CrossIcon,
+  ItalicIcon,
+  LinkIcon,
+  StrikethroughIcon,
+  UnderlineIcon,
+} from '../../icons';
+import styles from './styles.module.css';
 
 type Mode = 'main' | 'link' | 'colors';
 
@@ -41,7 +43,7 @@ const getButtonClassName = (isActive: boolean) => {
   return isActive ? [styles.button, styles.active].join(' ') : styles.button;
 };
 
-export const FloatingMenu = (props: Props) => {
+const FloatingMenu = (props: Props) => {
   const { editor, $store, commands } = props;
   const {
     isFloatingMenuOpen,
@@ -287,3 +289,5 @@ export const FloatingMenu = (props: Props) => {
     </>
   );
 };
+
+export default FloatingMenu;
