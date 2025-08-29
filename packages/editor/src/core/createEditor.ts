@@ -201,15 +201,17 @@ export const createEditor = (plugins: IPlugin[]) => () => {
     const nodes = Array.from(
       Editor.nodes<CustomElement>(editorWithPlugins, {
         at: selection,
-        match: (n) =>
-          !Editor.isEditor(n) &&
-          Editor.isBlock(editorWithPlugins, n as CustomElement),
+        match: (n) => {
+          return (
+            !Editor.isEditor(n) &&
+            Editor.isBlock(editorWithPlugins, n as CustomElement)
+          );
+        },
         reverse: true,
         mode: 'highest',
         voids: true,
       }),
     );
-
 
     for (const entry of nodes) {
       const [node, path] = entry;
@@ -222,18 +224,26 @@ export const createEditor = (plugins: IPlugin[]) => () => {
         const plugin = plugins.find((plugin) =>
           plugin.blocks?.find((b) => b.type === node.type),
         );
+
         if (plugin) {
           const match = plugin.blocks?.find((b) => b.type === node.type);
-          const result = match?.onBeforeDelete
-            ? await match.onBeforeDelete([node])
-            : true;
-          if (result) {
-            Transforms.removeNodes(editorWithPlugins, {
-              at: path,
-              match: (n) => (n as CustomElement).type === node.type,
-            });
-            match?.onDelete?.([node]);
+
+          const hasOnBeforeDelete = match?.onBeforeDelete;
+
+          if (hasOnBeforeDelete) {
+            const result = await match.onBeforeDelete!([node]);
+
+            if (result) {
+              Transforms.removeNodes(editorWithPlugins, {
+                at: path,
+                match: (n) => (n as CustomElement).type === node.type,
+              });
+              match?.onDelete?.([node]);
+            } else {
+              return;
+            }
           } else {
+            deleteFragment(options);
             return;
           }
         } else {
