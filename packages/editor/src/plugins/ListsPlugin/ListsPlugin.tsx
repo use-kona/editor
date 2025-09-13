@@ -328,6 +328,15 @@ export class ListsPlugin implements IPlugin {
     },
   };
 
+  commands = {
+    toggleBulletedList: () => (editor: Editor) => {
+      return ListsPlugin.toggleList(editor, ListsPlugin.BULLETED_LIST_ELEMENT);
+    },
+    toggleNumberedList: () => (editor: Editor) => {
+      return ListsPlugin.toggleList(editor, ListsPlugin.NUMBERED_LIST_ELEMENT);
+    },
+  };
+
   static isListActive = (editor: Editor, type: string) => {
     const { selection } = editor;
 
