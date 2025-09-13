@@ -14,6 +14,8 @@ import type { Block, IPlugin } from '../types';
 export const createEditor = (plugins: IPlugin[]) => () => {
   const baseEditor = withHistory(withReact(createBaseEditor()));
 
+  const pluginsMap = new Map<new () => IPlugin, IPlugin>();
+
   const editorWithPlugins = plugins.reduce<Editor>((editor, plugin) => {
     if (plugin.init) {
       return plugin.init(editor);
@@ -30,6 +32,16 @@ export const createEditor = (plugins: IPlugin[]) => () => {
     deleteBackward,
     deleteForward,
   } = editorWithPlugins;
+
+  editorWithPlugins.getCommands = (plugin: new () => IPlugin) => {
+    const pluginInstance = pluginsMap.get(plugin);
+
+    if (!pluginInstance) {
+      throw new Error(`Plugin ${plugin.name} not found`);
+    }
+
+    return pluginInstance.commands;
+  };
 
   editorWithPlugins.normalizeNode = (entry) => {
     const [node, path] = entry;

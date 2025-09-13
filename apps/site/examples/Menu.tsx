@@ -1,5 +1,5 @@
-import type { Editor } from 'slate';
 import { CodeBlockPlugin, HeadingsPlugin, ListsPlugin } from '@use-kona/editor';
+import type { Editor } from 'slate';
 import { CodeIcon } from './icons/code';
 import { Heading1Icon } from './icons/heading1';
 import { Heading2Icon } from './icons/heading2';
