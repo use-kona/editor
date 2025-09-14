@@ -2,6 +2,12 @@
 This fill will contain all the changes for `@use-kona/editor` 
 since version `0.1.11`.
 
+## 0.1.14 - 2025-08-17
+### Core
+**Fixed:**  
+* Removed the default normalizeNode handler to avoid problems with
+the sync plugin in the future.
+
 ## 0.1.13 - 2025-08-17
 ### Core
 **Added:**

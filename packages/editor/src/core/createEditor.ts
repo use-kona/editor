@@ -43,24 +43,6 @@ export const createEditor = (plugins: IPlugin[]) => () => {
     return pluginInstance.commands;
   };
 
-  editorWithPlugins.normalizeNode = (entry) => {
-    const [node, path] = entry;
-
-    const lastElement =
-      editorWithPlugins.children[editorWithPlugins.children.length - 1];
-    if (!lastElement || (lastElement as CustomElement).type !== 'paragraph') {
-      const paragraph = {
-        type: 'paragraph',
-        children: [{ text: '' }],
-      };
-      Transforms.insertNodes(editorWithPlugins, paragraph, {
-        at: [editorWithPlugins.children.length],
-      });
-    }
-
-    return normalizeNode([node, path]);
-  };
-
   editorWithPlugins.isVoid = (element) => {
     const result = plugins.reduce<boolean | undefined>((result, plugin) => {
       const match = plugin.blocks?.find((el) => element?.type === el.type);
