@@ -9,8 +9,14 @@ type NodeIdBlock = CustomElement & {
 const assignId = (node: Node, generateId: () => string) => {
   if (Element.isElement(node)) {
     try {
+      if ((node as NodeIdBlock).nodeId) {
+        return;
+      }
+
       (node as NodeIdBlock).nodeId = generateId();
-      node.children.forEach((n) => assignId(n, generateId));
+      node.children.forEach((n) => {
+        assignId(n, generateId);
+      });
     } catch {}
   }
 };
