@@ -1,10 +1,15 @@
 # Changelog
-This fill will contain all the changes for `@use-kona/editor` 
+This fill will contain all the changes for `@use-kona/editor`
 since version `0.1.11`.
+
+## 0.1.15
+### LinksPlugin
+**Fixed**
+* It was impossible to close the link popup on click outside
 
 ## 0.1.14 - 2025-08-17
 ### Core
-**Fixed:**  
+**Fixed:**
 * Removed the default normalizeNode handler to avoid problems with
 the sync plugin in the future.
 
@@ -14,18 +19,18 @@ the sync plugin in the future.
 * Added commands for the plugins
 
 ### NodeIdPlugin
-**Fixed:**  
+**Fixed:**
 * Existing id was ignored and overwritten
 
 ## 0.1.12 - 2025-08-17
 
 ### Editor Example
-**Fixed:**  
+**Fixed:**
 * Fixed the scrolling in the editor example
 
 ### TableOfContentsPlugin
-**Fixed:**  
+**Fixed:**
 * Fixed position of the header after scrolling to it
 
-**Improved:**  
+**Improved:**
 * Zone of activation for the table of contents block

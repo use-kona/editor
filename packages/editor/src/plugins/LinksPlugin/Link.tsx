@@ -74,18 +74,21 @@ export const Link = (props: Props) => {
       </a>
       {isOpen &&
         createPortal(
-          <div
-            contentEditable={false}
-            className={styles.hint}
-            style={style}
-            onMouseUp={handleMenuClick}
-          >
-            {renderHint({
-              getLinkElement,
-              getUrl,
-              getEditor,
-            })}
-          </div>,
+          <>
+            <div className={styles.backdrop} onClick={() => setOpen(false)} />
+            <div
+              contentEditable={false}
+              className={styles.hint}
+              style={style}
+              onMouseUp={handleMenuClick}
+            >
+              {renderHint({
+                getLinkElement,
+                getUrl,
+                getEditor,
+              })}
+            </div>
+          </>,
           document.body,
         )}
     </Component>
