@@ -2,6 +2,11 @@
 This fill will contain all the changes for `@use-kona/editor`
 since version `0.1.11`.
 
+## 0.1.16
+### DnDPlugin
+**Added**
+* Added a way to alter the dragged item data
+
 ## 0.1.15
 ### LinksPlugin
 **Fixed**

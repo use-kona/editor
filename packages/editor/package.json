@@ -1,6 +1,6 @@
 {
   "name": "@use-kona/editor",
-  "version": "0.1.15",
+  "version": "0.1.16",
   "type": "module",
   "exports": {
     ".": "./src/index.ts"

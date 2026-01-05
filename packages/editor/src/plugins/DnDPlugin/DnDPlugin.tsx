@@ -32,6 +32,7 @@ type Options = {
     [type: string]: {
       type: string | symbol;
       getData?: (element: CustomElement) => Record<string, unknown>;
+      getDndItem?: (element: CustomElement) => Record<string, unknown>;
     };
   };
 };
@@ -65,6 +66,7 @@ export class DnDPlugin implements IPlugin {
         ...(customType?.getData?.(props.element) || {}),
         element: props.element,
       },
+      ...(customType?.getDndItem?.(props.element) || {}),
       canDrag: !isReadOnly,
     });
 
