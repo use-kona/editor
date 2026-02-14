@@ -2,16 +2,16 @@
 /** @jsx jsx */
 
 import {
-  createHyperscript,
-  createText,
-  type HyperscriptShorthands,
-} from 'slate-hyperscript';
-import {
   CodeBlockPlugin,
   HeadingsPlugin,
   LinksPlugin,
   ListsPlugin,
 } from '@use-kona/editor';
+import {
+  createHyperscript,
+  createText,
+  type HyperscriptShorthands,
+} from 'slate-hyperscript';
 
 declare global {
   namespace JSX {
@@ -47,8 +47,8 @@ const jsx = createHyperscript({ elements, creators });
 
 export const text = (
   <fragment>
-    <heading1>About</heading1>
-    <paragraph>
+    <heading1 nodeId="abc">About</heading1>
+    <paragraph nodeId="efg">
       <htext bold italic>
         Kona Editor
       </htext>{' '}

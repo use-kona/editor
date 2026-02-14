@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import { useRef, useState } from 'react';
-import { ExampleEditor } from '../src';
+import { ExampleEditor } from '../../../apps/site/examples/Editor';
 
 // More on how to set up stories at: https://storybook.js.org/docs/writing-stories#default-export
 const meta = {

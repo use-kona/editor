@@ -14,6 +14,8 @@ type Props = {
   dropRef: ConnectDropTarget;
   previewRef: ConnectDragPreview;
   position: 'top' | 'bottom' | null;
+  selected?: boolean;
+  onToggleSelected: () => void;
 };
 
 export const DragBlock = (props: Props) => {
@@ -23,13 +25,22 @@ export const DragBlock = (props: Props) => {
     dropRef: drop,
     previewRef: preview,
     position,
+    selected,
+    onToggleSelected,
   } = props;
+
+  const handleToggleSelected = (event: React.MouseEvent<HTMLDivElement>) => {
+    if (event.metaKey) {
+      onToggleSelected();
+    }
+  };
 
   return (
     <div
       className={cn(styles.root, {
         [styles.top]: position === 'top',
         [styles.bottom]: position === 'bottom',
+        [styles.selected]: selected,
       })}
       {...attributes}
     >
@@ -44,6 +55,7 @@ export const DragBlock = (props: Props) => {
           ref={(element) => {
             drag(element);
           }}
+          onClick={handleToggleSelected}
           contentEditable={false}
         >
           <DragHandler attributes={attributes} element={element}>

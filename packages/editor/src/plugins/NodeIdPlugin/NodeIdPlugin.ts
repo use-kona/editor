@@ -1,4 +1,4 @@
-import { type Editor, Element, Node, Text } from 'slate';
+import { type Editor, Element, Node, type NodeEntry, Text } from 'slate';
 import type { CustomElement } from '../../../types';
 import type { IPlugin } from '../../types';
 
@@ -29,7 +29,7 @@ export class NodeIdPlugin implements IPlugin<Editor, NodeIdBlock> {
   constructor(private options: Options) {}
 
   init(editor: Editor) {
-    const { apply } = editor;
+    const { apply, normalizeNode } = editor;
 
     editor.apply = (operation) => {
       if (operation.type === 'set_node') {
@@ -61,6 +61,14 @@ export class NodeIdPlugin implements IPlugin<Editor, NodeIdBlock> {
       }
 
       return apply(operation);
+    };
+
+    editor.normalizeNode = (entry: NodeEntry) => {
+      const [node] = entry;
+
+      assignId(node, this.options.generateId);
+
+      normalizeNode(entry);
     };
 
     return editor;

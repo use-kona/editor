@@ -1,3 +1,5 @@
+import { useStore } from '@nanostores/react';
+import { type MapStore, map } from 'nanostores';
 import type React from 'react';
 import { useEffect, useState } from 'react';
 import {
@@ -8,7 +10,7 @@ import {
   useDrop,
 } from 'react-dnd';
 import { NativeTypes } from 'react-dnd-html5-backend';
-import { Editor, Path, Transforms } from 'slate';
+import { Editor, isBlock, Path, Transforms } from 'slate';
 import {
   ReactEditor,
   type RenderElementProps,
@@ -26,6 +28,8 @@ type Options = {
     dropRef: ConnectDropTarget;
     previewRef: ConnectDragPreview;
     position: 'top' | 'bottom' | null;
+    selected?: boolean;
+    onToggleSelected: () => void;
   }) => React.ReactNode;
   ignoreNodes?: string[];
   customTypes?: {
@@ -38,7 +42,26 @@ type Options = {
 };
 
 export class DnDPlugin implements IPlugin {
-  constructor(private options: Options) {}
+  store: MapStore<{ selected: Set<string> }>;
+
+  constructor(private options: Options) {
+    this.store = map({
+      selected: new Set(),
+    });
+  }
+
+  handleToggleSelected = (nodeId: string) => {
+    const selected = new Set(this.store.get().selected);
+    if (selected.has(nodeId)) {
+      selected.delete(nodeId);
+    } else {
+      selected.add(nodeId);
+    }
+
+    this.store.set({
+      selected,
+    });
+  };
 
   static DND_BLOCK_ELEMENT = 'block';
 
@@ -50,6 +73,8 @@ export class DnDPlugin implements IPlugin {
 
   renderBlock = (props: RenderElementProps) => {
     const editor = useSlate();
+
+    const $store = useStore(this.store);
 
     const options = this.options;
     const isReadOnly = useReadOnly();
@@ -65,6 +90,7 @@ export class DnDPlugin implements IPlugin {
       item: {
         ...(customType?.getData?.(props.element) || {}),
         element: props.element,
+        nodeIds: Array.from($store.selected.values()),
       },
       ...(customType?.getDndItem?.(props.element) || {}),
       canDrag: !isReadOnly,
@@ -137,7 +163,7 @@ export class DnDPlugin implements IPlugin {
               return;
             }
 
-            moveNode(editor, sourceTo, targetTo, dropPosition);
+            moveNode(editor, sourceTo, item.nodeIds, dropPosition);
             break;
           }
         }
@@ -165,6 +191,10 @@ export class DnDPlugin implements IPlugin {
       dropRef: drop,
       previewRef: preview,
       position: dropPosition,
+      selected: $store.selected.has(props.element.nodeId),
+      onToggleSelected: () => {
+        this.handleToggleSelected(props.element.nodeId);
+      },
     });
   };
 }
@@ -187,16 +217,23 @@ const getDropPath = (
 const moveNode = (
   editor: Editor,
   targetNodePath: Path,
-  sourceNodePath: Path,
+  nodeIds: string[],
   position: 'top' | 'bottom',
 ) => {
   const dropPath = getDropPath(editor, targetNodePath, position);
 
   if (!dropPath) return;
 
+  // nodeIds.reverse().forEach((nodeId) => {
   Transforms.moveNodes(editor, {
-    at: sourceNodePath,
+    // at: sourceNodePath,
+    at: [],
+    match: (n) => {
+      const shouldMove = isBlock(editor, n) && nodeIds.includes(n.nodeId);
+      return shouldMove;
+    },
     to: dropPath,
     mode: 'highest',
   });
+  // });
 };
