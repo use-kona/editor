@@ -8,6 +8,7 @@ import { Tab, Tabs } from 'rspress/theme';
 ## Description
 
 This plugin allows to enter `/` to open the menu with a custom list of commands.
+Commands can now expose nested levels through `getCommands`.
 
 ## Usage
 You need to provide a list of commands to this plugin and render the menu itself.
@@ -43,10 +44,51 @@ You need to provide a list of commands to this plugin and render the menu itself
           actions.set({ type: 'paragraph' });
         },
       },
+      {
+        name: 'insert',
+        title: 'Insert',
+        icon: <PlusIcon size={16} />,
+        commandName: 'insert',
+        getCommands: () => [ // static submenu
+          {
+            name: 'heading-1',
+            title: 'Heading 1',
+            icon: <Heading1Icon size={16} />,
+            commandName: 'heading1',
+            action: (actions) => {
+              actions.set({ type: HeadingsPlugin.HeadingLevel1 });
+            },
+          },
+        ],
+      },
+      {
+        name: 'remote',
+        title: 'Remote',
+        icon: <SearchIcon size={16} />,
+        commandName: 'remote',
+        getCommands: async ({ query }) => { // dynamic submenu
+          const commands = await fetchCommands(query);
+          return commands;
+        },
+      },
     ])
     ```
   </Tab>
 </Tabs>
+
+### `getCommands` context
+`getCommands` receives:
+- `query`: current text after `/`
+- `editor`: current editor instance
+- `path`: current submenu path
+- `parent`: parent command that is loading children
+
+### Keyboard navigation
+- `ArrowDown` / `ArrowUp`: move selection
+- `Enter` or `ArrowRight` on submenu item: open submenu
+- `ArrowLeft`: go back to parent level
+- `Enter` on leaf item: execute command
+- `Escape`: close menu
 
 ### actions
 When you pass a callback to the action parameter, it receives an object with methods that can help you

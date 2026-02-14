@@ -10,7 +10,7 @@ import {
   useDrop,
 } from 'react-dnd';
 import { NativeTypes } from 'react-dnd-html5-backend';
-import { Editor, isBlock, Path, Transforms } from 'slate';
+import { Editor, Path, Transforms } from 'slate';
 import {
   ReactEditor,
   type RenderElementProps,
@@ -39,6 +39,15 @@ type Options = {
       getDndItem?: (element: CustomElement) => Record<string, unknown>;
     };
   };
+};
+
+type DnDItem = {
+  element: CustomElement;
+  nodeIds?: string[];
+};
+
+type DnDNode = CustomElement & {
+  nodeId?: string;
 };
 
 export class DnDPlugin implements IPlugin {
@@ -84,6 +93,7 @@ export class DnDPlugin implements IPlugin {
     );
 
     const customType = options.customTypes?.[props.element.type];
+    const currentElement = props.element as DnDNode;
 
     const [, drag, preview] = useDrag({
       type: customType?.type || DnDPlugin.DND_BLOCK_ELEMENT,
@@ -154,16 +164,13 @@ export class DnDPlugin implements IPlugin {
             );
             break;
           default: {
-            const targetTo = ReactEditor.findPath(
-              editor,
-              (item as { element: CustomElement }).element,
-            );
+            const dragItem = item as DnDItem;
 
-            if (!dropPosition) {
+            if (!dropPosition || !dragItem.nodeIds?.length) {
               return;
             }
 
-            moveNode(editor, sourceTo, item.nodeIds, dropPosition);
+            moveNode(editor, sourceTo, dragItem.nodeIds, dropPosition);
             break;
           }
         }
@@ -191,9 +198,14 @@ export class DnDPlugin implements IPlugin {
       dropRef: drop,
       previewRef: preview,
       position: dropPosition,
-      selected: $store.selected.has(props.element.nodeId),
+      selected:
+        typeof currentElement.nodeId === 'string'
+          ? $store.selected.has(currentElement.nodeId)
+          : false,
       onToggleSelected: () => {
-        this.handleToggleSelected(props.element.nodeId);
+        if (typeof currentElement.nodeId === 'string') {
+          this.handleToggleSelected(currentElement.nodeId);
+        }
       },
     });
   };
@@ -229,7 +241,13 @@ const moveNode = (
     // at: sourceNodePath,
     at: [],
     match: (n) => {
-      const shouldMove = isBlock(editor, n) && nodeIds.includes(n.nodeId);
+      if (!Editor.isBlock(editor, n as CustomElement)) {
+        return false;
+      }
+
+      const node = n as DnDNode;
+      const shouldMove =
+        typeof node.nodeId === 'string' && nodeIds.includes(node.nodeId);
       return shouldMove;
     },
     to: dropPath,

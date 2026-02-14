@@ -1,5 +1,5 @@
 import { useStore } from '@nanostores/react';
-import { computed, type MapStore, map, type ReadableAtom } from 'nanostores';
+import { type MapStore, map } from 'nanostores';
 import { Editor, Node } from 'slate';
 import type { CustomElement } from '../../../types';
 import type { IPlugin, UiParams } from '../../types';
@@ -9,32 +9,13 @@ import type { CommandsStore, Options } from './types';
 export class CommandsPlugin implements IPlugin {
   options: Options;
   $store: MapStore<CommandsStore>;
-  $commands: ReadableAtom<CommandsStore['commands']>;
 
   constructor(options: Options) {
     this.options = options;
     this.$store = map<CommandsStore>({
       isOpen: false,
       filter: false,
-      commands: [],
-    });
-
-    this.$commands = computed(this.$store, (store) => {
-      if (store.filter === false) {
-        return [];
-      }
-
-      return store.commands.filter((command) => {
-        const isCommandMatches = command.commandName
-          .toLocaleLowerCase()
-          .includes((store.filter as string).toLocaleLowerCase());
-
-        const isTitleMatches = command.title
-          .toLocaleLowerCase()
-          .includes((store.filter as string).toLocaleLowerCase());
-
-        return isCommandMatches || isTitleMatches;
-      });
+      openId: 0,
     });
   }
 
@@ -43,8 +24,8 @@ export class CommandsPlugin implements IPlugin {
 
     editor.insertText = (text: string) => {
       if (text === '/') {
+        this.$store.setKey('openId', this.$store.get().openId + 1);
         this.$store.setKey('isOpen', true);
-        this.$store.setKey('commands', this.options.commands);
         this.$store.setKey('filter', '');
       }
 
@@ -67,8 +48,7 @@ export class CommandsPlugin implements IPlugin {
     return editor;
   }
 
-  ui(params: UiParams) {
-    const commands = useStore(this.$commands);
+  ui(_params: UiParams) {
     const { isOpen } = useStore(this.$store);
 
     if (!isOpen) {
@@ -79,7 +59,7 @@ export class CommandsPlugin implements IPlugin {
       <Menu
         renderMenu={this.options.renderMenu}
         $store={this.$store}
-        commands={commands}
+        rootCommands={this.options.commands}
         ignoreNodes={this.options.ignoreNodes}
       />
     );

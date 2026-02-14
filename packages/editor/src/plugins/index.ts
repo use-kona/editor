@@ -2,7 +2,12 @@ export { AttachmentsPlugin } from './AttachmentsPlugin';
 export { BasicFormattingPlugin } from './BasicFormattingPlugin';
 export { BreaksPlugin } from './BreaksPlugin';
 export { CodeBlockPlugin, type CodeElement } from './CodeBlockPlugin';
-export { type Command, CommandsPlugin } from './CommandsPlugin';
+export {
+  type Command,
+  type CommandPathEntry,
+  CommandsPlugin,
+  type GetCommandsContext,
+} from './CommandsPlugin';
 export { DnDPlugin } from './DnDPlugin';
 export { EmojiPlugin } from './EmojiPlugin';
 export { type Commands, FloatingMenuPlugin } from './FloatingMenuPlugin';

@@ -1,2 +1,2 @@
 export { CommandsPlugin } from './CommandsPlugin';
-export type { Command } from './types';
+export type { Command, CommandPathEntry, GetCommandsContext } from './types';

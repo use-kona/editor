@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react';
 
-import type { Editor, Node } from 'slate';
+import type { Editor } from 'slate';
 import type { CustomElement } from '../../../types';
 
 export type Options = {
@@ -12,7 +12,20 @@ export type Options = {
 export type CommandsStore = {
   isOpen: boolean;
   filter: boolean | string;
-  commands: Command[];
+  openId: number;
+};
+
+export type CommandPathEntry = {
+  name: string;
+  title: string;
+  commandName: string;
+};
+
+export type GetCommandsContext = {
+  query: string;
+  editor: Editor;
+  path: CommandPathEntry[];
+  parent: Command;
 };
 
 export type Command = {
@@ -20,7 +33,8 @@ export type Command = {
   title: string;
   commandName: string;
   icon: ReactNode;
-  action: (actions: Actions, editor: Editor) => void;
+  action?: (actions: Actions, editor: Editor) => void;
+  getCommands?: (context: GetCommandsContext) => Command[] | Promise<Command[]>;
 };
 
 export type Actions = {

@@ -1,7 +1,7 @@
 import { useStore } from '@nanostores/react';
 import cn from 'clsx';
 import type { MapStore } from 'nanostores';
-import React, {
+import {
   type CSSProperties,
   type ReactNode,
   useEffect,
@@ -16,30 +16,55 @@ import { useFocused, useSlate, useSlateSelection } from 'slate-react';
 import type { CustomElement } from '../../../types';
 import { insert, insertText, removeCommand, set, wrap } from './actions';
 import styles from './styles.module.css';
-import type { Command, CommandsStore } from './types';
+import type { Command, CommandPathEntry, CommandsStore } from './types';
+import { useResolvedCommands } from './useResolvedCommands';
 
 type Props = {
   $store: MapStore<CommandsStore>;
-  commands: Command[];
+  rootCommands: Command[];
   ignoreNodes?: string[];
   renderMenu: (children: ReactNode) => ReactNode;
 };
 
 export const Menu = (props: Props) => {
-  const { commands, $store, renderMenu, ignoreNodes = [] } = props;
+  const { rootCommands, $store, renderMenu, ignoreNodes = [] } = props;
   const store = useStore($store);
   const [style, setStyle] = useState<CSSProperties | undefined>({});
   const [active, setActive] = useState(0);
-  const refs = useRef<Record<string, HTMLButtonElement>>({});
+  const [path, setPath] = useState<CommandPathEntry[]>([]);
+  const refs = useRef<Record<number, HTMLButtonElement | null>>({});
 
   const selection = useSlateSelection();
   const editor = useSlate() as Editor;
   const isFocused = useFocused();
-  const ref = useRef<HTMLDivElement>(null)
+  const ref = useRef<HTMLDivElement>(null);
 
   const entry = Editor.above<CustomElement>(editor, {
     match: (n) => Editor.isBlock(editor, n as CustomElement),
   });
+
+  const isBrowseMode = typeof store.filter === 'string' && store.filter === '';
+  const isSearchMode = typeof store.filter === 'string' && store.filter !== '';
+
+  const { commands, isLoading, isError } = useResolvedCommands({
+    rootCommands,
+    filter: store.filter,
+    path,
+    editor,
+    isOpen: store.isOpen,
+  });
+  const entries = useMemo(() => {
+    const commandEntries = commands.map((command) => ({
+      type: 'command' as const,
+      command,
+    }));
+
+    if (isBrowseMode && path.length > 0) {
+      return [{ type: 'back' as const }, ...commandEntries];
+    }
+
+    return commandEntries;
+  }, [commands, isBrowseMode, path.length]);
 
   // biome-ignore lint/correctness/useExhaustiveDependencies: we care only about those deps
   const actions = useMemo(() => {
@@ -50,7 +75,33 @@ export const Menu = (props: Props) => {
       wrap: wrap(editor, selection, store.filter),
       insertText: insertText(editor),
     };
-  }, [commands, store.filter]);
+  }, [selection, store.filter]);
+
+  // biome-ignore lint/correctness/useExhaustiveDependencies: reset on open session changes
+  useEffect(() => {
+    if (!store.isOpen) {
+      return;
+    }
+    setPath([]);
+    setActive(0);
+  }, [store.isOpen, store.openId]);
+
+  useEffect(() => {
+    if (store.filter === false || isSearchMode) {
+      setActive(0);
+    }
+  }, [isSearchMode, store.filter]);
+
+  useEffect(() => {
+    if (!entries.length) {
+      setActive(0);
+      return;
+    }
+
+    if (active > entries.length - 1) {
+      setActive(entries.length - 1);
+    }
+  }, [active, entries]);
 
   // biome-ignore lint/correctness/useExhaustiveDependencies: we care only about those deps
   useLayoutEffect(() => {
@@ -61,55 +112,129 @@ export const Menu = (props: Props) => {
       return;
     }
 
-    setTimeout(() => {
+    const frame = window.requestAnimationFrame(() => {
       const domSelection = window.getSelection();
-      const domRange = domSelection?.getRangeAt(0);
+      const domRange =
+        domSelection && domSelection.rangeCount > 0
+          ? domSelection.getRangeAt(0)
+          : null;
       const rect = domRange?.getBoundingClientRect();
+      const x = (rect?.left || 0) + (rect?.width || 0) / 2;
+      const menuHeight = ref.current?.offsetHeight || 0;
+      let y = (rect?.top || 0) + (rect?.height || 0) + 2;
 
-      if (store.isOpen) {
-        setStyle({
-          opacity: 1,
-          transform: 'scale(1)',
-          top: `${(rect?.top || 0) + window.scrollY + (rect?.height || 0) + 2}px`,
-          left: `${(rect?.left || 0) + window.scrollX + (rect?.width || 0) / 2}px`,
-        });
-      } else {
-        setStyle({
-          opacity: 0,
-          transform: 'scale(0.9)',
-        });
+      if (menuHeight > 0 && y + menuHeight >= window.innerHeight) {
+        y = Math.max(8, (rect?.top || 0) - menuHeight - 2);
       }
-    }, 0);
 
+      const transform = `translate3d(${Math.round(x)}px, ${Math.round(y)}px, 0) ${store.isOpen ? 'scale(1)' : 'scale(0.95)'}`;
+
+      setStyle({
+        opacity: store.isOpen ? 1 : 0,
+        transform,
+      });
+    });
+
+    return () => {
+      window.cancelAnimationFrame(frame);
+    };
+  }, [selection, commands.length, isLoading, isError, store.isOpen, isFocused]);
+
+  useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
+      if (!store.isOpen) {
+        return;
+      }
+
       switch (event.key) {
         case 'ArrowDown': {
-          event.preventDefault();
-          setActive((active) => {
-            const newActive = active >= commands.length - 1 ? 0 : active + 1;
-            refs.current[newActive]?.scrollIntoView({ block: 'nearest' });
+          if (!entries.length) {
+            return;
+          }
 
-            return newActive;
+          event.preventDefault();
+          event.stopPropagation();
+          setActive((active) => {
+            const nextActive = active >= entries.length - 1 ? 0 : active + 1;
+            refs.current[nextActive]?.scrollIntoView({ block: 'nearest' });
+            return nextActive;
           });
           break;
         }
         case 'ArrowUp': {
-          event.preventDefault();
-          setActive((active) => {
-            const newActive = active <= 0 ? commands.length - 1 : active - 1;
-            refs.current[newActive]?.scrollIntoView({ block: 'nearest' });
+          if (!entries.length) {
+            return;
+          }
 
-            return newActive;
+          event.preventDefault();
+          event.stopPropagation();
+          setActive((active) => {
+            const nextActive = active <= 0 ? entries.length - 1 : active - 1;
+            refs.current[nextActive]?.scrollIntoView({ block: 'nearest' });
+            return nextActive;
           });
           break;
         }
-        case 'Enter': {
+        case 'ArrowRight': {
+          const entry = entries[active];
+          if (!entry || entry.type !== 'command' || !entry.command.isSubmenu) {
+            return;
+          }
+
           event.preventDefault();
-          commands[active]?.action(actions, editor);
+          event.stopPropagation();
+          setPath(entry.command.path);
+          if (!isBrowseMode) {
+            $store.setKey('filter', '');
+          }
+          setActive(0);
+          break;
+        }
+        case 'ArrowLeft': {
+          if (!isBrowseMode || !path.length) {
+            return;
+          }
+
+          event.preventDefault();
+          event.stopPropagation();
+          setPath((path) => path.slice(0, path.length - 1));
+          setActive(0);
+          break;
+        }
+        case 'Enter': {
+          const entry = entries[active];
+          if (!entry) {
+            return;
+          }
+
+          event.preventDefault();
+          event.stopPropagation();
+
+          if (entry.type === 'back' && isBrowseMode) {
+            setPath((path) => path.slice(0, path.length - 1));
+            setActive(0);
+            break;
+          }
+
+          if (entry.type !== 'command') {
+            break;
+          }
+
+          if (entry.command.isSubmenu) {
+            setPath(entry.command.path);
+            if (!isBrowseMode) {
+              $store.setKey('filter', '');
+            }
+            setActive(0);
+            break;
+          }
+
+          entry.command.command.action?.(actions, editor);
           $store.setKey('isOpen', false);
           break;
         }
         case 'Escape': {
+          event.preventDefault();
           event.stopPropagation();
           $store.setKey('isOpen', false);
           break;
@@ -117,52 +242,33 @@ export const Menu = (props: Props) => {
       }
     };
 
-    if (store.isOpen && commands.length > 0) {
-      document.addEventListener('keydown', handleKeyDown);
-    }
+    document.addEventListener('keydown', handleKeyDown);
 
     return () => {
       document.removeEventListener('keydown', handleKeyDown);
     };
-  }, [selection, active, actions, store.isOpen]);
+  }, [
+    actions,
+    active,
+    entries,
+    editor,
+    isBrowseMode,
+    path.length,
+    store.isOpen,
+    $store,
+  ]);
 
-  // biome-ignore lint/correctness/useExhaustiveDependencies: we care only about filter
-  useEffect(() => {
-    if (active < 0) {
-      setActive(0);
-      return;
-    }
+  const hasRows = entries.length > 0 || isLoading || isError;
 
-    if (active > commands.length - 1) {
-      setActive(commands.length - 1);
-    }
-  }, [store.filter]);
-
-  useLayoutEffect(() => {
-    const element = ref.current;
-    if (element) {
-      const { height, top } = element.getBoundingClientRect();
-
-      const domSelection = window.getSelection();
-      const domRange = domSelection?.getRangeAt(0);
-      const rect = domRange?.getBoundingClientRect();
-
-      if (top + height >= window.innerHeight) {
-        setStyle((style) => ({
-          ...style,
-          top: `${top - height - (rect?.height ?? 22)}px`,
-        }));
-      }
-    }
-  }, []);
-
-  if (!commands.length) {
+  if (store.filter === false || !hasRows) {
     return null;
   }
 
   if (entry && ignoreNodes.includes(entry[0].type)) {
     return null;
   }
+
+  const pathLabel = path.map((item) => item.title).join(' / ');
 
   return createPortal(
     renderMenu(
@@ -183,28 +289,96 @@ export const Menu = (props: Props) => {
             event.preventDefault();
           }}
         >
-          {commands.map((command, index) => (
-            <button
-              type="button"
-              ref={(element) => {
-                if (element) {
+          {isBrowseMode && pathLabel && (
+            <div className={styles.path}>{pathLabel}</div>
+          )}
+          {entries.map((entry, index) => {
+            if (entry.type === 'back') {
+              return (
+                <button
+                  type="button"
+                  ref={(element) => {
+                    refs.current[index] = element;
+                  }}
+                  key="back"
+                  className={cn(styles.button, {
+                    [styles.active]: index === active,
+                  })}
+                  onMouseDown={(event) => {
+                    event.preventDefault();
+                    setPath((path) => path.slice(0, path.length - 1));
+                    setActive(0);
+                  }}
+                >
+                  <span className={styles.icon}>...</span>
+                  <span className={styles.content}>
+                    <span>...</span>
+                  </span>
+                </button>
+              );
+            }
+
+            return (
+              <button
+                type="button"
+                ref={(element) => {
                   refs.current[index] = element;
-                }
-              }}
-              key={index}
-              className={cn(styles.button, {
-                [styles.active]: index === active,
-              })}
-              onMouseDown={(event) => {
-                event.preventDefault();
-                command.action(actions, editor);
-                $store.setKey('isOpen', false);
-              }}
-            >
-              <span className={styles.icon}>{command.icon}</span>
-              <span>{command.title}</span>
-            </button>
-          ))}
+                }}
+                key={entry.command.key}
+                className={cn(styles.button, {
+                  [styles.active]: index === active,
+                })}
+                onMouseDown={(event) => {
+                  event.preventDefault();
+                  if (entry.command.isSubmenu) {
+                    setPath(entry.command.path);
+                    if (!isBrowseMode) {
+                      $store.setKey('filter', '');
+                    }
+                    setActive(0);
+                    return;
+                  }
+
+                  entry.command.command.action?.(actions, editor);
+                  $store.setKey('isOpen', false);
+                }}
+              >
+                <span className={styles.icon}>
+                  {entry.command.command.icon}
+                </span>
+                <span className={styles.content}>
+                  <span>{entry.command.command.title}</span>
+                  {isSearchMode && entry.command.breadcrumb && (
+                    <span className={styles.breadcrumb}>
+                      {entry.command.breadcrumb}
+                    </span>
+                  )}
+                </span>
+                {entry.command.isSubmenu && isBrowseMode && (
+                  <span className={styles.submenu} aria-hidden="true">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="12"
+                      height="12"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    >
+                      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                      <path d="M9 6l6 6l-6 6" />
+                    </svg>
+                  </span>
+                )}
+              </button>
+            );
+          })}
+          {isLoading && <div className={styles.systemRow}>Loading...</div>}
+          {isError && (
+            <div className={styles.systemRow}>Could not load commands</div>
+          )}
         </div>
       </>,
     ),

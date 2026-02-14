@@ -1,22 +1,28 @@
 .menu {
-  position: absolute;
+  position: fixed;
   color: var(--kona-editor-text-color);
   z-index: 31;
-  top: -100000px;
-  left: -100000px;
+  top: 0;
+  left: 0;
   opacity: 0;
-  transform: scale(0.9);
+  transform: translate3d(-100000px, -100000px, 0) scale(0.95);
+  transform-origin: top left;
   margin-top: -6px;
   background-color: var(--kona-editor-background-color, #fff);
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.025);
   border: 1px solid var(--kona-editor-border-color, #ddd);
   border-radius: 4px;
-  transition: transform 0.25s;
+  transition:
+    transform 0.12s ease,
+    opacity 0.12s ease;
   display: flex;
   flex-direction: column;
   max-height: 200px;
   overflow-y: auto;
   font-size: 12px;
+  will-change: transform, opacity;
+  contain: layout paint style;
+  backface-visibility: hidden;
 
   &::-webkit-scrollbar {
     width: 6px;
@@ -35,14 +41,16 @@
 .button {
   border: none;
   background: transparent;
-  display: inline-flex;
+  display: flex;
   column-gap: 8px;
   align-items: center;
   padding: 8px 8px;
-  height: 40px;
+  min-height: 40px;
   box-sizing: border-box;
   cursor: pointer;
   color: var(--kona-editor-text-color, #444);
+  text-align: left;
+  width: 100%;
 }
 
 .button:hover {
@@ -65,6 +73,40 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
+}
+
+.content {
+  display: flex;
+  flex: 1;
+  min-width: 0;
+  flex-direction: column;
+  row-gap: 2px;
+}
+
+.breadcrumb {
+  font-size: 11px;
+  color: var(--kona-editor-secondary-text-color, #777);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.submenu {
+  color: var(--kona-editor-secondary-text-color, #777);
+}
+
+.path {
+  padding: 6px 8px;
+  font-size: 11px;
+  color: var(--kona-editor-secondary-text-color, #777);
+  border-bottom: 1px solid var(--kona-editor-border-color, #ddd);
+}
+
+.systemRow {
+  min-height: 32px;
+  padding: 8px;
+  color: var(--kona-editor-secondary-text-color, #777);
+  font-size: 11px;
 }
 
 .backdrop {
