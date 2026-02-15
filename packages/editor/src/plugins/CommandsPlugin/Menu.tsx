@@ -4,6 +4,7 @@ import type { MapStore } from 'nanostores';
 import {
   type CSSProperties,
   type ReactNode,
+  useCallback,
   useEffect,
   useLayoutEffect,
   useMemo,
@@ -11,7 +12,7 @@ import {
   useState,
 } from 'react';
 import { createPortal } from 'react-dom';
-import { Editor } from 'slate';
+import { Editor, Transforms } from 'slate';
 import { useFocused, useSlate, useSlateSelection } from 'slate-react';
 import type { CustomElement } from '../../../types';
 import { insert, insertText, removeCommand, set, wrap } from './actions';
@@ -64,6 +65,29 @@ export const Menu = (props: Props) => {
 
     return commandEntries;
   }, [commands, isBrowseMode, path.length]);
+
+  const enterSubmenu = useCallback(
+    (nextPath: CommandPathEntry[]) => {
+      if (!isBrowseMode && typeof store.filter === 'string' && store.filter) {
+        const focus = selection?.focus ?? editor.selection?.focus;
+
+        if (focus) {
+          Transforms.delete(editor, {
+            at: focus,
+            distance: store.filter.length,
+            reverse: true,
+            unit: 'character',
+          });
+        }
+
+        $store.setKey('filter', '');
+      }
+
+      setPath(nextPath);
+      setActive(0);
+    },
+    [editor, isBrowseMode, selection, store.filter, $store],
+  );
 
   // biome-ignore lint/correctness/useExhaustiveDependencies: we care only about those deps
   const actions = useMemo(() => {
@@ -185,11 +209,7 @@ export const Menu = (props: Props) => {
 
           event.preventDefault();
           event.stopPropagation();
-          setPath(entry.command.path);
-          if (!isBrowseMode) {
-            $store.setKey('filter', '');
-          }
-          setActive(0);
+          enterSubmenu(entry.command.path);
           break;
         }
         case 'ArrowLeft': {
@@ -223,11 +243,7 @@ export const Menu = (props: Props) => {
           }
 
           if (entry.command.isSubmenu) {
-            setPath(entry.command.path);
-            if (!isBrowseMode) {
-              $store.setKey('filter', '');
-            }
-            setActive(0);
+            enterSubmenu(entry.command.path);
             break;
           }
 
@@ -254,13 +270,14 @@ export const Menu = (props: Props) => {
     active,
     entries,
     editor,
+    enterSubmenu,
     isBrowseMode,
     path.length,
     store.isOpen,
     $store,
   ]);
 
-  const hasRows = entries.length > 0 || isLoading || isError;
+  const hasRows = entries.length > 0 || isError;
 
   if (store.filter === false || !hasRows) {
     return null;
@@ -328,11 +345,7 @@ export const Menu = (props: Props) => {
                 onMouseDown={(event) => {
                   event.preventDefault();
                   if (entry.command.isSubmenu) {
-                    setPath(entry.command.path);
-                    if (!isBrowseMode) {
-                      $store.setKey('filter', '');
-                    }
-                    setActive(0);
+                    enterSubmenu(entry.command.path);
                     return;
                   }
 
@@ -340,34 +353,41 @@ export const Menu = (props: Props) => {
                   $store.setKey('isOpen', false);
                 }}
               >
-                <span className={styles.icon}>
-                  {entry.command.command.icon}
-                </span>
-                <span className={styles.content}>
-                  <span>{entry.command.command.title}</span>
-                </span>
-                {entry.command.isSubmenu && isBrowseMode && (
-                  <span className={styles.submenu} aria-hidden="true">
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      width="12"
-                      height="12"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    >
-                      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                      <path d="M9 6l6 6l-6 6" />
-                    </svg>
-                  </span>
+                {entry.command.command.render?.({
+                  command: entry.command.command,
+                  isSubmenu: entry.command.isSubmenu,
+                  isActive: index === active,
+                }) ?? (
+                  <>
+                    <span className={styles.icon}>
+                      {entry.command.command.icon}
+                    </span>
+                    <span className={styles.content}>
+                      <span>{entry.command.command.title}</span>
+                    </span>
+                    {entry.command.isSubmenu && (
+                      <span className={styles.submenu} aria-hidden="true">
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          width="12"
+                          height="12"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="2"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        >
+                          <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                          <path d="M9 6l6 6l-6 6" />
+                        </svg>
+                      </span>
+                    )}
+                  </>
                 )}
               </button>
             );
           })}
-          {isLoading && <div className={styles.systemRow}>Loading...</div>}
           {isError && (
             <div className={styles.systemRow}>Could not load commands</div>
           )}

@@ -35,6 +35,11 @@ export type Command = {
   icon: ReactNode;
   action?: (actions: Actions, editor: Editor) => void;
   getCommands?: (context: GetCommandsContext) => Command[] | Promise<Command[]>;
+  render?: (params: {
+    command: Command;
+    isSubmenu: boolean;
+    isActive: boolean;
+  }) => ReactNode;
 };
 
 export type Actions = {
