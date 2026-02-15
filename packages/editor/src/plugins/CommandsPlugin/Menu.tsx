@@ -44,7 +44,6 @@ export const Menu = (props: Props) => {
   });
 
   const isBrowseMode = typeof store.filter === 'string' && store.filter === '';
-  const isSearchMode = typeof store.filter === 'string' && store.filter !== '';
 
   const { commands, isLoading, isError } = useResolvedCommands({
     rootCommands,
@@ -87,10 +86,13 @@ export const Menu = (props: Props) => {
   }, [store.isOpen, store.openId]);
 
   useEffect(() => {
-    if (store.filter === false || isSearchMode) {
+    if (
+      store.filter === false ||
+      (typeof store.filter === 'string' && store.filter !== '')
+    ) {
       setActive(0);
     }
-  }, [isSearchMode, store.filter]);
+  }, [store.filter]);
 
   useEffect(() => {
     if (!entries.length) {
@@ -268,8 +270,6 @@ export const Menu = (props: Props) => {
     return null;
   }
 
-  const pathLabel = path.map((item) => item.title).join(' / ');
-
   return createPortal(
     renderMenu(
       <>
@@ -289,9 +289,6 @@ export const Menu = (props: Props) => {
             event.preventDefault();
           }}
         >
-          {isBrowseMode && pathLabel && (
-            <div className={styles.path}>{pathLabel}</div>
-          )}
           {entries.map((entry, index) => {
             if (entry.type === 'back') {
               return (
@@ -348,11 +345,6 @@ export const Menu = (props: Props) => {
                 </span>
                 <span className={styles.content}>
                   <span>{entry.command.command.title}</span>
-                  {isSearchMode && entry.command.breadcrumb && (
-                    <span className={styles.breadcrumb}>
-                      {entry.command.breadcrumb}
-                    </span>
-                  )}
                 </span>
                 {entry.command.isSubmenu && isBrowseMode && (
                   <span className={styles.submenu} aria-hidden="true">

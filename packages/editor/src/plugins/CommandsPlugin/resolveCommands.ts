@@ -16,7 +16,6 @@ export type ResolvedCommand = {
   command: Command;
   key: string;
   path: CommandPathEntry[];
-  breadcrumb: string;
   isSubmenu: boolean;
 };
 
@@ -84,8 +83,42 @@ const toResolvedCommand = (
     command,
     path,
     key: pathToKey(path),
-    breadcrumb: parentPath.map((item) => item.title).join(' / '),
     isSubmenu: Boolean(command.getCommands),
+  };
+};
+
+const resolveCurrentLevelCommands = async (
+  params: ResolveCommandsParams,
+  resolveChildCommands: ResolveChildCommands,
+  queryForCurrentLevel: string,
+) => {
+  const { rootCommands, path, editor } = params;
+  let currentCommands = rootCommands;
+  let currentPath: CommandPathEntry[] = [];
+
+  for (let index = 0; index < path.length; index++) {
+    const item = path[index];
+    const isLastPathItem = index === path.length - 1;
+    const command = currentCommands.find((entry) => entry.name === item.name);
+    if (!command?.getCommands) {
+      return {
+        commands: [],
+        path: currentPath,
+      };
+    }
+
+    currentPath = [...currentPath, toPathEntry(command)];
+    currentCommands = await resolveChildCommands({
+      command,
+      path: currentPath,
+      query: isLastPathItem ? queryForCurrentLevel : '',
+      editor,
+    });
+  }
+
+  return {
+    commands: currentCommands,
+    path: currentPath,
   };
 };
 
@@ -93,27 +126,14 @@ const resolveBrowseCommands = async (
   params: ResolveCommandsParams,
   resolveChildCommands: ResolveChildCommands,
 ) => {
-  const { rootCommands, path, editor } = params;
-  let currentCommands = rootCommands;
-  let currentPath: CommandPathEntry[] = [];
+  const currentLevel = await resolveCurrentLevelCommands(
+    params,
+    resolveChildCommands,
+    '',
+  );
 
-  for (const item of path) {
-    const command = currentCommands.find((entry) => entry.name === item.name);
-    if (!command?.getCommands) {
-      return [];
-    }
-
-    currentPath = [...currentPath, toPathEntry(command)];
-    currentCommands = await resolveChildCommands({
-      command,
-      path: currentPath,
-      query: '',
-      editor,
-    });
-  }
-
-  return currentCommands.map((command) =>
-    toResolvedCommand(command, currentPath),
+  return currentLevel.commands.map((command) =>
+    toResolvedCommand(command, currentLevel.path),
   );
 };
 
@@ -121,38 +141,20 @@ const resolveSearchCommands = async (
   params: ResolveCommandsParams,
   resolveChildCommands: ResolveChildCommands,
 ) => {
-  const { rootCommands, filter, editor } = params;
-  const commands: ResolvedCommand[] = [];
+  const { filter } = params;
+  const currentLevel = await resolveCurrentLevelCommands(
+    params,
+    resolveChildCommands,
+    filter,
+  );
 
-  const walk = async (
-    levelCommands: Command[],
-    parentPath: CommandPathEntry[],
-  ): Promise<void> => {
-    for (const command of levelCommands) {
-      if (command.getCommands) {
-        if (isCommandMatchesQuery(command, filter)) {
-          commands.push(toResolvedCommand(command, parentPath));
-        }
+  const matchedCommands = currentLevel.commands.filter((command) =>
+    isCommandMatchesQuery(command, filter),
+  );
 
-        const currentPath = [...parentPath, toPathEntry(command)];
-        const children = await resolveChildCommands({
-          command,
-          path: currentPath,
-          query: filter,
-          editor,
-        });
-        await walk(children, currentPath);
-        continue;
-      }
-
-      if (command.action && isCommandMatchesQuery(command, filter)) {
-        commands.push(toResolvedCommand(command, parentPath));
-      }
-    }
-  };
-
-  await walk(rootCommands, []);
-  return commands;
+  return matchedCommands.map((command) =>
+    toResolvedCommand(command, currentLevel.path),
+  );
 };
 
 export class CommandsResolver {

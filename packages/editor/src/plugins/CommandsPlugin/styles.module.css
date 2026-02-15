@@ -11,7 +11,7 @@
   background-color: var(--kona-editor-background-color, #fff);
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.025);
   border: 1px solid var(--kona-editor-border-color, #ddd);
-  border-radius: 4px;
+  border-radius: 8px;
   transition:
     transform 0.12s ease,
     opacity 0.12s ease;
@@ -79,27 +79,11 @@
   display: flex;
   flex: 1;
   min-width: 0;
-  flex-direction: column;
-  row-gap: 2px;
-}
-
-.breadcrumb {
-  font-size: 11px;
-  color: var(--kona-editor-secondary-text-color, #777);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  flex-direction: row;
 }
 
 .submenu {
   color: var(--kona-editor-secondary-text-color, #777);
-}
-
-.path {
-  padding: 6px 8px;
-  font-size: 11px;
-  color: var(--kona-editor-secondary-text-color, #777);
-  border-bottom: 1px solid var(--kona-editor-border-color, #ddd);
 }
 
 .systemRow {

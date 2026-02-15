@@ -26,19 +26,42 @@ export const useResolvedCommands = (params: Params) => {
   const { rootCommands, filter, path, editor, isOpen } = params;
   const resolverRef = useRef(new CommandsResolver());
   const [state, setState] = useState<ResolvedCommandsState>(EMPTY_STATE);
+  const prevIsOpenRef = useRef(false);
+  const prevPathKeyRef = useRef('');
+  const prevQueryRef = useRef('');
   const query = typeof filter === 'string' ? filter : '';
 
   useEffect(() => {
     if (!isOpen || filter === false) {
       setState(EMPTY_STATE);
+      prevIsOpenRef.current = false;
+      prevPathKeyRef.current = '';
+      prevQueryRef.current = '';
       return;
     }
 
-    setState({
-      commands: [],
-      isLoading: true,
-      isError: false,
-    });
+    const pathKey = path.map((item) => item.name).join('/');
+    const isNewSession = !prevIsOpenRef.current;
+    const isPathChanged = !isNewSession && prevPathKeyRef.current !== pathKey;
+    const isQueryChanged = !isNewSession && prevQueryRef.current !== query;
+
+    if (isNewSession || isPathChanged) {
+      setState({
+        commands: [],
+        isLoading: true,
+        isError: false,
+      });
+    } else if (isQueryChanged) {
+      setState((state) => ({
+        ...state,
+        isLoading: true,
+        isError: false,
+      }));
+    }
+
+    prevIsOpenRef.current = true;
+    prevPathKeyRef.current = pathKey;
+    prevQueryRef.current = query;
 
     const timeout = window.setTimeout(
       () => {
@@ -48,8 +71,6 @@ export const useResolvedCommands = (params: Params) => {
           path,
           editor,
         });
-
-        setState(request.state);
 
         request.promise.then((resolved) => {
           setState(resolved);

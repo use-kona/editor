@@ -102,7 +102,7 @@ describe('CommandsResolver', () => {
     expect(result.commands[0]?.command.name).toBe('code');
   });
 
-  it('returns global leaf query matches with breadcrumbs', async () => {
+  it('searches only root level when path is empty', async () => {
     const resolver = new CommandsResolver();
     const rootCommands: Command[] = [
       {
@@ -110,15 +110,9 @@ describe('CommandsResolver', () => {
         title: 'Insert',
         commandName: 'insert',
         icon: null,
-        getCommands: () => [
-          leaf({
-            name: 'heading-1',
-            title: 'Heading 1',
-            commandName: 'heading1',
-          }),
-          leaf({ name: 'code', title: 'Code', commandName: 'code' }),
-        ],
+        getCommands: () => [leaf({ name: 'code', title: 'Code' })],
       },
+      leaf({ name: 'paragraph', title: 'Paragraph' }),
     ];
 
     const request = resolver.resolve({
@@ -130,9 +124,32 @@ describe('CommandsResolver', () => {
 
     const result = await request.promise;
 
+    expect(result.commands).toHaveLength(0);
+  });
+
+  it('searches only current nested level', async () => {
+    const resolver = new CommandsResolver();
+    const rootCommands: Command[] = [
+      {
+        name: 'insert',
+        title: 'Insert',
+        commandName: 'insert',
+        icon: null,
+        getCommands: () => [leaf({ name: 'code', title: 'Code' })],
+      },
+    ];
+
+    const request = resolver.resolve({
+      rootCommands,
+      filter: 'code',
+      path: [{ name: 'insert', title: 'Insert', commandName: 'insert' }],
+      editor,
+    });
+
+    const result = await request.promise;
+
     expect(result.commands).toHaveLength(1);
     expect(result.commands[0]?.command.name).toBe('code');
-    expect(result.commands[0]?.breadcrumb).toBe('Insert');
   });
 
   it('returns matching submenu commands in query mode', async () => {
@@ -185,13 +202,13 @@ describe('CommandsResolver', () => {
     const firstRequest = resolver.resolve({
       rootCommands,
       filter: 'a',
-      path: [],
+      path: [{ name: 'remote', title: 'Remote', commandName: 'remote' }],
       editor,
     });
     const secondRequest = resolver.resolve({
       rootCommands,
       filter: 'b',
-      path: [],
+      path: [{ name: 'remote', title: 'Remote', commandName: 'remote' }],
       editor,
     });
 
@@ -243,7 +260,7 @@ describe('CommandsResolver', () => {
     const loadingRequest = resolver.resolve({
       rootCommands,
       filter: 'code',
-      path: [],
+      path: [{ name: 'remote', title: 'Remote', commandName: 'remote' }],
       editor,
     });
 
