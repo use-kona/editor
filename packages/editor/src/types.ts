@@ -24,6 +24,7 @@ export interface IPlugin<
 
   handlers?: {
     onDrop?: (event: DragEvent, editor: Editor) => void;
+    onDragOver?: (event: DragEvent, editor: Editor) => void;
     onKeyDown?: (event: KeyboardEvent, editor: Editor) => void;
     onPaste?: (event: ClipboardEvent, editor: Editor) => void;
   };

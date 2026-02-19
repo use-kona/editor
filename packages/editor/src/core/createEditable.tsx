@@ -26,7 +26,7 @@ import type { IPlugin } from '../types';
 import { deserialize } from './deserialize';
 import styles from './styles.module.css';
 
-const SUPPORTED_HANDLERS = ['onDrop', 'onKeyDown', 'onPaste'];
+const SUPPORTED_HANDLERS = ['onDrop', 'onDragOver', 'onKeyDown', 'onPaste'];
 
 type Props = {
   readOnly?: boolean;
