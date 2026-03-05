@@ -29,9 +29,25 @@ export const KonaEditor = forwardRef<EditorRef, KonaEditorProps>(
         Transforms.removeNodes(editor, { at: [], match });
       };
 
+      const insertNodes: EditorRef['insertNodes'] = (nodes, at) => {
+        if (!editor || !Array.isArray(nodes) || !nodes.length) {
+          return false;
+        }
+
+        const target = at ?? editor.selection ?? [editor.children.length];
+
+        try {
+          Transforms.insertNodes(editor, nodes, { at: target });
+          return true;
+        } catch {
+          return false;
+        }
+      };
+
       return {
         serialize: serialize(plugins),
         deserialize: deserialize(plugins),
+        insertNodes,
         deleteNode,
         isEmpty: () => {
           return isEmpty(editor.children);

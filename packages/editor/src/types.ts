@@ -3,6 +3,7 @@ import type {
   DecoratedRange,
   Descendant,
   Editor,
+  Location,
   NodeEntry,
   NodeMatch,
 } from 'slate';
@@ -82,6 +83,7 @@ export type EditorRef = {
   deserialize: (
     element: HTMLElement,
   ) => (Descendant | string)[] | string | Descendant | null;
+  insertNodes: (nodes: Descendant[], at?: Location) => boolean;
   isEmpty: () => boolean;
   deleteNode: (match: NodeMatch<CustomElement>) => void;
   focus: (mode?: 'end') => void;

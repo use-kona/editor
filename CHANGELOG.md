@@ -2,6 +2,13 @@
 This fill will contain all the changes for `@use-kona/editor`
 since version `0.1.11`.
 
+## 0.1.21
+### Core
+**Added**
+* Added imperative `EditorRef.insertNodes(nodes, at?)` API for inserting arbitrary Slate nodes.
+* `insertNodes` uses native Slate insertion and supports explicit locations (including root and nested paths), selection insertion, and append-to-end fallback when selection is missing.
+* `insertNodes` returns `false` for invalid input/location and `true` on successful insertion.
+
 ## 0.1.16
 ### DnDPlugin
 **Added**
