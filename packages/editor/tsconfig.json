@@ -11,5 +11,6 @@
     "useDefineForClassFields": true,
     "noImplicitAny": false,
   },
-  "include": ["src"]
+  "include": ["src", "types.d.ts"],
+  "exclude": ["**/*.spec.*", "**/*.test.*", "node_modules"]
 }

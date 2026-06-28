@@ -35,8 +35,25 @@ const defaultValue = [
   },
   {
     nodeId: 'node-4',
-    type: 'paragraph',
-    children: [{ text: 'Third text' }],
+    type: 'ul',
+    children: [
+      {
+        nodeId: 'node-5',
+        type: 'li',
+        children: [{ text: '123' }],
+      },
+    ],
+  },
+  {
+    nodeId: 'node-6',
+    type: 'ul',
+    children: [
+      {
+        nodeId: 'node-7',
+        type: 'li',
+        children: [{ text: '456' }],
+      },
+    ],
   }
 ];
 

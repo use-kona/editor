@@ -7,8 +7,10 @@ export const isEmpty = (children: Descendant[]) => {
     return first.text.trim() === '';
   }
 
-  if (children && children.length <= 1 && Text.isText(first?.children?.[0])) {
-    return first.children.every((child) => child.text?.trim() === '');
+  if (children && children.length <= 1 && first && 'children' in first) {
+    return first.children.every(
+      (child) => Text.isText(child) && child.text?.trim() === '',
+    );
   }
 
   return false;

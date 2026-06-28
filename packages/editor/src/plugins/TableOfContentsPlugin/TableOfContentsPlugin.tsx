@@ -1,7 +1,7 @@
 import { useStore } from '@nanostores/react';
 import { type MapStore, map } from 'nanostores';
 import { type MouseEvent, useEffect } from 'react';
-import { Editor, type NodeEntry, Operation } from 'slate';
+import { Editor, type NodeEntry, Operation, Text } from 'slate';
 import { ReactEditor } from 'slate-react';
 import type { CustomElement } from '../../../types';
 import type { IPlugin, UiParams } from '../../types';
@@ -87,7 +87,7 @@ export class TableOfContentsPlugin implements IPlugin {
             className={styles[`h${level}`]}
             onMouseDown={handleMouseDown}
           >
-            {node.children[0].text}
+            {Text.isText(node.children[0]) ? node.children[0].text : ''}
           </div>
         );
       },

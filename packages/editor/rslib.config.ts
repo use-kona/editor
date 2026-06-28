@@ -6,6 +6,7 @@ export default defineConfig({
     entry: {
       index: ['./src/**'],
     },
+    exclude: ['**/*.spec.ts', '**/*.spec.tsx', '**/*.test.ts', '**/*.test.tsx'],
   },
   lib: [
     {

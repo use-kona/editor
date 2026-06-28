@@ -12,12 +12,12 @@
     "src"
   ],
   "scripts": {
-    "build": "rslib build",
+    "build": "rslib build && find dist -type f \\( -name '*.spec.*' -o -name '*.test.*' \\) -delete || true",
     "build:storybook": "storybook build",
     "check": "biome check --write",
     "dev": "rslib build --watch",
     "format": "biome format --write",
-    "storybook": "storybook dev",
+    "storybook": "NODE_OPTIONS=\"--inspect=9229\" storybook dev",
     "test": "vitest run"
   },
   "devDependencies": {

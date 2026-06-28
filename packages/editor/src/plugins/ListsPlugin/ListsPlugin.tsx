@@ -44,8 +44,15 @@ export class ListsPlugin implements IPlugin {
 
     editor.normalizeNode = (entry: NodeEntry) => {
       const [node, path] = entry;
-      //
+
       if (this.isList(editor, node as CustomElement)) {
+        if ((node as CustomElement).children.length === 0) {
+          Transforms.removeNodes(editor, {
+            at: path,
+          });
+          return;
+        }
+
         /* Unwrap lists around non-list-items */
         for (const [child, childPath] of Array.from(
           Node.children(editor, path),
@@ -64,6 +71,7 @@ export class ListsPlugin implements IPlugin {
         }
       }
 
+      /* Wrap list items in list if they are not already wrapped */
       if (this.isListItem(editor, node as CustomElement)) {
         const parent = Editor.above(editor, {
           at: path,
@@ -87,39 +95,17 @@ export class ListsPlugin implements IPlugin {
         }
       }
 
-      if (this.isList(editor, node as CustomElement)) {
-        if (!Path.hasPrevious(path)) {
-          normalizeNode(entry);
+      /* Merge adjacent lists */
+      if (this.isList(editor, node as CustomElement) && Path.hasPrevious(path)) {
+        const prevPath = Path.previous(path);
+        const prevNode = Node.get(editor, prevPath) as CustomElement;
+
+        if (
+          this.isList(editor, prevNode) &&
+          prevNode.type === (node as CustomElement).type
+        ) {
+          Transforms.mergeNodes(editor, { at: path });
           return;
-        }
-
-        const prevListItemPath = Editor.before(editor, path, {
-          unit: 'block',
-        });
-
-        const prevList =
-          prevListItemPath &&
-          Editor.above<CustomElement>(editor, {
-            at: prevListItemPath,
-            match: (n) => this.isList(editor, n as CustomElement),
-          });
-
-        if (prevList) {
-          const currentDepth = this.getListDepth(editor, path);
-          const prevDepth = this.getListDepth(editor, prevList[1]);
-
-          if (
-            this.isList(editor, prevList[0] as CustomElement) &&
-            currentDepth === prevDepth &&
-            prevList[0].type === (node as CustomElement).type
-          ) {
-            try {
-              Transforms.mergeNodes(editor, {
-                at: path,
-                match: (n) => this.isList(editor, n as CustomElement),
-              });
-            } catch (e) {}
-          }
         }
       }
 
@@ -424,21 +410,19 @@ export class ListsPlugin implements IPlugin {
           return;
         }
 
-        Transforms.wrapNodes(
-          editor,
-          { type: listType, children: [] },
-          {
-            mode: 'highest',
-            match: (n) => {
-              return Element.isElement(n) && n.type === listItemType;
-            },
-          },
-        );
-
         Transforms.setNodes(
           editor,
           { type: listItemType },
           { at: nodes[0][1], split: true },
+        );
+
+        Transforms.wrapNodes(
+          editor,
+          { type: listType, children: [] },
+          {
+            at: nodes[0][1],
+            match: (n) => (n as CustomElement).type === listItemType,
+          },
         );
       }
     });
@@ -461,26 +445,6 @@ export class ListsPlugin implements IPlugin {
       return count;
     }
 
-    return 0;
-  };
-
-  private getListDepth = (editor: Editor, path?: Path) => {
-    if (path) {
-      const node = Node.get(editor, path) as CustomElement;
-      if (!this.isList(editor, node)) {
-        return 0;
-      }
-
-      let count = 0;
-      let parent = Editor.parent(editor, path);
-
-      while (parent && this.isList(editor, parent[0] as CustomElement)) {
-        count++;
-        parent = Editor.parent(editor, parent[1]);
-      }
-
-      return count;
-    }
     return 0;
   };
 

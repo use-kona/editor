@@ -237,19 +237,27 @@ const moveNode = (
     return
   }
 
-  Transforms.moveNodes(editor, {
-    at: [],
-    match: (n) => {
-      if (!Editor.isBlock(editor, n as CustomElement)) {
-        return false;
-      }
+  Editor.withoutNormalizing(editor, () => {
+    Transforms.moveNodes(editor, {
+      at: [],
+      match: (n) => {
+        if (!Editor.isBlock(editor, n as CustomElement)) {
+          return false;
+        }
 
-      const node = n as DnDNode;
-      const shouldMove =
-        typeof node.nodeId === 'string' && nodeIds.includes(node.nodeId);
-      return shouldMove;
-    },
-    to: dropPath,
-    mode: 'highest',
+        if (Editor.isEditor(n)) {
+          return false;
+        }
+
+        const node = n as DnDNode;
+        const shouldMove =
+          typeof node.nodeId === 'string' && nodeIds.includes(node.nodeId);
+        return shouldMove;
+      },
+      to: dropPath,
+      mode: 'highest',
+    });
   });
+  Editor.normalize(editor);
+
 };
