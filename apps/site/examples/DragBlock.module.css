@@ -1,11 +1,9 @@
 .root {
   position: relative;
-  border-radius: 4px;
-  border-top: 2px solid transparent;
-  border-bottom: 2px solid transparent;
   transition:
     background-color,
     transform 0.25s;
+  padding: 2px 0;
 
   &.selected {
     background-color: #3498db11;
@@ -15,10 +13,12 @@
 
 .top {
   border-top: 2px solid #3498db;
+  padding-top: 0;
 }
 
 .bottom {
   border-bottom: 2px solid #3498db;
+  padding-bottom: 0;
 }
 
 .drag {

@@ -61,6 +61,15 @@ If you don't want to allow reordering particular blocks, you can add them here.
         position,
       } = props;
 
+      // Merge Slate's ref (from attributes) with the DnD drop ref.
+      // Both must be called on the same element.
+      const rootRef = (el: HTMLElement | null) => {
+        const r = attributes.ref;
+        if (typeof r === 'function') r(el);
+        else if (r) (r as any).current = el;
+        drop(preview(el));
+      };
+
       return (
         <div
           className={cn(styles.root, {
@@ -68,13 +77,9 @@ If you don't want to allow reordering particular blocks, you can add them here.
           [styles.bottom]: position === 'bottom',
         })}
         {...attributes}
+        ref={rootRef}
         >
-          <div
-            className={styles.block}
-            ref={(e) => {
-              drop(preview(e));
-            }}
-          >
+          <div className={styles.block}>
             <div
               className={styles.drag}
               ref={(element) => {

@@ -1,7 +1,7 @@
 import { useStore } from '@nanostores/react';
 import { type MapStore, map } from 'nanostores';
 import type React from 'react';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import {
   type ConnectDragPreview,
   type ConnectDragSource,
@@ -92,6 +92,8 @@ export class DnDPlugin implements IPlugin {
       null,
     );
 
+    const dropTargetRef = useRef<HTMLElement | null>(null);
+
     const customType = options.customTypes?.[props.element.type];
     const currentElement = props.element as DnDNode;
 
@@ -128,10 +130,7 @@ export class DnDPlugin implements IPlugin {
         };
       },
       hover(_, monitor) {
-        const element = ReactEditor.toDOMNode(
-          editor,
-          props.element,
-        ) as HTMLElement;
+        const element = dropTargetRef.current;
         if (!element) return;
 
         const hoverBoundingRect = element.getBoundingClientRect();
@@ -184,6 +183,11 @@ export class DnDPlugin implements IPlugin {
       },
     });
 
+    const connectDropRef: ConnectDropTarget = (el) => {
+      dropTargetRef.current = el as HTMLElement | null;
+      return drop(el);
+    };
+
     // biome-ignore lint/correctness/useExhaustiveDependencies: we care only about this dep
     useEffect(() => {
       setDropPosition(null);
@@ -200,7 +204,7 @@ export class DnDPlugin implements IPlugin {
     return options.renderBlock?.({
       props,
       dragRef: drag,
-      dropRef: drop,
+      dropRef: connectDropRef,
       previewRef: preview,
       position: dropPosition,
       selected:

@@ -5,6 +5,7 @@ import type {
   ConnectDropTarget,
 } from 'react-dnd';
 import type { RenderElementProps } from 'slate-react';
+import { useMergeRefs } from './ui/useMergeRefs';
 import styles from './DragBlock.module.css';
 import { DragHandler } from './DragHandler';
 
@@ -35,6 +36,8 @@ export const DragBlock = (props: Props) => {
     }
   };
 
+  const rootRef = useMergeRefs([attributes.ref, (e) => drop(preview(e))]);
+
   return (
     <div
       className={cn(styles.root, {
@@ -43,13 +46,9 @@ export const DragBlock = (props: Props) => {
         [styles.selected]: selected,
       })}
       {...attributes}
+      ref={rootRef}
     >
-      <div
-        className={styles.block}
-        ref={(e) => {
-          drop(preview(e));
-        }}
-      >
+      <div className={styles.block}>
         <div
           className={styles.drag}
           ref={(element) => {
