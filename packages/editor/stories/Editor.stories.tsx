@@ -19,9 +19,25 @@ type Story = StoryObj<typeof meta>;
 
 const defaultValue = [
   {
+    nodeId: 'node-1',
     type: 'paragraph',
-    children: [{ text: 'Default text' }],
+    children: [{ text: 'First text' }],
   },
+  {
+    nodeId: 'node-2',
+    type: 'paragraph',
+    children: [{ text: 'Second text' }],
+  },
+  {
+    nodeId: 'node-3',
+    type: 'paragraph',
+    children: [{ text: '' }],
+  },
+  {
+    nodeId: 'node-4',
+    type: 'paragraph',
+    children: [{ text: 'Third text' }],
+  }
 ];
 
 // More on writing stories with args: https://storybook.js.org/docs/writing-stories/args

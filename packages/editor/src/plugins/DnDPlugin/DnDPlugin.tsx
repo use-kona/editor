@@ -95,12 +95,16 @@ export class DnDPlugin implements IPlugin {
     const customType = options.customTypes?.[props.element.type];
     const currentElement = props.element as DnDNode;
 
+    const selected = Array.from($store.selected.values());
+
     const [, drag, preview] = useDrag({
       type: customType?.type || DnDPlugin.DND_BLOCK_ELEMENT,
       item: {
         ...(customType?.getData?.(props.element) || {}),
         element: props.element,
-        nodeIds: Array.from($store.selected.values()),
+        nodeIds: currentElement?.nodeId && selected.includes(currentElement?.nodeId)
+          ? selected
+          : [currentElement?.nodeId],
       },
       ...(customType?.getDndItem?.(props.element) || {}),
       canDrag: !isReadOnly,
@@ -151,7 +155,7 @@ export class DnDPlugin implements IPlugin {
 
         if (!sourceTo) return;
 
-        const dropPath = getDropPath(editor, sourceTo, dropPosition);
+        const dropPath = getDropPath(editor, sourceTo);
 
         if (!dropPath) return;
 
@@ -170,7 +174,8 @@ export class DnDPlugin implements IPlugin {
               return;
             }
 
-            moveNode(editor, sourceTo, dragItem.nodeIds, dropPosition);
+            moveNode(editor, sourceTo, dragItem.nodeIds);
+            $store.selected.clear();
             break;
           }
         }
@@ -214,31 +219,25 @@ export class DnDPlugin implements IPlugin {
 const getDropPath = (
   editor: Editor,
   targetNodePath: Path,
-  position: 'top' | 'bottom' | null,
 ) => {
   const target = Editor.node(editor, targetNodePath);
 
-  switch (position) {
-    case 'top':
-      return target[1];
-    case 'bottom':
-      return Path.next(target[1]);
-  }
+  return target[1];
 };
 
 const moveNode = (
   editor: Editor,
   targetNodePath: Path,
   nodeIds: string[],
-  position: 'top' | 'bottom',
 ) => {
-  const dropPath = getDropPath(editor, targetNodePath, position);
+  const dropPath = getDropPath(editor, targetNodePath);
 
   if (!dropPath) return;
+  if (!Editor.hasPath(editor, dropPath)) {
+    return
+  }
 
-  // nodeIds.reverse().forEach((nodeId) => {
   Transforms.moveNodes(editor, {
-    // at: sourceNodePath,
     at: [],
     match: (n) => {
       if (!Editor.isBlock(editor, n as CustomElement)) {
@@ -253,5 +252,4 @@ const moveNode = (
     to: dropPath,
     mode: 'highest',
   });
-  // });
 };
