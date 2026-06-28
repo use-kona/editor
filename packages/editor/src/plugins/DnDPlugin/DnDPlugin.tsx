@@ -154,7 +154,7 @@ export class DnDPlugin implements IPlugin {
 
         if (!sourceTo) return;
 
-        const dropPath = getDropPath(editor, sourceTo);
+        const dropPath = getDropPath(editor, sourceTo, dropPosition || 'bottom');
 
         if (!dropPath) return;
 
@@ -173,7 +173,7 @@ export class DnDPlugin implements IPlugin {
               return;
             }
 
-            moveNode(editor, sourceTo, dragItem.nodeIds);
+            moveNode(editor, sourceTo, dragItem.nodeIds, dropPosition);
             $store.selected.clear();
             break;
           }
@@ -223,18 +223,25 @@ export class DnDPlugin implements IPlugin {
 const getDropPath = (
   editor: Editor,
   targetNodePath: Path,
+  position: 'top' | 'bottom',
 ) => {
   const target = Editor.node(editor, targetNodePath);
 
-  return target[1];
+  switch (position) {
+    case 'top':
+      return target[1];
+    case 'bottom':
+      return Path.next(target[1]);
+  }
 };
 
 const moveNode = (
   editor: Editor,
   targetNodePath: Path,
   nodeIds: string[],
+  position: 'top' | 'bottom',
 ) => {
-  const dropPath = getDropPath(editor, targetNodePath);
+  const dropPath = getDropPath(editor, targetNodePath, position);
 
   if (!dropPath) return;
   if (!Editor.hasPath(editor, dropPath)) {

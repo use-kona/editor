@@ -2,6 +2,11 @@
 This fill will contain all the changes for `@use-kona/editor`
 since version `0.1.11`.
 
+## 0.1.23
+### DnDPlugin
+**Fixed**
+* Fixed top/bottom drop position logic during drag-and-drop. Nodes now correctly insert above or below the target based on drop location.
+
 ## 0.1.22
 ### DnDPlugin
 **Fixed**
