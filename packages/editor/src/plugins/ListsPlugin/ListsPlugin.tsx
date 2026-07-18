@@ -96,7 +96,10 @@ export class ListsPlugin implements IPlugin {
       }
 
       /* Merge adjacent lists */
-      if (this.isList(editor, node as CustomElement) && Path.hasPrevious(path)) {
+      if (
+        this.isList(editor, node as CustomElement) &&
+        Path.hasPrevious(path)
+      ) {
         const prevPath = Path.previous(path);
         const prevNode = Node.get(editor, prevPath) as CustomElement;
 
@@ -331,10 +334,7 @@ export class ListsPlugin implements IPlugin {
     const [match] = Array.from(
       Editor.nodes(editor, {
         at: Editor.unhangRange(editor, selection),
-        match: (node) =>
-          !Editor.isEditor(node) &&
-          Element.isElement(node) &&
-          node.type === type,
+        match: (node) => Element.isElement(node) && node.type === type,
       }),
     );
 

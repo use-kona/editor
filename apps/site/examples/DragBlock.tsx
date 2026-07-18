@@ -1,13 +1,14 @@
 import cn from 'clsx';
+import type * as React from 'react';
 import type {
   ConnectDragPreview,
   ConnectDragSource,
   ConnectDropTarget,
 } from 'react-dnd';
-import type { RenderElementProps } from 'slate-react';
-import { useMergeRefs } from './ui/useMergeRefs';
+import { type RenderElementProps, useSelected } from 'slate-react';
 import styles from './DragBlock.module.css';
 import { DragHandler } from './DragHandler';
+import { useMergeRefs } from './ui/useMergeRefs';
 
 type Props = {
   props: RenderElementProps;
@@ -16,7 +17,8 @@ type Props = {
   previewRef: ConnectDragPreview;
   position: 'top' | 'bottom' | null;
   selected?: boolean;
-  onToggleSelected: () => void;
+  onToggleSelected?: (event: React.MouseEvent<HTMLDivElement>) => void;
+  onNativeDrop?: (event: React.DragEvent<HTMLDivElement>) => void;
 };
 
 export const DragBlock = (props: Props) => {
@@ -26,27 +28,36 @@ export const DragBlock = (props: Props) => {
     dropRef: drop,
     previewRef: preview,
     position,
-    selected,
     onToggleSelected,
+    onNativeDrop,
   } = props;
 
   const handleToggleSelected = (event: React.MouseEvent<HTMLDivElement>) => {
     if (event.metaKey) {
-      onToggleSelected();
+      onToggleSelected(event);
     }
   };
 
-  const rootRef = useMergeRefs([attributes.ref, (e) => drop(preview(e))]);
+  const handleNativeDrop = (event: React.DragEvent<HTMLDivElement>) => {
+    if (onNativeDrop) {
+      onNativeDrop(event);
+    }
+  };
+
+  const rootRef = useMergeRefs([
+    attributes.ref,
+    (e: HTMLDivElement) => drop(preview(e)),
+  ]);
 
   return (
     <div
       className={cn(styles.root, {
         [styles.top]: position === 'top',
         [styles.bottom]: position === 'bottom',
-        [styles.selected]: selected,
       })}
       {...attributes}
       ref={rootRef}
+      onDrop={handleNativeDrop}
     >
       <div className={styles.block}>
         <div

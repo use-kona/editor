@@ -1,7 +1,5 @@
-
 .root {
   width: 600px;
-  height: calc(100vh - 128px * 2);
   overflow: hidden;
   border: 1px solid var(--kona-editor-border-color);
   border-radius: 8px;

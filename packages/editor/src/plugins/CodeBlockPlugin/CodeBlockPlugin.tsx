@@ -117,9 +117,7 @@ export class CodeBlockPlugin implements IPlugin {
         // Find the code block node and its path
         const entry = Editor.above(editor, {
           match: (n) =>
-            !Editor.isEditor(n) &&
-            Element.isElement(n) &&
-            n.type === CodeBlockPlugin.CODE_ELEMENT,
+            Element.isElement(n) && n.type === CodeBlockPlugin.CODE_ELEMENT,
         });
 
         if (entry) {

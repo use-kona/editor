@@ -3,4 +3,48 @@
   --kona-editor-background-color: #fff;
   --kona-editor-border-color: #e3e3e3;
   --kona-editor-text-color: #444;
+  --kona-editor-selected-color: rgb(0 123 255 / 0.08);
+}
+
+.demo {
+  display: grid;
+  grid-template-rows: auto auto auto;
+  gap: 8px;
+}
+
+.custom-dnd-block {
+  padding: 8px;
+  display: grid;
+  grid-template-columns: 12px 24px auto;
+  align-items: center;
+  border: 1px solid var(--kona-editor-border-color);
+  border-radius: 8px;
+  background: var(--kona-editor-background-color);
+
+  & input {
+    flex-grow: 1;
+    border: none;
+    outline: none;
+    background: transparent;
+  }
+}
+
+.task {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+}
+
+.tasks-pool {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 8px;
+  border: 1px dashed var(--kona-editor-border-color);
+  border-radius: 8px;
+}
+
+.handler {
+  display: flex;
+  align-items: center;
 }

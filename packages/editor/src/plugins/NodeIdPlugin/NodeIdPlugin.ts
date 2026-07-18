@@ -26,7 +26,11 @@ type Options = {
 };
 
 export class NodeIdPlugin implements IPlugin<Editor, NodeIdBlock> {
-  constructor(private options: Options) {}
+  generateId: () => string;
+
+  constructor(private options: Options) {
+    this.generateId = options.generateId;
+  }
 
   init(editor: Editor) {
     const { apply, normalizeNode } = editor;
@@ -39,14 +43,13 @@ export class NodeIdPlugin implements IPlugin<Editor, NodeIdBlock> {
         const newType = (operation.newProperties as CustomElement).type;
 
         if (!node || (!Text.isText(node) && oldType !== newType)) {
-          (operation.newProperties as NodeIdBlock).nodeId =
-            this.options.generateId();
+          (operation.newProperties as NodeIdBlock).nodeId = this.generateId();
         }
         return apply(operation);
       }
 
       if (operation.type === 'insert_node') {
-        assignId(operation.node, this.options.generateId);
+        assignId(operation.node, this.generateId);
         return apply(operation);
       }
 
@@ -54,8 +57,7 @@ export class NodeIdPlugin implements IPlugin<Editor, NodeIdBlock> {
         const node = Node.get(editor, operation.path);
 
         if (!node || !Text.isText(node)) {
-          (operation.properties as NodeIdBlock).nodeId =
-            this.options.generateId();
+          (operation.properties as NodeIdBlock).nodeId = this.generateId();
         }
         return apply(operation);
       }
@@ -66,7 +68,7 @@ export class NodeIdPlugin implements IPlugin<Editor, NodeIdBlock> {
     editor.normalizeNode = (entry: NodeEntry) => {
       const [node] = entry;
 
-      assignId(node, this.options.generateId);
+      assignId(node, this.generateId);
 
       normalizeNode(entry);
     };

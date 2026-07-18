@@ -1,7 +1,7 @@
 .root {
   height: 24px;
-  background-color: var(--kona-editor-background-color);
-  border: 1px solid var(--kona-editor-border-color);
+  background-color: #fff;
+  border: 1px solid #ddd;
   border-radius: 4px;
   overflow: hidden;
   z-index: 2;

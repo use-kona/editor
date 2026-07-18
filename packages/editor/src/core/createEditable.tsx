@@ -1,4 +1,6 @@
+import { useStore } from '@nanostores/react';
 import isHotkey from 'is-hotkey';
+import { atom } from 'nanostores';
 import React, {
   type ClipboardEvent,
   isValidElement,
@@ -7,21 +9,28 @@ import React, {
   type ReactElement,
   type ReactNode,
   useCallback,
+  useState,
 } from 'react';
 import {
   type DecoratedRange,
   type Descendant,
-  type Editor,
+  Editor,
+  Element,
   type NodeEntry,
+  Path,
   Transforms,
 } from 'slate';
 import {
   Editable,
+  ReactEditor,
   type RenderElementProps,
   type RenderLeafProps,
   useReadOnly,
 } from 'slate-react';
+import type { CustomElement } from '../../types';
 import { BaseElement } from '../elements/BaseElement';
+import { Block } from '../elements/Block';
+import { EditorProvider } from '../provider';
 import type { IPlugin } from '../types';
 import { deserialize } from './deserialize';
 import styles from './styles.module.css';
@@ -35,6 +44,10 @@ type Props = {
 export const createEditable =
   (editor: Editor, plugins: IPlugin[]) =>
   ({ readOnly }: Props) => {
+    const [selectedNodes] = useState(() => atom<CustomElement[]>([]));
+
+    const $selectedNodes = useStore(selectedNodes);
+
     const renderElement = (props: RenderElementProps): ReactElement => {
       let result: ReactElement | null = null;
 
@@ -56,13 +69,21 @@ export const createEditable =
         }
       }
 
-      return result || <BaseElement {...props} />;
+      if (Editor.isInline(editor, props.element)) {
+        return result || <BaseElement {...props} />;
+      }
+
+      return (
+        <Block element={props.element} attributes={props.attributes}>
+          {result || <BaseElement {...props} />}
+        </Block>
+      );
     };
 
     const renderLeaf = (props: RenderLeafProps): JSX.Element => {
       let result: ReactNode;
       for (const plugin of plugins) {
-        plugin.leafs?.map((element) => {
+        plugin.leafs?.forEach((element) => {
           const newElement = element.render(
             {
               ...props,
@@ -82,6 +103,132 @@ export const createEditable =
     const handleHotkey = (event: KeyboardEvent) => {
       if (event.key === 'Tab') {
         event.preventDefault();
+      }
+
+      if (event.key === 'Escape') {
+        const currentBlock = Editor.above<CustomElement>(editor, {
+          at: editor.selection?.focus,
+          match: (n) => Element.isElement(n) && Editor.isBlock(editor, n),
+        });
+
+        if (!currentBlock) {
+          return;
+        }
+
+        if ($selectedNodes.length === 0) {
+          selectedNodes.set([currentBlock[0]]);
+        } else {
+          selectedNodes.set([]);
+          ReactEditor.blur(editor);
+        }
+      } else if (event.key === 'ArrowDown') {
+        const currentBlock = Editor.above(editor, {
+          at: editor.selection?.focus,
+          match: (n) => Element.isElement(n),
+        });
+
+        if (!currentBlock) return;
+
+        const nextBlock = Editor.next(editor, {
+          at: currentBlock[1],
+          match: (n) => Element.isElement(n),
+          voids: true,
+        });
+
+        if (nextBlock) {
+          if (Editor.isVoid(editor, nextBlock[0])) {
+            event.preventDefault();
+            selectedNodes.set([nextBlock[0]]);
+          } else {
+            selectedNodes.set([]);
+          }
+          if (
+            Editor.isVoid(editor, currentBlock[0]) ||
+            Editor.isVoid(editor, nextBlock[0])
+          ) {
+            event.preventDefault();
+            Transforms.select(editor, nextBlock[1]);
+            Transforms.collapse(editor, { edge: 'start' });
+          }
+        }
+      } else if (event.key === 'ArrowUp') {
+        const currentBlock = Editor.above(editor, {
+          at: editor.selection?.focus,
+          match: (n) => Element.isElement(n),
+        });
+
+        if (!currentBlock) return;
+
+        const prevBlock = Editor.previous(editor, {
+          at: currentBlock[1],
+          match: (n) => Element.isElement(n),
+          voids: true,
+        });
+
+        if (prevBlock) {
+          if (Editor.isVoid(editor, prevBlock[0])) {
+            event.preventDefault();
+            selectedNodes.set([prevBlock[0]]);
+          } else {
+            selectedNodes.set([]);
+          }
+          if (
+            Editor.isVoid(editor, currentBlock[0]) ||
+            Editor.isVoid(editor, prevBlock[0])
+          ) {
+            event.preventDefault();
+            Transforms.select(editor, prevBlock[1]);
+            Transforms.collapse(editor, { edge: 'end' });
+          }
+        }
+      } else if (event.key === 'Backspace') {
+        const currentBlock = Editor.above(editor, {
+          at: editor.selection?.focus,
+          match: (n) => Element.isElement(n) && Editor.isBlock(editor, n),
+        });
+
+        if (!currentBlock) return;
+        if (editor.selection?.focus.offset !== 0) return;
+
+        const prevBlock = Editor.previous(editor, {
+          at: currentBlock[1],
+          match: (n) => Element.isElement(n),
+          voids: true,
+        });
+
+        if (prevBlock && Editor.isVoid(editor, prevBlock[0])) {
+          event.preventDefault();
+          Transforms.removeNodes(editor, {
+            at: currentBlock[1],
+          });
+          Transforms.select(editor, prevBlock[1]);
+          selectedNodes.set([prevBlock[0]]);
+          Transforms.collapse(editor, { edge: 'start' });
+        }
+      } else if (event.key === 'Enter') {
+        const currentBlock = Editor.above(editor, {
+          at: editor.selection?.focus,
+          match: (n) => Element.isElement(n),
+        });
+
+        if (!currentBlock) return;
+
+        if (Editor.isVoid(editor, currentBlock[0])) {
+          event.preventDefault();
+          Transforms.insertNodes(
+            editor,
+            {
+              type: 'paragraph',
+              children: [{ text: '' }],
+            },
+            {
+              at: Path.next(currentBlock[1]),
+            },
+          );
+          selectedNodes.set([]);
+          Transforms.select(editor, Path.next(currentBlock[1]));
+          Transforms.collapse(editor, { edge: 'start' });
+        }
       }
 
       for (const plugin of plugins) {
@@ -154,12 +301,15 @@ export const createEditable =
         }
 
         return (
-          <div className={styles.ui} onClick={(event) => {
-            event.stopPropagation();
-          }}>
+          <div
+            className={styles.ui}
+            onClick={(event) => {
+              event.stopPropagation();
+            }}
+          >
             {ui.map((p, index) => (
               <React.Fragment key={index}>
-                {p.ui!({ readOnly, children, editor })}
+                {p.ui?.({ readOnly, children, editor })}
               </React.Fragment>
             ))}
             <div className={styles.editor}>{children}</div>
@@ -170,16 +320,18 @@ export const createEditable =
     );
 
     return (
-      <div className={styles.root}>
-        <Ui>
-          <Editable
-            decorate={decorate}
-            renderElement={renderElement}
-            renderLeaf={renderLeaf}
-            readOnly={readOnly}
-            {...handlers}
-          />
-        </Ui>
-      </div>
+      <EditorProvider selectedNodes={selectedNodes}>
+        <div className={styles.root}>
+          <Ui>
+            <Editable
+              decorate={decorate}
+              renderElement={renderElement}
+              renderLeaf={renderLeaf}
+              readOnly={readOnly}
+              {...handlers}
+            />
+          </Ui>
+        </div>
+      </EditorProvider>
     );
   };

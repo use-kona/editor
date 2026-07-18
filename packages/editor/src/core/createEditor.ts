@@ -24,14 +24,8 @@ export const createEditor = (plugins: IPlugin[]) => () => {
     return editor;
   }, baseEditor);
 
-  const {
-    isInline,
-    isVoid,
-    normalizeNode,
-    deleteFragment,
-    deleteBackward,
-    deleteForward,
-  } = editorWithPlugins;
+  const { isInline, isVoid, deleteFragment, deleteBackward, deleteForward } =
+    editorWithPlugins;
 
   editorWithPlugins.getCommands = (plugin: new () => IPlugin) => {
     const pluginInstance = pluginsMap.get(plugin);
@@ -225,7 +219,7 @@ export const createEditor = (plugins: IPlugin[]) => () => {
           const hasOnBeforeDelete = match?.onBeforeDelete;
 
           if (hasOnBeforeDelete) {
-            const result = await match.onBeforeDelete!([node]);
+            const result = await match.onBeforeDelete?.([node]);
 
             if (result) {
               Transforms.removeNodes(editorWithPlugins, {

@@ -1,16 +1,8 @@
 import { useStore } from '@nanostores/react';
-import { type MapStore, map } from 'nanostores';
-import type React from 'react';
 import { useEffect, useRef, useState } from 'react';
-import {
-  type ConnectDragPreview,
-  type ConnectDragSource,
-  type ConnectDropTarget,
-  useDrag,
-  useDrop,
-} from 'react-dnd';
+import { type ConnectDropTarget, useDrag, useDrop } from 'react-dnd';
 import { NativeTypes } from 'react-dnd-html5-backend';
-import { Editor, Path, Transforms } from 'slate';
+import { Editor, Element, Path, Transforms } from 'slate';
 import {
   ReactEditor,
   type RenderElementProps,
@@ -18,59 +10,17 @@ import {
   useSlate,
 } from 'slate-react';
 import type { CustomElement } from '../../../types';
+import { useEditorContext } from '../../provider';
 import type { IPlugin } from '../../types';
-
-type Options = {
-  onDropFiles: (editor: Editor, files: File[], path: Path) => void;
-  renderBlock?: (params: {
-    props: RenderElementProps;
-    dragRef: ConnectDragSource;
-    dropRef: ConnectDropTarget;
-    previewRef: ConnectDragPreview;
-    position: 'top' | 'bottom' | null;
-    selected?: boolean;
-    onToggleSelected: () => void;
-  }) => React.ReactNode;
-  ignoreNodes?: string[];
-  customTypes?: {
-    [type: string]: {
-      type: string | symbol;
-      getData?: (element: CustomElement) => Record<string, unknown>;
-      getDndItem?: (element: CustomElement) => Record<string, unknown>;
-    };
-  };
-};
-
-type DnDItem = {
-  element: CustomElement;
-  nodeIds?: string[];
-};
-
-type DnDNode = CustomElement & {
-  nodeId?: string;
-};
+import type { EditorDragItem, NodeWithId, Options } from './types';
+import { getNodesByNodeIds } from './utils';
 
 export class DnDPlugin implements IPlugin {
-  store: MapStore<{ selected: Set<string> }>;
+  constructor(private options: Options) {}
 
-  constructor(private options: Options) {
-    this.store = map({
-      selected: new Set(),
-    });
+  init(editor: Editor) {
+    return editor;
   }
-
-  handleToggleSelected = (nodeId: string) => {
-    const selected = new Set(this.store.get().selected);
-    if (selected.has(nodeId)) {
-      selected.delete(nodeId);
-    } else {
-      selected.add(nodeId);
-    }
-
-    this.store.set({
-      selected,
-    });
-  };
 
   static DND_BLOCK_ELEMENT = 'block';
 
@@ -83,9 +33,12 @@ export class DnDPlugin implements IPlugin {
   renderBlock = (props: RenderElementProps) => {
     const editor = useSlate();
 
-    const $store = useStore(this.store);
+    const { selectedNodes } = useEditorContext();
+    const $selectedNodes = useStore(selectedNodes);
 
+    const isCopying = useRef(false);
     const options = this.options;
+    const generateId = this.options?.nodeIdPlugin?.generateId;
     const isReadOnly = useReadOnly();
 
     const [dropPosition, setDropPosition] = useState<'top' | 'bottom' | null>(
@@ -95,28 +48,69 @@ export class DnDPlugin implements IPlugin {
     const dropTargetRef = useRef<HTMLElement | null>(null);
 
     const customType = options.customTypes?.[props.element.type];
-    const currentElement = props.element as DnDNode;
-
-    const selected = Array.from($store.selected.values());
+    const currentElement = props.element as NodeWithId;
 
     const [, drag, preview] = useDrag({
       type: customType?.type || DnDPlugin.DND_BLOCK_ELEMENT,
-      item: {
-        ...(customType?.getData?.(props.element) || {}),
-        element: props.element,
-        nodeIds: currentElement?.nodeId && selected.includes(currentElement?.nodeId)
-          ? selected
-          : [currentElement?.nodeId],
+      item: () => {
+        const selected: Array<NodeWithId> = $selectedNodes;
+
+        /**
+         * We copy nodes that the user is dragging.
+         * If a user drags multiple nodes, and the current node is one of them,
+         * we copy selected nodes. Otherwise, we copy only the current node.
+         */
+        const nodes =
+          selected.length > 0 &&
+          selected.find((node) => node.nodeId === currentElement.nodeId)
+            ? getNodesByNodeIds(
+                editor,
+                selected.map((node) => node.nodeId),
+              )
+            : [structuredClone(props.element as NodeWithId)];
+
+        const item =
+          this.options.customTypes?.[currentElement.type]?.getData?.(
+            currentElement,
+          );
+
+        const items = nodes
+          .map((node) => {
+            if (this.options.customTypes?.[node.type]) {
+              return this.options.customTypes[node.type].getData?.(node);
+            }
+            return null;
+          })
+          .filter(Boolean);
+
+        const dragItem: EditorDragItem = {
+          kind: 'inner',
+          nodes,
+          item,
+          items,
+          source: {
+            editor,
+            documentId: options.documentId,
+          },
+        };
+
+        return dragItem;
       },
-      ...(customType?.getDndItem?.(props.element) || {}),
       canDrag: !isReadOnly,
+      end: () => {
+        selectedNodes.set([]);
+      },
     });
 
     const allCustomTypes = Object.values(options.customTypes || {}).map(
       (customType) => customType.type,
     );
 
-    const [{ isOver }, drop] = useDrop({
+    const [{ isOver }, drop] = useDrop<
+      EditorDragItem,
+      void,
+      { isOver: boolean }
+    >({
       accept: [
         DnDPlugin.DND_BLOCK_ELEMENT,
         NativeTypes.FILE,
@@ -147,38 +141,88 @@ export class DnDPlugin implements IPlugin {
           setDropPosition('bottom');
         }
       },
-      drop(item, monitor) {
+      drop: (data, monitor) => {
         const itemType = monitor.getItemType();
+        const sourceEditor = data.kind === 'inner' ? data.source?.editor : null;
+
+        const isSameDocument =
+          data.kind === 'inner' &&
+          data.source?.documentId === this.options.documentId &&
+          this.options.documentId !== undefined;
+        const isSameEditor =
+          data.kind === 'inner' && data.source?.editor === editor;
 
         const sourceTo = ReactEditor.findPath(editor, props.element);
 
         if (!sourceTo) return;
 
-        const dropPath = getDropPath(editor, sourceTo, dropPosition || 'bottom');
+        const insertAt = getDropPath(
+          editor,
+          sourceTo,
+          dropPosition || 'bottom',
+        );
 
-        if (!dropPath) return;
+        if (!insertAt) return;
+
+        const customDropHandler =
+          itemType && options.customDropHandlers?.[itemType];
+
+        if (customDropHandler && data.kind === 'outer') {
+          customDropHandler.onDrop({ editor, data, insertAt });
+          return;
+        }
 
         switch (itemType) {
           case NativeTypes.FILE:
             options.onDropFiles(
               editor,
-              (item as { files: File[] }).files,
-              dropPath,
+              (data as unknown as { files: File[] }).files,
+              insertAt,
             );
             break;
           default: {
-            const dragItem = item as DnDItem;
+            const dragItem = data as EditorDragItem;
 
-            if (!dropPosition || !dragItem.nodeIds?.length) {
+            // We don't know what "default" behavior for the outer items is
+            if (dragItem.kind === 'outer') {
               return;
             }
 
-            moveNode(editor, sourceTo, dragItem.nodeIds, dropPosition);
-            $store.selected.clear();
+            if (!dropPosition || !dragItem.nodes.length) {
+              return;
+            }
+
+            const nodeIds = dragItem.nodes.map((node) => node.nodeId);
+
+            if (isSameDocument || isSameEditor) {
+              if (!isCopying.current) {
+                moveNode(editor, sourceTo, nodeIds, dropPosition);
+              } else {
+                if (!generateId) {
+                  return;
+                }
+
+                const clonedNodes = cloneWithNewIds(dragItem.nodes, generateId);
+                insertNodes(editor, insertAt, clonedNodes);
+              }
+            } else {
+              if (!generateId) {
+                return;
+              }
+
+              const clonedNodes = cloneWithNewIds(dragItem.nodes, generateId);
+
+              insertNodes(editor, insertAt, clonedNodes);
+              if (!isCopying.current && sourceEditor) {
+                removeNodes(sourceEditor, nodeIds);
+              }
+            }
+            selectedNodes.set([]);
             break;
           }
         }
 
+        isCopying.current = false;
         setDropPosition(null);
       },
     });
@@ -201,22 +245,32 @@ export class DnDPlugin implements IPlugin {
       return props.children;
     }
 
-    return options.renderBlock?.({
-      props,
-      dragRef: drag,
-      dropRef: connectDropRef,
-      previewRef: preview,
-      position: dropPosition,
-      selected:
-        typeof currentElement.nodeId === 'string'
-          ? $store.selected.has(currentElement.nodeId)
-          : false,
-      onToggleSelected: () => {
-        if (typeof currentElement.nodeId === 'string') {
-          this.handleToggleSelected(currentElement.nodeId);
-        }
-      },
-    });
+    return (
+      <div>
+        {options.renderBlock?.({
+          props,
+          dragRef: drag,
+          dropRef: connectDropRef,
+          previewRef: preview,
+          position: dropPosition,
+          onNativeDrop: (event) => {
+            isCopying.current = event.altKey;
+          },
+          onToggleSelected: (event) => {
+            event.stopPropagation();
+            if ($selectedNodes.includes(props.element)) {
+              selectedNodes.set(
+                [...$selectedNodes].filter(
+                  (element) => element !== props.element,
+                ),
+              );
+            } else {
+              selectedNodes.set([...$selectedNodes, props.element]);
+            }
+          },
+        })}
+      </div>
+    );
   };
 }
 
@@ -245,7 +299,7 @@ const moveNode = (
 
   if (!dropPath) return;
   if (!Editor.hasPath(editor, dropPath)) {
-    return
+    return;
   }
 
   Editor.withoutNormalizing(editor, () => {
@@ -260,7 +314,7 @@ const moveNode = (
           return false;
         }
 
-        const node = n as DnDNode;
+        const node = n as NodeWithId;
         const shouldMove =
           typeof node.nodeId === 'string' && nodeIds.includes(node.nodeId);
         return shouldMove;
@@ -270,5 +324,53 @@ const moveNode = (
     });
   });
   Editor.normalize(editor);
+};
 
+const insertNodes = (editor: Editor, path: Path, nodes: NodeWithId[]) => {
+  Editor.withoutNormalizing(editor, () => {
+    Transforms.insertNodes(editor, nodes, { at: path });
+  });
+};
+
+const removeNodes = (editor: Editor, nodeIds: string[]) => {
+  try {
+    Transforms.removeNodes(editor, {
+      at: [],
+      match: (n) => {
+        if (!Element.isElement(n)) {
+          return false;
+        }
+
+        if (!Editor.isBlock(editor, n)) {
+          return false;
+        }
+
+        const node = n as NodeWithId;
+        return typeof node.nodeId === 'string' && nodeIds.includes(node.nodeId);
+      },
+      mode: 'highest',
+    });
+  } catch {
+    return;
+  }
+};
+
+const cloneWithNewIds = (
+  nodes: NodeWithId[],
+  generateId: () => string,
+): NodeWithId[] => {
+  const copy = structuredClone(nodes);
+
+  const assignId = (node: NodeWithId): void => {
+    node.nodeId = generateId();
+    node.children.forEach((node) => {
+      if ('children' in node) {
+        assignId(node);
+      }
+    });
+  };
+
+  copy.forEach(assignId);
+
+  return copy;
 };

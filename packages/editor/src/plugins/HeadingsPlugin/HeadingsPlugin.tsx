@@ -124,8 +124,7 @@ const isBlockActive = (editor, type) => {
   const [match] = Array.from(
     Editor.nodes(editor, {
       at: Editor.unhangRange(editor, selection),
-      match: (node) =>
-        !Editor.isEditor(node) && Element.isElement(node) && node.type === type,
+      match: (node) => Element.isElement(node) && node.type === type,
     }),
   );
 

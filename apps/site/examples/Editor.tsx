@@ -1,4 +1,4 @@
-import type { CustomElement, EditorRef } from '@use-kona/editor';
+import type { CustomElement, EditorRef, IPlugin } from '@use-kona/editor';
 import { deserialize, KonaEditor, serialize } from '@use-kona/editor';
 import {
   forwardRef,
@@ -19,13 +19,14 @@ const initialValue = text;
 type Props = {
   initialValueType?: 'kona-editor' | 'html';
   value?: any;
+  customPlugins?: IPlugin[];
   onChange?: (value: Descendant[]) => void;
 };
 
 export const ExampleEditor = forwardRef((props: Props, ref) => {
   const { value: defaultValue = text, initialValueType = 'kona-editor' } =
     props;
-  const [plugins] = useState(getPlugins());
+  const [plugins] = useState(props.customPlugins || getPlugins());
   const [value, setValue] = useState<Descendant[] | null>(null);
 
   const editorRef = useRef<EditorRef>(null);

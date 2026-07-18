@@ -1,8 +1,9 @@
-import type { Editor } from 'slate';
 import {
+  AttachmentsPlugin,
   BasicFormattingPlugin,
   BreaksPlugin,
   CodeBlockPlugin,
+  type CodeElement,
   type Commands,
   CommandsPlugin,
   DnDPlugin,
@@ -18,7 +19,7 @@ import {
   ShortcutsPlugin,
   TableOfContentsPlugin,
 } from '@use-kona/editor';
-import type { CodeElement } from '@use-kona/editor';
+import type { Editor } from 'slate';
 import { CodeBlock } from './CodeBlock';
 import { colors } from './colors';
 import { DragBlock } from './DragBlock';
@@ -55,6 +56,21 @@ export const getPlugins = () => {
   });
 
   return [
+    new AttachmentsPlugin({
+      Attachment: (props) => {
+        const { file } = props.element as any;
+        const url = isMimeTypeIsImage(file?.type) ? file?.url : null;
+
+        return (
+          <div {...props.attributes}>
+            {props.children}
+            <div contentEditable={false}>
+              <img width="100%" src={url} alt="" />
+            </div>
+          </div>
+        );
+      },
+    }),
     new BasicFormattingPlugin(),
     new EmojiPlugin({
       ignoreNodes: [CodeBlockPlugin.CODE_LINE_ELEMENT],
@@ -151,4 +167,17 @@ export const getPlugins = () => {
       },
     }),
   ];
+};
+
+const isMimeTypeIsImage = (type: string) => {
+  const imageTypes = [
+    'image/jpeg',
+    'image/png',
+    'image/gif',
+    'image/webp',
+    'image/bmp',
+    'image/tiff',
+    'image/svg+xml',
+  ];
+  return imageTypes.includes(type);
 };
