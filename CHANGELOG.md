@@ -2,6 +2,28 @@
 This fill will contain all the changes for `@use-kona/editor`
 since version `0.1.11`.
 
+## 0.1.25
+### DnDPlugin
+**Added**
+* Added drag-and-drop between editor instances, with move and Alt-drag copy behavior.
+* Added typed external drag sources and custom drop handlers for converting external items into editor blocks.
+* Added multi-block selection and dragging, including selection through the drag handle.
+* Added `documentId` and `nodeIdPlugin` options so drops can distinguish documents and generate fresh node IDs when copying blocks.
+
+**Changed**
+* Drag items now use the `EditorDragItem` shape and include the dragged nodes, source editor, and optional custom item data.
+* The custom `renderBlock` API now exposes native drop and selection-toggle event handlers.
+
+### Core
+**Added**
+* Added block selection state and the public `useEditorContext` hook.
+* Added keyboard navigation and actions for void blocks using Escape, Arrow Up/Down, Backspace, and Enter.
+* Added selected-block styling through the `--kona-editor-selected-color` CSS custom property.
+
+### Dependencies
+**Changed**
+* Upgraded Slate, Slate React, and Slate DOM to `0.126.x`.
+
 ## 0.1.23
 ### DnDPlugin
 **Fixed**
