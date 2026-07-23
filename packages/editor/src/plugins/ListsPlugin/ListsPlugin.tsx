@@ -17,6 +17,7 @@ import styles from './styles.module.css';
 type Options = {
   listTypes?: string[];
   listItemTypes?: string[];
+  ignoreBackspaceTypes?: string[];
 };
 
 export class ListsPlugin implements IPlugin {
@@ -27,9 +28,14 @@ export class ListsPlugin implements IPlugin {
   static LIST_ITEM_ELEMENT = 'li';
 
   constructor(options: Options = {}) {
-    const { listTypes = [], listItemTypes = [] } = options;
+    const {
+      ignoreBackspaceTypes = [],
+      listTypes = [],
+      listItemTypes = [],
+    } = options;
 
     this.options = {
+      ignoreBackspaceTypes,
       listTypes: [
         ListsPlugin.BULLETED_LIST_ELEMENT,
         ListsPlugin.NUMBERED_LIST_ELEMENT,
@@ -239,9 +245,14 @@ export class ListsPlugin implements IPlugin {
         if (
           selection &&
           match &&
+          !this.options.ignoreBackspaceTypes?.includes(
+            (match[0] as CustomElement).type,
+          ) &&
           this.getListItemDepth(editor, match[1]) === 1 &&
           Editor.isStart(editor, selection.anchor, match[1])
         ) {
+          event.preventDefault();
+
           Transforms.unwrapNodes(editor, {
             match: (n) => this.isList(editor, n as CustomElement),
             split: true,

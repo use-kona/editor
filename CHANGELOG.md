@@ -2,6 +2,14 @@
 This fill will contain all the changes for `@use-kona/editor`
 since version `0.1.11`.
 
+## 0.1.26
+### ListsPlugin
+**Added**
+* Added `ignoreBackspaceTypes` so custom first-level list items can opt out of the built-in Backspace conversion to paragraphs.
+
+**Fixed**
+* Prevented the triggering Backspace event after the plugin converts a first-level list item into a paragraph.
+
 ## 0.1.25
 ### DnDPlugin
 **Added**
