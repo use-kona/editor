@@ -2,6 +2,11 @@
 This fill will contain all the changes for `@use-kona/editor`
 since version `0.1.11`.
 
+## 0.1.27
+### Core
+**Fixed**
+* Prevented the default Escape behavior when clearing block selection and blurring the editor.
+
 ## 0.1.26
 ### ListsPlugin
 **Added**
