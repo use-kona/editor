@@ -2,6 +2,11 @@
 This fill will contain all the changes for `@use-kona/editor`
 since version `0.1.11`.
 
+## 0.1.27
+### TableOfContentsPlugin
+**Fixed**
+* Limited heading navigation to the closest scrollable container so it no longer scrolls the surrounding page.
+
 ## 0.1.26
 ### ListsPlugin
 **Added**

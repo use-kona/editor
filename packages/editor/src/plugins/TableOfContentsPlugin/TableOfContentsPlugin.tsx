@@ -5,6 +5,7 @@ import { Editor, type NodeEntry, Operation, Text } from 'slate';
 import { ReactEditor } from 'slate-react';
 import type { CustomElement } from '../../../types';
 import type { IPlugin, UiParams } from '../../types';
+import { scrollToHeading } from './scrollToHeading';
 import styles from './styles.module.css';
 
 type Options = {
@@ -75,10 +76,7 @@ export class TableOfContentsPlugin implements IPlugin {
             params.editor,
             node,
           ) as HTMLElement;
-          element?.scrollIntoView({
-            behavior: 'smooth',
-            block: 'start',
-          });
+          scrollToHeading(element);
         };
 
         return (
