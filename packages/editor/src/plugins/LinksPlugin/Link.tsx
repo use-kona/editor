@@ -8,6 +8,7 @@ import {
 } from 'slate-react';
 import styles from './styles.module.css';
 import type { LinkElement, Options } from './types';
+import { isSafeLinkUrl } from './url';
 
 type Props = {
   as?: React.ElementType;
@@ -52,6 +53,14 @@ export const Link = (props: Props) => {
       }
     }
   }, [isOpen]);
+
+  if (!isSafeLinkUrl(element.url)) {
+    return (
+      <Component ref={ref} className={styles.link}>
+        {children}
+      </Component>
+    );
+  }
 
   const getLinkElement = () => element;
 

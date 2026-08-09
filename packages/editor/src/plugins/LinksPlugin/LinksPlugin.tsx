@@ -1,4 +1,3 @@
-import isUrl from 'is-url';
 import { Editor, Element, Range, Transforms } from 'slate';
 import { jsx } from 'slate-hyperscript';
 import type { RenderElementProps } from 'slate-react';
@@ -6,6 +5,7 @@ import type { IPlugin } from '../../types';
 import { LINK_ELEMENT } from './constants';
 import { Link } from './Link';
 import type { LinkElement, Options } from './types';
+import { isSafeLinkUrl } from './url';
 
 export class LinksPlugin implements IPlugin {
   static LINK_TYPE = LINK_ELEMENT;
@@ -16,7 +16,7 @@ export class LinksPlugin implements IPlugin {
     const { insertText } = editor;
 
     editor.insertText = (text: string) => {
-      if (text && isUrl(text)) {
+      if (text && isSafeLinkUrl(text)) {
         const selectedText = window.getSelection()?.toString();
         if (selectedText) {
           Transforms.wrapNodes(editor, {
@@ -66,6 +66,10 @@ export class LinksPlugin implements IPlugin {
       deserialize: (element: HTMLElement, children) => {
         if (element.tagName === 'A') {
           const url = element.getAttribute('href') || '';
+          if (!isSafeLinkUrl(url)) {
+            return children;
+          }
+
           return jsx(
             'element',
             {
@@ -80,6 +84,10 @@ export class LinksPlugin implements IPlugin {
   ];
 
   static addLink = (editor: Editor, url: string) => {
+    if (!isSafeLinkUrl(url)) {
+      return;
+    }
+
     const { selection } = editor;
 
     if (!selection) {

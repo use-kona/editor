@@ -13,7 +13,11 @@ export { EmojiPlugin } from './EmojiPlugin';
 export { type Commands, FloatingMenuPlugin } from './FloatingMenuPlugin';
 export { HeadingsPlugin } from './HeadingsPlugin';
 export { HighlightsPlugin } from './HighlightsPlugin';
-export { LinksPlugin, type OptionsMethods } from './LinksPlugin';
+export {
+  isSafeLinkUrl,
+  LinksPlugin,
+  type OptionsMethods,
+} from './LinksPlugin';
 export { ListsPlugin } from './ListsPlugin';
 export { MenuPlugin } from './MenuPlugin';
 export { NodeIdPlugin } from './NodeIdPlugin';

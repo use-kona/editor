@@ -2,6 +2,11 @@
 This fill will contain all the changes for `@use-kona/editor`
 since version `0.1.11`.
 
+## 0.1.28
+### LinksPlugin
+**Fixed**
+* Rejected unsafe URL schemes when creating, typing, or importing links, and rendered persisted unsafe links as inline content.
+
 ## 0.1.27
 ### TableOfContentsPlugin
 **Fixed**
