@@ -12,6 +12,10 @@ since version `0.1.11`.
 **Fixed**
 * Limited heading navigation to the closest scrollable container so it no longer scrolls the surrounding page.
 
+### Core
+**Fixed**
+* Prevented the default Escape behavior when clearing block selection and blurring the editor.
+
 ## 0.1.26
 ### ListsPlugin
 **Added**

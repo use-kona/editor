@@ -118,6 +118,7 @@ export const createEditable =
         if ($selectedNodes.length === 0) {
           selectedNodes.set([currentBlock[0]]);
         } else {
+          event.preventDefault();
           selectedNodes.set([]);
           ReactEditor.blur(editor);
         }
