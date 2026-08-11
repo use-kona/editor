@@ -2,6 +2,11 @@
 This fill will contain all the changes for `@use-kona/editor`
 since version `0.1.11`.
 
+## 0.1.29
+### CommandsPlugin
+**Fixed**
+* Prioritized slash-menu Arrow Up and Arrow Down navigation over editor void-block navigation.
+
 ## 0.1.28
 ### LinksPlugin
 **Fixed**
