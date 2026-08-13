@@ -23,6 +23,8 @@ const initialValue = [
   { type: HeadingsPlugin.HeadingLevel1, children: [{ text: 'Heading 1' }] },
   { type: 'paragraph', children: [{ text: 'Hidden text' }] },
   { type: HeadingsPlugin.HeadingLevel2, children: [{ text: 'Heading 2' }] },
+  { type: 'paragraph', children: [{ text: 'Nested text' }] },
+  { type: HeadingsPlugin.HeadingLevel1, children: [{ text: 'Next heading' }] },
   { type: 'paragraph', children: [{ text: 'Visible text' }] },
 ];
 
@@ -39,7 +41,7 @@ const plugins = () => [
 afterEach(cleanup);
 
 describe('CollapsibleBlocksPlugin', () => {
-  it('hides only the blocks before the next configured boundary and persists the collapsed state', async () => {
+  it('hides nested configured blocks until the next equal-or-higher boundary and persists the collapsed state', async () => {
     const onChange = vi.fn();
 
     render(
@@ -58,7 +60,9 @@ describe('CollapsibleBlocksPlugin', () => {
     fireEvent.click(firstChevron);
 
     await waitFor(() => expect(hiddenText).not.toBeVisible());
-    expect(screen.getByText('Heading 2')).toBeVisible();
+    expect(screen.getByText('Heading 2')).not.toBeVisible();
+    expect(screen.getByText('Nested text')).not.toBeVisible();
+    expect(screen.getByText('Next heading')).toBeVisible();
     expect(screen.getByText('Visible text')).toBeVisible();
     expect(
       screen.getByRole('button', { name: 'Expand section' }),
@@ -152,7 +156,7 @@ describe('CollapsibleBlocksPlugin', () => {
     });
   });
 
-  it('keeps a selection in the next section in place', () => {
+  it('keeps a selection in the next equal-level section in place', () => {
     let editor: Editor | undefined;
     const capturePlugin: IPlugin = {
       init(value) {
@@ -174,15 +178,15 @@ describe('CollapsibleBlocksPlugin', () => {
     }
 
     act(() => {
-      Transforms.select(editor, { path: [2, 0], offset: 2 });
+      Transforms.select(editor, { path: [4, 0], offset: 2 });
     });
     fireEvent.click(
       screen.getAllByRole('button', { name: 'Collapse section' })[0],
     );
 
     expect(editor.selection).toEqual({
-      anchor: { path: [2, 0], offset: 2 },
-      focus: { path: [2, 0], offset: 2 },
+      anchor: { path: [4, 0], offset: 2 },
+      focus: { path: [4, 0], offset: 2 },
     });
   });
 });

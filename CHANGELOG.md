@@ -7,6 +7,9 @@ since version `0.1.11`.
 **Added**
 * Added configurable collapsible sections with persisted block state and leading chevrons.
 
+**Changed**
+* Nested configured types now remain inside a parent section until the next equal-or-higher type.
+
 ### CodeBlockPlugin
 **Fixed**
 * Numbered code-block lines sequentially instead of displaying `1` on every line.

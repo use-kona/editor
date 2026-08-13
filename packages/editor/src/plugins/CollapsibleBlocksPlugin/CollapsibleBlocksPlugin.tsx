@@ -20,6 +20,16 @@ export class CollapsibleBlocksPlugin implements IPlugin {
       return props.children;
     }
 
+    const isHidden = isHiddenByCollapsedBoundary(editor, path, this.types);
+
+    if (isHidden) {
+      return (
+        <div className={styles.hidden} hidden>
+          {props.children}
+        </div>
+      );
+    }
+
     if (this.types.includes(props.element.type)) {
       return (
         <CollapsibleBoundary
@@ -33,13 +43,7 @@ export class CollapsibleBlocksPlugin implements IPlugin {
       );
     }
 
-    return isHiddenByPreviousBoundary(editor, path, this.types) ? (
-      <div className={styles.hidden} hidden>
-        {props.children}
-      </div>
-    ) : (
-      props.children
-    );
+    return props.children;
   };
 }
 
@@ -105,16 +109,21 @@ const CollapsibleBoundary = ({
   );
 };
 
-const isHiddenByPreviousBoundary = (
+const isHiddenByCollapsedBoundary = (
   editor: Editor,
   path: Path,
   types: string[],
 ) => {
-  for (let index = path[0] - 1; index >= 0; index--) {
+  for (let index = 0; index < path[0]; index++) {
     const node = editor.children[index] as CollapsibleElement;
 
-    if (Element.isElement(node) && types.includes(node.type)) {
-      return node.collapsed === true;
+    if (
+      Element.isElement(node) &&
+      node.collapsed === true &&
+      types.includes(node.type) &&
+      path[0] < getSectionEnd(editor, index, types)
+    ) {
+      return true;
     }
   }
 
@@ -138,17 +147,25 @@ const isSelectionInsideSection = (
     return false;
   }
 
-  for (
-    let index = boundaryPath[0] + 1;
-    index < editor.children.length;
-    index++
-  ) {
-    const node = editor.children[index];
+  return selectionIndex < getSectionEnd(editor, boundaryPath[0], types);
+};
 
-    if (Element.isElement(node) && types.includes(node.type)) {
-      return selectionIndex < index;
+const getSectionEnd = (
+  editor: Editor,
+  boundaryIndex: number,
+  types: string[],
+) => {
+  const boundary = editor.children[boundaryIndex] as CollapsibleElement;
+  const boundaryLevel = types.indexOf(boundary.type);
+
+  for (let index = boundaryIndex + 1; index < editor.children.length; index++) {
+    const node = editor.children[index];
+    const nodeLevel = Element.isElement(node) ? types.indexOf(node.type) : -1;
+
+    if (nodeLevel !== -1 && nodeLevel <= boundaryLevel) {
+      return index;
     }
   }
 
-  return true;
+  return editor.children.length;
 };

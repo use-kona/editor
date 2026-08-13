@@ -7,9 +7,11 @@ import { Badge } from '@theme';
 
 ## Description
 
-Adds a chevron to configured top-level block types. Each configured block starts
-a section that ends at the next configured block. Collapsing a section stores
-`collapsed: true` on its starting block and hides the intervening blocks.
+Adds a chevron to configured top-level block types. Types are ordered from the
+highest to lowest section level. Each configured block starts a section that
+ends at the next configured block of the same or higher level. Collapsing a
+section stores `collapsed: true` on its starting block and hides every nested
+block in that section.
 
 ## Usage
 
@@ -29,5 +31,6 @@ const collapsibleBlocksPlugin = new CollapsibleBlocksPlugin([
 return <KonaEditor plugins={[new HeadingsPlugin(), collapsibleBlocksPlugin]} />;
 ```
 
-All configured block types are flat section boundaries: heading levels are not
-nested. Sections are expanded when `collapsed` is omitted or `false`.
+The array order defines hierarchy: an `h1` section includes following `h2` and
+`h3` sections until the next `h1`; an `h2` section ends at the next `h1` or
+`h2`. Sections are expanded when `collapsed` is omitted or `false`.
