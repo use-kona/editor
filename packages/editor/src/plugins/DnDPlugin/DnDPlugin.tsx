@@ -12,7 +12,10 @@ import {
 import type { CustomElement } from '../../../types';
 import { useEditorContext } from '../../provider';
 import type { IPlugin } from '../../types';
-import { getCollapsibleSectionPaths } from '../CollapsibleBlocksPlugin/CollapsibleBlocksPlugin';
+import {
+  getCollapsibleSectionPaths,
+  isHiddenByCollapsedSection,
+} from '../CollapsibleBlocksPlugin/CollapsibleBlocksPlugin';
 import type { EditorDragItem, NodeWithId, Options } from './types';
 import { getNodesByNodeIds } from './utils';
 
@@ -50,12 +53,13 @@ export class DnDPlugin implements IPlugin {
 
     const customType = options.customTypes?.[props.element.type];
     const currentElement = props.element as NodeWithId;
+    const path = ReactEditor.findPath(editor, props.element);
+    const isHidden = isHiddenByCollapsedSection(editor, path);
 
     const [, drag, preview] = useDrag({
       type: customType?.type || DnDPlugin.DND_BLOCK_ELEMENT,
       item: () => {
         const selected: Array<NodeWithId> = $selectedNodes;
-        const path = ReactEditor.findPath(editor, props.element);
         const sectionPaths = getCollapsibleSectionPaths(editor, path);
 
         /**
@@ -252,7 +256,7 @@ export class DnDPlugin implements IPlugin {
     }
 
     return (
-      <div>
+      <div hidden={isHidden}>
         {options.renderBlock?.({
           props,
           dragRef: drag,

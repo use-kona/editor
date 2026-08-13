@@ -2,6 +2,15 @@
 This fill will contain all the changes for `@use-kona/editor`
 since version `0.1.11`.
 
+## 0.1.31
+### CollapsibleBlocksPlugin
+**Fixed**
+* Kept chevrons positioned within custom block wrappers.
+
+### DnDPlugin
+**Fixed**
+* Hidden section content now hides its drag controls without consumer CSS.
+
 ## 0.1.30
 ### CollapsibleBlocksPlugin
 **Added**

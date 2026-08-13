@@ -29,7 +29,7 @@ export class CollapsibleBlocksPlugin implements IPlugin {
       return props.children;
     }
 
-    const isHidden = isHiddenByCollapsedBoundary(editor, path, this.types);
+    const isHidden = isHiddenByCollapsedSection(editor, path);
 
     if (isHidden) {
       return (
@@ -129,11 +129,10 @@ export const getCollapsibleSectionPaths = (editor: Editor, path: Path) => {
   return Array.from({ length: end - path[0] }, (_, index) => [path[0] + index]);
 };
 
-const isHiddenByCollapsedBoundary = (
-  editor: Editor,
-  path: Path,
-  types: string[],
-) => {
+export const isHiddenByCollapsedSection = (editor: Editor, path: Path) => {
+  const types = sectionTypesByEditor.get(editor);
+  if (!types) return false;
+
   for (let index = 0; index < path[0]; index++) {
     const node = editor.children[index] as CollapsibleElement;
 

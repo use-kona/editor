@@ -1,5 +1,6 @@
 // @vitest-environment jsdom
 
+import '@testing-library/jest-dom/vitest';
 import { act, render, waitFor } from '@testing-library/react';
 import { createDragDropManager, type DragDropManager } from 'dnd-core';
 import React from 'react';
@@ -342,5 +343,66 @@ describe('DnDPlugin', () => {
       'Nested text',
     ]);
     await waitFor(() => expect(onChange).toHaveBeenCalled());
+  });
+
+  it('hides custom drag wrappers for collapsed section content', async () => {
+    const manager = createDndManager();
+    const dndPlugin = new DnDPlugin({
+      onDropFiles: () => {},
+      renderBlock: ({ dragRef, dropRef, previewRef, props }) =>
+        React.createElement(
+          'div',
+          {
+            ...props.attributes,
+            'data-dnd-block': (props.element as { nodeId: string }).nodeId,
+            ref: (element) => dropRef(previewRef(element)),
+          },
+          React.createElement(
+            'button',
+            { contentEditable: false, ref: dragRef, type: 'button' },
+            'Drag',
+          ),
+          props.children,
+        ),
+    });
+
+    render(
+      React.createElement(
+        DndProvider,
+        { manager },
+        React.createElement(KonaEditor, {
+          initialValue: [
+            {
+              type: HeadingsPlugin.HeadingLevel1,
+              nodeId: 'section',
+              collapsed: true,
+              children: [{ text: 'Section' }],
+            },
+            {
+              type: 'paragraph',
+              nodeId: 'section-text',
+              children: [{ text: 'Section text' }],
+            },
+            {
+              type: HeadingsPlugin.HeadingLevel1,
+              nodeId: 'next-section',
+              children: [{ text: 'Next section' }],
+            },
+          ],
+          plugins: [
+            new HeadingsPlugin(),
+            new CollapsibleBlocksPlugin([HeadingsPlugin.HeadingLevel1]),
+            dndPlugin,
+          ],
+          onChange: () => {},
+        }),
+      ),
+    );
+
+    const hiddenDragBlock = document.querySelector(
+      '[data-dnd-block="section-text"]',
+    );
+
+    expect(hiddenDragBlock).not.toBeVisible();
   });
 });
