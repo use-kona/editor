@@ -2,6 +2,7 @@ export { AttachmentsPlugin } from './AttachmentsPlugin';
 export { BasicFormattingPlugin } from './BasicFormattingPlugin';
 export { BreaksPlugin } from './BreaksPlugin';
 export { CodeBlockPlugin, type CodeElement } from './CodeBlockPlugin';
+export { CollapsibleBlocksPlugin } from './CollapsibleBlocksPlugin';
 export {
   type Command,
   type CommandPathEntry,

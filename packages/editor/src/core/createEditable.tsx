@@ -47,6 +47,10 @@ export const createEditable =
     const [selectedNodes] = useState(() => atom<CustomElement[]>([]));
 
     const $selectedNodes = useStore(selectedNodes);
+    const renderBlockPlugins = [...plugins].sort(
+      (left, right) =>
+        (left.renderBlockPriority || 0) - (right.renderBlockPriority || 0),
+    );
 
     const renderElement = (props: RenderElementProps): ReactElement => {
       let result: ReactElement | null = null;
@@ -60,7 +64,7 @@ export const createEditable =
         }
       }
 
-      for (const plugin of plugins) {
+      for (const plugin of renderBlockPlugins) {
         if (plugin.renderBlock) {
           result = plugin.renderBlock({
             ...props,

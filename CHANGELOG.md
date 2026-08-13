@@ -2,6 +2,25 @@
 This fill will contain all the changes for `@use-kona/editor`
 since version `0.1.11`.
 
+## 0.1.30
+### CollapsibleBlocksPlugin
+**Added**
+* Added configurable collapsible sections with persisted block state and leading chevrons.
+
+**Changed**
+* Nested configured types now remain inside a parent section until the next equal-or-higher type.
+* Collapsible sections now compose correctly with block wrappers regardless of plugin array order.
+* Dragging a collapsible boundary moves its complete section, including nested content and persisted collapsed state.
+
+### DnDPlugin
+**Fixed**
+* Fixed moving blocks without `nodeId` values, including paragraphs and list items.
+* Fixed section moves when dropping at the end of a container or when hover state is unavailable at drop time.
+
+### CodeBlockPlugin
+**Fixed**
+* Numbered code-block lines sequentially instead of displaying `1` on every line.
+
 ## 0.1.29
 ### CommandsPlugin
 **Fixed**

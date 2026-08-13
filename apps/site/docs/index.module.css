@@ -1,13 +1,20 @@
 .root {
-  width: 700px;
+  box-sizing: border-box;
+  height: calc(100dvh - 56px);
   margin: 0 auto;
   padding: 20px;
+  width: min(700px, 100%);
 
   display: flex;
   flex-direction: column;
-  align-items: center;
+  align-items: stretch;
 
   row-gap: 16px;
+
+  & > :last-child {
+    flex: 1;
+    min-height: 0;
+  }
 
   & code {
     font-size: 14px;

@@ -5,6 +5,10 @@
     transform 0.25s;
   padding: 2px 0;
 
+  &:has([data-collapsible-block-hidden]) {
+    display: none;
+  }
+
   &.selected {
     background-color: #3498db11;
     transform: scale(0.98);
@@ -24,6 +28,7 @@
 .drag {
   display: inline-block;
   vertical-align: baseline;
+  height: 16px;
   width: 16px;
   cursor: move;
   line-height: 1.2;
@@ -36,7 +41,7 @@
   border-radius: 4px;
   display: grid;
   grid-template-columns: 16px 1fr;
-  column-gap: 8px;
+  column-gap: 24px;
   align-items: start;
   padding: 4px 8px 4px 8px;
   transition: background-color 0.25s;

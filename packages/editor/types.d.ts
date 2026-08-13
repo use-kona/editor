@@ -3,7 +3,11 @@ import type { ReactEditor } from 'slate-react';
 import type { IPlugin } from './src';
 
 type CustomText = { text: string };
-type CustomElement = { type: string; children: (CustomElement | CustomText)[] };
+type CustomElement = {
+  type: string;
+  collapsed?: boolean;
+  children: (CustomElement | CustomText)[];
+};
 
 declare module 'slate' {
   interface CustomTypes {

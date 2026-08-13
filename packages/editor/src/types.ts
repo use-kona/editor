@@ -21,6 +21,11 @@ export interface IPlugin<
   leafs?: Leaf<TEditor, TLeaf>[];
   hotkeys?: Hotkey[];
 
+  /**
+   * Render block wrappers from lower to higher priority. Plugins with the same
+   * priority retain the order supplied to KonaEditor.
+   */
+  renderBlockPriority?: number;
   renderBlock?: (props: RenderElementProps) => ReactElement | null;
   renderLeaf?: (props: RenderLeafProps) => ReactElement | null;
 

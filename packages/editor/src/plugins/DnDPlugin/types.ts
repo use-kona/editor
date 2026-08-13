@@ -73,6 +73,7 @@ export type EditorInnerDragItem<TItem = unknown> = {
      */
     documentId?: string | null;
     path?: Path;
+    sectionPaths?: Path[];
   };
   data?: Record<string, unknown>;
 };

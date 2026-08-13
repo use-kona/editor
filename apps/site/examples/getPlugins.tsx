@@ -4,6 +4,7 @@ import {
   BreaksPlugin,
   CodeBlockPlugin,
   type CodeElement,
+  CollapsibleBlocksPlugin,
   type Commands,
   CommandsPlugin,
   DnDPlugin,
@@ -98,6 +99,11 @@ export const getPlugins = () => {
       generateId: () => Math.random().toString(36).substring(2, 15),
     }),
     new HeadingsPlugin(),
+    new CollapsibleBlocksPlugin([
+      HeadingsPlugin.HeadingLevel1,
+      HeadingsPlugin.HeadingLevel2,
+      HeadingsPlugin.HeadingLevel3,
+    ]),
     new MenuPlugin({
       renderMenu: ({ editor }) => {
         return <Menu editor={editor} />;

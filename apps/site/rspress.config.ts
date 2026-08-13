@@ -54,6 +54,10 @@ export default defineConfig({
               link: '/guide/plugins/code-block-plugin',
             },
             {
+              text: 'CollapsibleBlocksPlugin',
+              link: '/guide/plugins/collapsible-blocks-plugin',
+            },
+            {
               text: 'CommandsPlugin',
               link: '/guide/plugins/commands-plugin',
             },

@@ -1,0 +1,1 @@
+export { CollapsibleBlocksPlugin } from './CollapsibleBlocksPlugin';

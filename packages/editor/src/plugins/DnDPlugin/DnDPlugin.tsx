@@ -12,6 +12,7 @@ import {
 import type { CustomElement } from '../../../types';
 import { useEditorContext } from '../../provider';
 import type { IPlugin } from '../../types';
+import { getCollapsibleSectionPaths } from '../CollapsibleBlocksPlugin/CollapsibleBlocksPlugin';
 import type { EditorDragItem, NodeWithId, Options } from './types';
 import { getNodesByNodeIds } from './utils';
 
@@ -54,15 +55,18 @@ export class DnDPlugin implements IPlugin {
       type: customType?.type || DnDPlugin.DND_BLOCK_ELEMENT,
       item: () => {
         const selected: Array<NodeWithId> = $selectedNodes;
+        const path = ReactEditor.findPath(editor, props.element);
+        const sectionPaths = getCollapsibleSectionPaths(editor, path);
 
         /**
          * We copy nodes that the user is dragging.
          * If a user drags multiple nodes, and the current node is one of them,
          * we copy selected nodes. Otherwise, we copy only the current node.
          */
-        const nodes =
-          selected.length > 0 &&
-          selected.find((node) => node.nodeId === currentElement.nodeId)
+        const nodes = sectionPaths
+          ? getNodesAtPaths(editor, sectionPaths)
+          : selected.length > 0 &&
+              selected.find((node) => node.nodeId === currentElement.nodeId)
             ? getNodesByNodeIds(
                 editor,
                 selected.map((node) => node.nodeId),
@@ -91,6 +95,8 @@ export class DnDPlugin implements IPlugin {
           source: {
             editor,
             documentId: options.documentId,
+            path,
+            sectionPaths: sectionPaths || undefined,
           },
         };
 
@@ -124,22 +130,8 @@ export class DnDPlugin implements IPlugin {
         };
       },
       hover(_, monitor) {
-        const element = dropTargetRef.current;
-        if (!element) return;
-
-        const hoverBoundingRect = element.getBoundingClientRect();
-        const hoverMiddleY =
-          (hoverBoundingRect.bottom - hoverBoundingRect.top) / 2;
-        const clientOffset = monitor.getClientOffset();
-        if (!clientOffset) return;
-
-        const hoverClientY = clientOffset.y - hoverBoundingRect.top;
-
-        if (hoverClientY < hoverMiddleY) {
-          setDropPosition('top');
-        } else {
-          setDropPosition('bottom');
-        }
+        const position = getDropPosition(dropTargetRef.current, monitor);
+        if (position) setDropPosition(position);
       },
       drop: (data, monitor) => {
         const itemType = monitor.getItemType();
@@ -156,11 +148,12 @@ export class DnDPlugin implements IPlugin {
 
         if (!sourceTo) return;
 
-        const insertAt = getDropPath(
-          editor,
-          sourceTo,
-          dropPosition || 'bottom',
-        );
+        const position =
+          getDropPosition(dropTargetRef.current, monitor) ||
+          dropPosition ||
+          'bottom';
+
+        const insertAt = getDropPath(editor, sourceTo, position);
 
         if (!insertAt) return;
 
@@ -188,15 +181,24 @@ export class DnDPlugin implements IPlugin {
               return;
             }
 
-            if (!dropPosition || !dragItem.nodes.length) {
+            if (!dragItem.nodes.length) {
               return;
             }
 
-            const nodeIds = dragItem.nodes.map((node) => node.nodeId);
+            const nodeIds = dragItem.nodes
+              .map((node) => node.nodeId)
+              .filter((nodeId): nodeId is string => typeof nodeId === 'string');
 
             if (isSameDocument || isSameEditor) {
               if (!isCopying.current) {
-                moveNode(editor, sourceTo, nodeIds, dropPosition);
+                moveNode(
+                  editor,
+                  sourceTo,
+                  nodeIds,
+                  position,
+                  dragItem.source.path,
+                  dragItem.source.sectionPaths,
+                );
               } else {
                 if (!generateId) {
                   return;
@@ -214,7 +216,11 @@ export class DnDPlugin implements IPlugin {
 
               insertNodes(editor, insertAt, clonedNodes);
               if (!isCopying.current && sourceEditor) {
-                removeNodes(sourceEditor, nodeIds);
+                removeNodes(
+                  sourceEditor,
+                  nodeIds,
+                  dragItem.source.sectionPaths,
+                );
               }
             }
             selectedNodes.set([]);
@@ -289,20 +295,66 @@ const getDropPath = (
   }
 };
 
-const moveNode = (
+const getDropPosition = (
+  element: HTMLElement | null,
+  monitor: { getClientOffset: () => { y: number } | null },
+) => {
+  if (!element) return null;
+
+  const clientOffset = monitor.getClientOffset();
+  if (!clientOffset) return null;
+
+  const rect = element.getBoundingClientRect();
+  return clientOffset.y - rect.top < (rect.bottom - rect.top) / 2
+    ? 'top'
+    : 'bottom';
+};
+
+export const moveNode = (
   editor: Editor,
   targetNodePath: Path,
   nodeIds: string[],
   position: 'top' | 'bottom',
+  sourcePath?: Path,
+  sectionPaths?: Path[],
 ) => {
   const dropPath = getDropPath(editor, targetNodePath, position);
 
   if (!dropPath) return;
-  if (!Editor.hasPath(editor, dropPath)) {
+  if (!isValidInsertPath(editor, dropPath)) {
+    return;
+  }
+
+  if (sectionPaths?.some((path) => Path.equals(path, targetNodePath))) {
     return;
   }
 
   Editor.withoutNormalizing(editor, () => {
+    if (sectionPaths?.length) {
+      const sectionNodes = new Set(
+        sectionPaths
+          .filter((path) => Editor.hasPath(editor, path))
+          .map((path) => Editor.node(editor, path)[0]),
+      );
+
+      Transforms.moveNodes(editor, {
+        at: [],
+        match: (node) => sectionNodes.has(node),
+        to: dropPath,
+        mode: 'highest',
+      });
+      return;
+    }
+
+    if (
+      nodeIds.length === 0 &&
+      sourcePath &&
+      Editor.hasPath(editor, sourcePath)
+    ) {
+      Transforms.moveNodes(editor, { at: sourcePath, to: dropPath });
+      return;
+    }
+
     Transforms.moveNodes(editor, {
       at: [],
       match: (n) => {
@@ -326,14 +378,48 @@ const moveNode = (
   Editor.normalize(editor);
 };
 
+const isValidInsertPath = (editor: Editor, path: Path) => {
+  const parentPath = Path.parent(path);
+  const index = path[path.length - 1];
+
+  if (index === undefined || !Editor.hasPath(editor, parentPath)) {
+    return false;
+  }
+
+  const [parent] = Editor.node(editor, parentPath);
+  return 'children' in parent && index <= parent.children.length;
+};
+
 const insertNodes = (editor: Editor, path: Path, nodes: NodeWithId[]) => {
   Editor.withoutNormalizing(editor, () => {
     Transforms.insertNodes(editor, nodes, { at: path });
   });
 };
 
-const removeNodes = (editor: Editor, nodeIds: string[]) => {
+const getNodesAtPaths = (editor: Editor, paths: Path[]) =>
+  paths
+    .filter((path) => Editor.hasPath(editor, path))
+    .map((path) => structuredClone(Editor.node(editor, path)[0] as NodeWithId));
+
+const removeNodes = (
+  editor: Editor,
+  nodeIds: string[],
+  sectionPaths?: Path[],
+) => {
   try {
+    if (sectionPaths?.length) {
+      const paths = sectionPaths
+        .filter((path) => Editor.hasPath(editor, path))
+        .sort((left, right) => Path.compare(right, left));
+
+      Editor.withoutNormalizing(editor, () => {
+        paths.forEach((path) => {
+          Transforms.removeNodes(editor, { at: path });
+        });
+      });
+      return;
+    }
+
     Transforms.removeNodes(editor, {
       at: [],
       match: (n) => {
