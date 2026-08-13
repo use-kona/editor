@@ -24,7 +24,7 @@ export class CollapsibleBlocksPlugin implements IPlugin {
 
     if (isHidden) {
       return (
-        <div className={styles.hidden} hidden>
+        <div className={styles.hidden} data-collapsible-block-hidden hidden>
           {props.children}
         </div>
       );

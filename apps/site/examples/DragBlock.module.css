@@ -5,6 +5,10 @@
     transform 0.25s;
   padding: 2px 0;
 
+  &:has([data-collapsible-block-hidden]) {
+    display: none;
+  }
+
   &.selected {
     background-color: #3498db11;
     transform: scale(0.98);
