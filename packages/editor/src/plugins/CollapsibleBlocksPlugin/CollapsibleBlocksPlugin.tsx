@@ -9,8 +9,17 @@ type CollapsibleElement = CustomElement & {
   collapsed?: boolean;
 };
 
+const sectionTypesByEditor = new WeakMap<Editor, string[]>();
+
 export class CollapsibleBlocksPlugin implements IPlugin {
+  renderBlockPriority = -1;
+
   constructor(private types: string[]) {}
+
+  init(editor: Editor) {
+    sectionTypesByEditor.set(editor, this.types);
+    return editor;
+  }
 
   renderBlock = (props: RenderElementProps) => {
     const editor = useSlate();
@@ -107,6 +116,17 @@ const CollapsibleBoundary = ({
       {children}
     </div>
   );
+};
+
+export const getCollapsibleSectionPaths = (editor: Editor, path: Path) => {
+  const types = sectionTypesByEditor.get(editor);
+  if (!types || path.length !== 1) return null;
+
+  const boundary = editor.children[path[0]] as CollapsibleElement | undefined;
+  if (!boundary || !types.includes(boundary.type)) return null;
+
+  const end = getSectionEnd(editor, path[0], types);
+  return Array.from({ length: end - path[0] }, (_, index) => [path[0] + index]);
 };
 
 const isHiddenByCollapsedBoundary = (

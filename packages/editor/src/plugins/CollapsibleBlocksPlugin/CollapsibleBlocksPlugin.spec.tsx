@@ -100,6 +100,30 @@ describe('CollapsibleBlocksPlugin', () => {
     ).toHaveLength(2);
   });
 
+  it('renders inside later block wrappers regardless of plugin array order', () => {
+    const wrapperPlugin: IPlugin = {
+      renderBlock: (props) => (
+        <div data-testid="block-wrapper">{props.children}</div>
+      ),
+    };
+
+    render(
+      <KonaEditor
+        initialValue={[
+          { type: HeadingsPlugin.HeadingLevel1, children: [{ text: 'One' }] },
+        ]}
+        plugins={[wrapperPlugin, ...plugins()]}
+        onChange={() => {}}
+      />,
+    );
+
+    expect(
+      screen
+        .getByRole('button', { name: 'Collapse section' })
+        .closest('[data-testid="block-wrapper"]'),
+    ).toBeInTheDocument();
+  });
+
   it('keeps chevrons interactive in read-only editors', async () => {
     const onChange = vi.fn();
 

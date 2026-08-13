@@ -9,6 +9,13 @@ since version `0.1.11`.
 
 **Changed**
 * Nested configured types now remain inside a parent section until the next equal-or-higher type.
+* Collapsible sections now compose correctly with block wrappers regardless of plugin array order.
+* Dragging a collapsible boundary moves its complete section, including nested content and persisted collapsed state.
+
+### DnDPlugin
+**Fixed**
+* Fixed moving blocks without `nodeId` values, including paragraphs and list items.
+* Fixed section moves when dropping at the end of a container or when hover state is unavailable at drop time.
 
 ### CodeBlockPlugin
 **Fixed**
