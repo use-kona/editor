@@ -2,6 +2,11 @@
 This fill will contain all the changes for `@use-kona/editor`
 since version `0.1.11`.
 
+## 0.1.30
+### CollapsibleBlocksPlugin
+**Added**
+* Added configurable collapsible sections with persisted block state and leading chevrons.
+
 ## 0.1.29
 ### CommandsPlugin
 **Fixed**

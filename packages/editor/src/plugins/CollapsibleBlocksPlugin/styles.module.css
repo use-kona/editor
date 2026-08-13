@@ -1,0 +1,37 @@
+.boundary {
+  position: relative;
+}
+
+.chevron {
+  align-items: center;
+  appearance: none;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+  display: flex;
+  height: 16px;
+  inset-inline-start: -20px;
+  justify-content: center;
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 16px;
+  font: inherit;
+  line-height: 1;
+  margin: 0;
+  padding: 0;
+  transition: transform 0.15s ease;
+}
+
+.expanded {
+  transform: translateY(-50%) rotate(90deg);
+}
+
+.chevron svg {
+  display: block;
+}
+
+.hidden {
+  display: none;
+}
