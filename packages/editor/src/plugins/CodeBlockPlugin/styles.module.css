@@ -1,4 +1,5 @@
 .root {
+  counter-reset: line;
   overflow: hidden;
   font-family: monospace;
   display: flex;
