@@ -1,8 +1,14 @@
 .root {
-  width: 600px;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  max-width: 100%;
+  min-height: 0;
   overflow: hidden;
   border: 1px solid var(--kona-editor-border-color);
   border-radius: 8px;
+  width: 600px;
 
   & > div {
     flex-grow: 1;
@@ -11,11 +17,18 @@
     & > div {
       display: flex;
       flex-direction: column;
+      min-height: 0;
+
+      & > div:last-child {
+        display: flex;
+        flex: 1;
+        flex-direction: column;
+        min-height: 0;
+      }
     }
   }
 
   & [data-slate-editor] {
-    overflow-y: auto;
     flex-grow: 1;
     outline: none;
     padding: 16px 16px;
