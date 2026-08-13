@@ -28,6 +28,7 @@
 .drag {
   display: inline-block;
   vertical-align: baseline;
+  height: 16px;
   width: 16px;
   cursor: move;
   line-height: 1.2;

@@ -91,6 +91,7 @@ export class DnDPlugin implements IPlugin {
           source: {
             editor,
             documentId: options.documentId,
+            path: ReactEditor.findPath(editor, props.element),
           },
         };
 
@@ -124,22 +125,8 @@ export class DnDPlugin implements IPlugin {
         };
       },
       hover(_, monitor) {
-        const element = dropTargetRef.current;
-        if (!element) return;
-
-        const hoverBoundingRect = element.getBoundingClientRect();
-        const hoverMiddleY =
-          (hoverBoundingRect.bottom - hoverBoundingRect.top) / 2;
-        const clientOffset = monitor.getClientOffset();
-        if (!clientOffset) return;
-
-        const hoverClientY = clientOffset.y - hoverBoundingRect.top;
-
-        if (hoverClientY < hoverMiddleY) {
-          setDropPosition('top');
-        } else {
-          setDropPosition('bottom');
-        }
+        const position = getDropPosition(dropTargetRef.current, monitor);
+        if (position) setDropPosition(position);
       },
       drop: (data, monitor) => {
         const itemType = monitor.getItemType();
@@ -156,11 +143,12 @@ export class DnDPlugin implements IPlugin {
 
         if (!sourceTo) return;
 
-        const insertAt = getDropPath(
-          editor,
-          sourceTo,
-          dropPosition || 'bottom',
-        );
+        const position =
+          getDropPosition(dropTargetRef.current, monitor) ||
+          dropPosition ||
+          'bottom';
+
+        const insertAt = getDropPath(editor, sourceTo, position);
 
         if (!insertAt) return;
 
@@ -188,15 +176,23 @@ export class DnDPlugin implements IPlugin {
               return;
             }
 
-            if (!dropPosition || !dragItem.nodes.length) {
+            if (!dragItem.nodes.length) {
               return;
             }
 
-            const nodeIds = dragItem.nodes.map((node) => node.nodeId);
+            const nodeIds = dragItem.nodes
+              .map((node) => node.nodeId)
+              .filter((nodeId): nodeId is string => typeof nodeId === 'string');
 
             if (isSameDocument || isSameEditor) {
               if (!isCopying.current) {
-                moveNode(editor, sourceTo, nodeIds, dropPosition);
+                moveNode(
+                  editor,
+                  sourceTo,
+                  nodeIds,
+                  position,
+                  dragItem.source.path,
+                );
               } else {
                 if (!generateId) {
                   return;
@@ -289,20 +285,45 @@ const getDropPath = (
   }
 };
 
-const moveNode = (
+const getDropPosition = (
+  element: HTMLElement | null,
+  monitor: { getClientOffset: () => { y: number } | null },
+) => {
+  if (!element) return null;
+
+  const clientOffset = monitor.getClientOffset();
+  if (!clientOffset) return null;
+
+  const rect = element.getBoundingClientRect();
+  return clientOffset.y - rect.top < (rect.bottom - rect.top) / 2
+    ? 'top'
+    : 'bottom';
+};
+
+export const moveNode = (
   editor: Editor,
   targetNodePath: Path,
   nodeIds: string[],
   position: 'top' | 'bottom',
+  sourcePath?: Path,
 ) => {
   const dropPath = getDropPath(editor, targetNodePath, position);
 
   if (!dropPath) return;
-  if (!Editor.hasPath(editor, dropPath)) {
+  if (!isValidInsertPath(editor, dropPath)) {
     return;
   }
 
   Editor.withoutNormalizing(editor, () => {
+    if (
+      nodeIds.length === 0 &&
+      sourcePath &&
+      Editor.hasPath(editor, sourcePath)
+    ) {
+      Transforms.moveNodes(editor, { at: sourcePath, to: dropPath });
+      return;
+    }
+
     Transforms.moveNodes(editor, {
       at: [],
       match: (n) => {
@@ -324,6 +345,18 @@ const moveNode = (
     });
   });
   Editor.normalize(editor);
+};
+
+const isValidInsertPath = (editor: Editor, path: Path) => {
+  const parentPath = Path.parent(path);
+  const index = path[path.length - 1];
+
+  if (index === undefined || !Editor.hasPath(editor, parentPath)) {
+    return false;
+  }
+
+  const [parent] = Editor.node(editor, parentPath);
+  return 'children' in parent && index <= parent.children.length;
 };
 
 const insertNodes = (editor: Editor, path: Path, nodes: NodeWithId[]) => {
