@@ -18,6 +18,7 @@ import {
   Element,
   type NodeEntry,
   Path,
+  Range,
   Transforms,
 } from 'slate';
 import {
@@ -192,12 +193,17 @@ export const createEditable =
           match: (n) => Element.isElement(n) && Editor.isBlock(editor, n),
         });
 
-        if (!currentBlock) return;
-        if (editor.selection?.focus.offset !== 0) return;
+        if (
+          !currentBlock ||
+          !editor.selection ||
+          !Range.isCollapsed(editor.selection) ||
+          !Editor.isStart(editor, editor.selection.focus, currentBlock[1])
+        )
+          return;
 
-        const prevBlock = Editor.previous(editor, {
+        const prevBlock = Editor.previous<CustomElement>(editor, {
           at: currentBlock[1],
-          match: (n) => Element.isElement(n),
+          match: (n) => Element.isElement(n) && Editor.isBlock(editor, n),
           voids: true,
         });
 

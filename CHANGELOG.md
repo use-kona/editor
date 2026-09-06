@@ -2,6 +2,12 @@
 This fill will contain all the changes for `@use-kona/editor`
 since version `0.1.11`.
 
+## 0.1.32
+### Core
+**Fixed**
+* Backspace after an inline void, such as a link chip, now removes the chip without deleting its containing paragraph.
+* Void-block Backspace navigation now requires a collapsed caret at the actual start of a block and only considers preceding block elements.
+
 ## 0.1.31
 ### CollapsibleBlocksPlugin
 **Fixed**
