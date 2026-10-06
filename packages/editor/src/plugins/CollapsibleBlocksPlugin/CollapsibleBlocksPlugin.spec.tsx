@@ -9,11 +9,13 @@ import {
   waitFor,
 } from '@testing-library/react';
 import React from 'react';
-import { type Editor, Transforms } from 'slate';
+import { Editor, Transforms } from 'slate';
 import { afterEach, describe, expect, it, vi } from 'vitest';
+import type { CustomElement } from '../../../types';
 import { KonaEditor } from '../../editor';
 import type { IPlugin } from '../../types';
 import { BasicFormattingPlugin } from '../BasicFormattingPlugin';
+import { BreaksPlugin } from '../BreaksPlugin';
 import { HeadingsPlugin } from '../HeadingsPlugin';
 import { CollapsibleBlocksPlugin } from './CollapsibleBlocksPlugin';
 
@@ -212,5 +214,141 @@ describe('CollapsibleBlocksPlugin', () => {
       anchor: { path: [4, 0], offset: 2 },
       focus: { path: [4, 0], offset: 2 },
     });
+  });
+});
+
+describe('Enter in collapsed sections', () => {
+  const headingTypes = [
+    HeadingsPlugin.HeadingLevel1,
+    HeadingsPlugin.HeadingLevel2,
+    HeadingsPlugin.HeadingLevel3,
+  ];
+
+  const renderEditor = (value: CustomElement[]) => {
+    let editor: Editor | undefined;
+    const capturePlugin: IPlugin = {
+      init(value) {
+        editor = value;
+        return value;
+      },
+    };
+    const { container, unmount } = render(
+      <KonaEditor
+        initialValue={value}
+        plugins={[
+          ...plugins(),
+          new BreaksPlugin({ breakNodes: headingTypes }),
+          capturePlugin,
+        ]}
+        onChange={() => {}}
+      />,
+    );
+
+    if (!editor) throw new Error('Expected editor to be initialized');
+
+    return { editor, container, cleanup: unmount };
+  };
+
+  it.each(headingTypes)(
+    'expands collapsed %s when Enter creates a paragraph after it',
+    async (type) => {
+      const { editor, container, cleanup } = renderEditor([
+        {
+          type,
+          collapsed: true,
+          children: [{ text: 'Heading' }],
+        },
+        { type: 'paragraph', children: [{ text: 'Existing content' }] },
+      ]);
+
+      try {
+        expect(container.querySelector('[hidden]')).not.toBeNull();
+
+        await act(async () => {
+          Transforms.select(editor, Editor.end(editor, [0]));
+          editor.insertBreak();
+          editor.insertText('New content');
+        });
+
+        expect(editor.children[0]).toMatchObject({ collapsed: false });
+        expect(editor.children[1]).toMatchObject({
+          type: 'paragraph',
+          children: [{ text: 'New content' }],
+        });
+        expect(container.querySelector('[hidden]')).toBeNull();
+        expect(container.textContent).toContain('New content');
+        expect(
+          container
+            .querySelector('[aria-label="Collapse section"]')
+            ?.getAttribute('aria-expanded'),
+        ).toBe('true');
+      } finally {
+        cleanup();
+      }
+    },
+  );
+
+  it('keeps a section collapsed when Enter inserts a paragraph before its heading', async () => {
+    const { editor, container, cleanup } = renderEditor([
+      {
+        type: HeadingsPlugin.HeadingLevel1,
+        collapsed: true,
+        children: [{ text: 'Heading' }],
+      },
+      { type: 'paragraph', children: [{ text: 'Existing content' }] },
+    ]);
+
+    try {
+      await act(async () => {
+        Transforms.select(editor, Editor.start(editor, [0]));
+        editor.insertBreak();
+      });
+
+      expect(editor.children[0]).toMatchObject({ type: 'paragraph' });
+      expect(editor.children[1]).toMatchObject({ collapsed: true });
+      expect(container.querySelectorAll('[hidden]')).toHaveLength(1);
+    } finally {
+      cleanup();
+    }
+  });
+
+  it('expands the edited section while preserving nested and adjacent collapsed sections', async () => {
+    const { editor, container, cleanup } = renderEditor([
+      {
+        type: HeadingsPlugin.HeadingLevel1,
+        collapsed: true,
+        children: [{ text: 'Heading' }],
+      },
+      {
+        type: HeadingsPlugin.HeadingLevel2,
+        collapsed: true,
+        children: [{ text: 'Nested heading' }],
+      },
+      { type: 'paragraph', children: [{ text: 'Nested content' }] },
+      {
+        type: HeadingsPlugin.HeadingLevel1,
+        collapsed: true,
+        children: [{ text: 'Adjacent heading' }],
+      },
+      { type: 'paragraph', children: [{ text: 'Adjacent content' }] },
+    ]);
+
+    try {
+      await act(async () => {
+        Transforms.select(editor, Editor.end(editor, [0]));
+        editor.insertBreak();
+        editor.insertText('New content');
+      });
+
+      expect(editor.children[0]).toMatchObject({ collapsed: false });
+      expect(editor.children[2]).toMatchObject({ collapsed: true });
+      expect(editor.children[4]).toMatchObject({ collapsed: true });
+      expect(container.querySelectorAll('[hidden]')).toHaveLength(2);
+      expect(
+        container.querySelectorAll('[aria-label="Expand section"]'),
+      ).toHaveLength(2);
+    } finally {
+      cleanup();
+    }
   });
 });

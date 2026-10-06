@@ -2,6 +2,11 @@
 This fill will contain all the changes for `@use-kona/editor`
 since version `0.1.11`.
 
+## 0.1.33
+### CollapsibleBlocksPlugin
+**Fixed**
+* Pressing Enter at the end of a collapsed section heading now expands the section so the new paragraph remains visible.
+
 ## 0.1.32
 ### Core
 **Fixed**

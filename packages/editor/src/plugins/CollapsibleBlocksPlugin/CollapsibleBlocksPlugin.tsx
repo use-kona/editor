@@ -18,6 +18,35 @@ export class CollapsibleBlocksPlugin implements IPlugin {
 
   init(editor: Editor) {
     sectionTypesByEditor.set(editor, this.types);
+
+    const { insertBreak } = editor;
+
+    editor.insertBreak = () => {
+      const { selection } = editor;
+      const boundary =
+        selection && Range.isCollapsed(selection)
+          ? Editor.above<CollapsibleElement>(editor, {
+              match: (node, path) =>
+                path.length === 1 &&
+                Element.isElement(node) &&
+                this.types.includes(node.type) &&
+                node.collapsed === true,
+            })
+          : undefined;
+
+      Editor.withoutNormalizing(editor, () => {
+        if (boundary) {
+          Transforms.setNodes<CollapsibleElement>(
+            editor,
+            { collapsed: false },
+            { at: boundary[1] },
+          );
+        }
+
+        insertBreak();
+      });
+    };
+
     return editor;
   }
 
