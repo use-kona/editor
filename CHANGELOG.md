@@ -2,6 +2,13 @@
 This fill will contain all the changes for `@use-kona/editor`
 since version `0.1.11`.
 
+## 0.1.34
+### DnDPlugin
+**Fixed**
+* Dropping a block above or below another block now preserves the intended position when moving in either direction.
+* Multi-block selections and collapsible sections now retain their document order when moved, including selections spanning the drop target.
+* Corrected drop positions within nested lists and preserved moves between list levels.
+
 ## 0.1.33
 ### CollapsibleBlocksPlugin
 **Fixed**
