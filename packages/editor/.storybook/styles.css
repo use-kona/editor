@@ -3,6 +3,7 @@
   --kona-editor-background-color: #fff;
   --kona-editor-border-color: #e3e3e3;
   --kona-editor-text-color: #444;
+  --kona-editor-border-selected-color: rgb(0 123 255 / 0.8);
   --kona-editor-selected-color: rgb(0 123 255 / 0.08);
 }
 

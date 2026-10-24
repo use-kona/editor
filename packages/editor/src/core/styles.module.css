@@ -33,14 +33,25 @@
   }
 }
 
-.block {
-  transition: background-color 0.2s ease-in-out;
+.editor
+  > [role="textbox"]
+  > .block:is(.selected:not(:has(.block)), :has(.block.selected)) {
+  border: 1px solid var(--kona-editor-border-selected-color);
+  background: var(--kona-editor-selected-color);
+  border-radius: 4px;
 
-  &.selected {
-    background-color: var(--kona-editor-selected-color);
-    & > * {
-      transition: transform 0.2s ease-in-out;
-      transform: scale(0.98);
-    }
+  /* Continue the group when the previous sibling is selected. */
+  .block:is(.selected:not(:has(.block)), :has(.block.selected)) + & {
+    border-top: 0;
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
+  }
+
+  /* Check the next sibling without nesting :has() inside :has(). */
+  &:has(+ .block.selected):not(:has(+ .block.selected .block)),
+  &:has(+ .block .block.selected) {
+    border-bottom: 0;
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
   }
 }

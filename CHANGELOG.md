@@ -2,6 +2,13 @@
 This fill will contain all the changes for `@use-kona/editor`
 since version `0.1.11`.
 
+## 0.1.35
+### Core
+**Changed**
+* Selected blocks now use rounded borders and a background highlight, with adjacent selected blocks forming a continuous group.
+* Nested block selections now highlight their top-level container, and selected content no longer shrinks.
+* Added the `--kona-editor-border-selected-color` CSS custom property to customize selection borders.
+
 ## 0.1.34
 ### DnDPlugin
 **Fixed**
