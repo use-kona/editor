@@ -17,9 +17,9 @@
     "react-dnd": "^16.0.1",
     "react-dnd-html5-backend": "^16.0.1",
     "rspress": "^1.40.2",
-    "slate": "^0.126.0",
-    "slate-hyperscript": "^0.125.0",
-    "slate-react": "^0.126.0"
+    "slate": "^0.146.0",
+    "slate-hyperscript": "^0.138.3",
+    "slate-react": "^0.147.3"
   },
   "devDependencies": {
     "@types/node": "^18.11.17",

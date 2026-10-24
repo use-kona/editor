@@ -2,6 +2,12 @@
 This fill will contain all the changes for `@use-kona/editor`
 since version `0.1.11`.
 
+## Unreleased
+### Dependencies
+**Changed**
+* Upgraded Slate to `0.146.0`, Slate React and Slate DOM to `0.147.3`, Slate History to `0.144.0`, and Slate Hyperscript to `0.138.3`.
+* Updated the editor's Slate peer requirements and aligned the documentation site's dependencies.
+
 ## 0.1.35
 ### Core
 **Changed**
