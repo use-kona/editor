@@ -9,7 +9,6 @@ import {
   useReadOnly,
   useSlate,
 } from 'slate-react';
-import type { CustomElement } from '../../../types';
 import { useEditorContext } from '../../provider';
 import type { IPlugin } from '../../types';
 import {
@@ -329,55 +328,71 @@ export const moveNode = (
     return;
   }
 
-  if (sectionPaths?.some((path) => Path.equals(path, targetNodePath))) {
+  const explicitPaths = sectionPaths?.length
+    ? sectionPaths
+    : nodeIds.length === 0 && sourcePath
+      ? [sourcePath]
+      : undefined;
+  const explicitNodes =
+    explicitPaths &&
+    new Set(
+      explicitPaths
+        .filter((path) => Editor.hasPath(editor, path))
+        .map((path) => Editor.node(editor, path)[0]),
+    );
+  const paths = Array.from(
+    Editor.nodes(editor, {
+      at: [],
+      match: (n) => {
+        if (explicitNodes) return explicitNodes.has(n);
+        return (
+          Element.isElement(n) &&
+          Editor.isBlock(editor, n) &&
+          typeof (n as NodeWithId).nodeId === 'string' &&
+          nodeIds.includes((n as NodeWithId).nodeId)
+        );
+      },
+      mode: 'highest',
+    }),
+    ([, path]) => path,
+  );
+
+  // A selected target (or its ancestor) cannot also anchor the move.
+  if (
+    paths.some(
+      (path) =>
+        Path.equals(path, targetNodePath) ||
+        Path.isAncestor(path, targetNodePath),
+    )
+  ) {
     return;
   }
 
+  const targetRef = Editor.pathRef(editor, targetNodePath);
+  const sourceRefs = paths.map((path) => Editor.pathRef(editor, path));
+
   Editor.withoutNormalizing(editor, () => {
-    if (sectionPaths?.length) {
-      const sectionNodes = new Set(
-        sectionPaths
-          .filter((path) => Editor.hasPath(editor, path))
-          .map((path) => Editor.node(editor, path)[0]),
-      );
+    try {
+      // Keep every move anchored to the target as earlier moves shift paths.
+      // Inserting after the target runs in reverse to preserve document order.
+      const orderedRefs =
+        position === 'top' ? sourceRefs : [...sourceRefs].reverse();
+      for (const sourceRef of orderedRefs) {
+        const from = sourceRef.current;
+        const target = targetRef.current;
+        if (!from || !target) continue;
 
-      Transforms.moveNodes(editor, {
-        at: [],
-        match: (node) => sectionNodes.has(node),
-        to: dropPath,
-        mode: 'highest',
-      });
-      return;
-    }
-
-    if (
-      nodeIds.length === 0 &&
-      sourcePath &&
-      Editor.hasPath(editor, sourcePath)
-    ) {
-      Transforms.moveNodes(editor, { at: sourcePath, to: dropPath });
-      return;
-    }
-
-    Transforms.moveNodes(editor, {
-      at: [],
-      match: (n) => {
-        if (!Editor.isBlock(editor, n as CustomElement)) {
-          return false;
+        let to = position === 'top' ? target : Path.next(target);
+        // Slate's sibling destination is the index after removing the source.
+        if (Path.isSibling(from, to) && Path.isBefore(from, to)) {
+          to = Path.previous(to);
         }
-
-        if (Editor.isEditor(n)) {
-          return false;
-        }
-
-        const node = n as NodeWithId;
-        const shouldMove =
-          typeof node.nodeId === 'string' && nodeIds.includes(node.nodeId);
-        return shouldMove;
-      },
-      to: dropPath,
-      mode: 'highest',
-    });
+        Transforms.moveNodes(editor, { at: from, to });
+      }
+    } finally {
+      targetRef.unref();
+      for (const ref of sourceRefs) ref.unref();
+    }
   });
   Editor.normalize(editor);
 };
