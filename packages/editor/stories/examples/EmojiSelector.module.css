@@ -1,19 +1,41 @@
 .root {
   display: flex;
-  gap: 4px;
+  flex-direction: column;
+  min-width: 180px;
   background-color: var(--kona-editor-background-color);
   border: 1px solid var(--kona-editor-border-color);
   border-radius: 8px;
-  padding: 4px 4px;
+  padding: 4px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 4px 8px;
+  border: 0;
+  border-radius: 4px;
+  background: transparent;
+  color: var(--kona-editor-text-color);
+  font: inherit;
+  text-align: left;
+  white-space: nowrap;
+  cursor: pointer;
+
+  &:hover {
+    background-color: rgba(0, 0, 0, 0.1);
+  }
 }
 
 .emoji {
   width: 24px;
   height: 24px;
+  flex-shrink: 0;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  cursor: pointer;
   border-radius: 4px;
   vertical-align: text-bottom;
 
@@ -24,14 +46,10 @@
     height: 20px;
     width: 20px;
   }
-
-  &:hover {
-    background-color: rgba(0, 0, 0, 0.1);
-  }
 }
 
-:global(html.dark) .emoji:hover,
-:global(html.dark) .emoji.selected {
+:global(html.dark) .item:hover,
+:global(html.dark) .item.selected {
   background-color: rgba(0, 0, 0, 0.8);
 }
 

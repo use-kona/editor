@@ -68,21 +68,26 @@ export const EmojiSelector = (props: Props) => {
     search();
   }, [emojiSearch]);
 
-  // biome-ignore lint/correctness/useExhaustiveDependencies: we don't need onConfirm
   useEffect(() => {
+    if (!items.length) {
+      return;
+    }
+
     const handleKeyDown = (event: KeyboardEvent) => {
       switch (event.key) {
-        case 'ArrowRight':
+        case 'ArrowDown':
           event.preventDefault();
           setIndex((index) => (index + 1) % items.length);
           break;
-        case 'ArrowLeft':
+        case 'ArrowUp':
           event.preventDefault();
           setIndex((index) => (index - 1 + items.length) % items.length);
           break;
         case 'Enter':
           event.preventDefault();
-          onConfirm(items[index]?.id, emojiSearch, editor);
+          if (items[index]) {
+            onConfirm(items[index].id, emojiSearch, editor);
+          }
           break;
       }
     };
@@ -92,22 +97,29 @@ export const EmojiSelector = (props: Props) => {
     return () => {
       document.removeEventListener('keydown', handleKeyDown, true);
     };
-  }, [items, index, emojiSearch]);
+  }, [items, index, emojiSearch, onConfirm, editor]);
 
   if (!items.length) {
     return null;
   }
 
   return (
-    <div className={styles.root}>
+    <div className={styles.root} role="menu" aria-label="Emoji suggestions">
       {items.map((item, idx) => {
         return (
-          <span
-            className={clsx(styles.emoji, { [styles.selected]: idx === index })}
+          <button
+            type="button"
+            role="menuitem"
+            tabIndex={-1}
+            className={clsx(styles.item, { [styles.selected]: idx === index })}
             key={item.id}
+            onMouseEnter={() => setIndex(idx)}
+            onMouseDown={(event) => event.preventDefault()}
+            onClick={() => onConfirm(item.id, emojiSearch, editor)}
           >
             <em-emoji class={styles.emoji} id={item.id} size="20px" />
-          </span>
+            <span>:{item.id}:</span>
+          </button>
         );
       })}
     </div>
