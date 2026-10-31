@@ -13,6 +13,8 @@
 }
 
 .editor {
+  position: relative;
+  isolation: isolate;
   outline: none;
   height: 100%;
   overflow: auto;
@@ -33,25 +35,29 @@
   }
 }
 
-.editor
-  > [role="textbox"]
-  > .block:is(.selected:not(:has(.block)), :has(.block.selected)) {
+.selectionLayer {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+}
+
+.selectionHighlight {
+  position: absolute;
+  top: 0;
+  left: 0;
+  box-sizing: border-box;
   border: 1px solid var(--kona-editor-border-selected-color);
   background: var(--kona-editor-selected-color);
   border-radius: 4px;
+  transition:
+    transform 180ms cubic-bezier(0.2, 0, 0, 1),
+    width 180ms cubic-bezier(0.2, 0, 0, 1),
+    height 180ms cubic-bezier(0.2, 0, 0, 1);
+}
 
-  /* Continue the group when the previous sibling is selected. */
-  .block:is(.selected:not(:has(.block)), :has(.block.selected)) + & {
-    border-top: 0;
-    border-top-left-radius: 0;
-    border-top-right-radius: 0;
-  }
-
-  /* Check the next sibling without nesting :has() inside :has(). */
-  &:has(+ .block.selected):not(:has(+ .block.selected .block)),
-  &:has(+ .block .block.selected) {
-    border-bottom: 0;
-    border-bottom-left-radius: 0;
-    border-bottom-right-radius: 0;
+@media (prefers-reduced-motion: reduce) {
+  .selectionHighlight {
+    transition: none;
   }
 }

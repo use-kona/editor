@@ -1,7 +1,6 @@
 import { useStore } from '@nanostores/react';
 import { Editor } from 'slate';
 import { type RenderElementProps, useSlateStatic } from 'slate-react';
-import styles from '../core/styles.module.css';
 import { useEditorContext } from '../provider';
 
 export const Block = (props: RenderElementProps) => {
@@ -10,10 +9,6 @@ export const Block = (props: RenderElementProps) => {
   const $selectedNodes = useStore(selectedNodes);
 
   const isSelected = $selectedNodes.some((node) => node === props.element);
-
-  const classes = isSelected
-    ? `${styles.block} ${styles.selected}`
-    : styles.block;
 
   const handleClick = () => {
     if (Editor.isVoid(editor, props.element)) {
@@ -24,7 +19,11 @@ export const Block = (props: RenderElementProps) => {
   };
 
   return (
-    <div className={classes} onClick={handleClick}>
+    <div
+      data-editor-block
+      data-editor-selected={isSelected || undefined}
+      onClick={handleClick}
+    >
       {props.children}
     </div>
   );

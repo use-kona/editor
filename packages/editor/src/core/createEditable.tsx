@@ -33,6 +33,7 @@ import { BaseElement } from '../elements/BaseElement';
 import { Block } from '../elements/Block';
 import { EditorProvider } from '../provider';
 import type { IPlugin } from '../types';
+import { EditorSurface } from './BlockSelectionHighlight';
 import { deserialize } from './deserialize';
 import styles from './styles.module.css';
 
@@ -308,7 +309,7 @@ export const createEditable =
         const readOnly = useReadOnly();
 
         if (!ui.length) {
-          return <div className={styles.editor}>{children}</div>;
+          return <EditorSurface>{children}</EditorSurface>;
         }
 
         return (
@@ -323,7 +324,7 @@ export const createEditable =
                 {p.ui?.({ readOnly, children, editor })}
               </React.Fragment>
             ))}
-            <div className={styles.editor}>{children}</div>
+            <EditorSurface>{children}</EditorSurface>
           </div>
         );
       },
