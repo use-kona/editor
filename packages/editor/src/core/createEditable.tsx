@@ -9,6 +9,7 @@ import React, {
   type ReactElement,
   type ReactNode,
   useCallback,
+  useRef,
   useState,
 } from 'react';
 import {
@@ -34,6 +35,7 @@ import { Block } from '../elements/Block';
 import { EditorProvider } from '../provider';
 import type { IPlugin } from '../types';
 import { EditorSurface } from './BlockSelectionHighlight';
+import { deleteSelectedBlocks } from './deleteSelectedBlocks';
 import { deserialize } from './deserialize';
 import styles from './styles.module.css';
 
@@ -47,6 +49,7 @@ export const createEditable =
   (editor: Editor, plugins: IPlugin[]) =>
   ({ readOnly }: Props) => {
     const [selectedNodes] = useState(() => atom<CustomElement[]>([]));
+    const deletingSelection = useRef(false);
 
     const $selectedNodes = useStore(selectedNodes);
     const renderBlockPlugins = [...plugins].sort(
@@ -303,6 +306,35 @@ export const createEditable =
       },
     );
 
+    const handleKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
+      const selected = selectedNodes.get();
+      if (
+        !readOnly &&
+        (event.key === 'Backspace' || event.key === 'Delete') &&
+        selected.length > 0
+      ) {
+        event.preventDefault();
+        if (!deletingSelection.current) {
+          deletingSelection.current = true;
+          void deleteSelectedBlocks(editor, plugins, selected)
+            .then((deleted) => {
+              if (deleted) {
+                selectedNodes.set(
+                  selectedNodes
+                    .get()
+                    .filter((node) => !selected.includes(node)),
+                );
+              }
+            })
+            .finally(() => {
+              deletingSelection.current = false;
+            });
+        }
+        return;
+      }
+      handlers.onKeyDown(event);
+    };
+
     const Ui = useCallback(
       ({ children }: { children: ReactNode }) => {
         const ui = plugins.filter((p) => Boolean(p.ui));
@@ -341,6 +373,7 @@ export const createEditable =
               renderLeaf={renderLeaf}
               readOnly={readOnly}
               {...handlers}
+              onKeyDown={handleKeyDown}
             />
           </Ui>
         </div>

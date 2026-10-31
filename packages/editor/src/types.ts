@@ -1,4 +1,4 @@
-import type { StoreValue } from 'nanostores';
+import type { WritableAtom } from 'nanostores';
 import type { KeyboardEvent, ReactElement, ReactNode } from 'react';
 import type {
   DecoratedRange,
@@ -107,5 +107,5 @@ export type Deserialize = (
 ) => CustomElement | CustomText[] | undefined;
 
 export type EditorContext = {
-  selectedNodes: StoreValue<string[]>;
+  selectedNodes: WritableAtom<CustomElement[]>;
 };
