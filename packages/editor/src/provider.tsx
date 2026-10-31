@@ -1,4 +1,3 @@
-import type { StoreValue } from 'nanostores';
 import type React from 'react';
 import { createContext, useContext } from 'react';
 import type { EditorContext } from './types';
@@ -10,7 +9,7 @@ export const EditorProvider = ({
   selectedNodes,
 }: {
   children: React.ReactNode;
-  selectedNodes: StoreValue<string[]>;
+  selectedNodes: EditorContext['selectedNodes'];
 }) => {
   return (
     <Context.Provider value={{ selectedNodes }}>{children}</Context.Provider>

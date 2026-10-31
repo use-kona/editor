@@ -1,3 +1,7 @@
 packages:
   - 'packages/editor'
   - 'apps/site'
+allowBuilds:
+  '@parcel/watcher': true
+  core-js: true
+  esbuild: true

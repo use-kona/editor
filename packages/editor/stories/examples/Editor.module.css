@@ -1,0 +1,159 @@
+.root {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  height: calc(100vh - 32px);
+  max-width: 100%;
+  min-height: 0;
+  overflow: hidden;
+  border: 1px solid var(--kona-editor-border-color);
+  border-radius: 8px;
+  width: 600px;
+
+  & > div {
+    flex-grow: 1;
+    min-height: 0;
+
+    & > div {
+      display: flex;
+      flex-direction: column;
+      min-height: 0;
+
+      & > div:last-child {
+        display: flex;
+        flex: 1;
+        flex-direction: column;
+        min-height: 0;
+      }
+    }
+  }
+
+  & [data-slate-editor] {
+    flex-grow: 1;
+    outline: none;
+    padding: 16px 16px;
+    font-size: 16px;
+  }
+
+  h1,
+  h2,
+  h3 {
+    margin: 8px 0 0;
+    font-weight: 600;
+  }
+
+  & [data-slate-editor] > :first-child :is(h1, h2, h3) {
+    margin-top: 0;
+  }
+
+  h1 {
+    font-size: 20px;
+  }
+
+  h2 {
+    font-size: 18px;
+  }
+
+  h3 {
+    font-size: 17px;
+  }
+
+  ol {
+    list-style: decimal;
+  }
+
+  ul {
+    list-style: disc;
+  }
+
+  li {
+    list-style-position: inside;
+  }
+}
+
+.button {
+  width: 24px;
+  height: 24px;
+  border-radius: 4px;
+  cursor: pointer;
+  padding: 0;
+  margin: 0;
+  outline: none;
+  background-color: transparent;
+  border: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: inherit;
+  transition: background-color 0.25s;
+}
+
+.button.active {
+  background-color: #eee;
+}
+
+.divider {
+  display: inline-block;
+  background-color: #ccc;
+  width: 1px;
+  height: 24px;
+}
+
+.floating {
+  height: 24px;
+}
+
+.hint {
+  background-color: var(--background-color);
+  color: var(--text-color);
+  padding: 2px;
+  border-radius: 4px;
+  border: 1px solid var(--border-color);
+}
+
+.editorToolbar {
+  display: flex;
+  justify-content: space-between;
+  column-gap: 4px;
+  padding: 8px;
+  background-color: #f9f9f9;
+
+  & select {
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    padding: 4px;
+    background-color: #fff;
+    color: inherit;
+    outline: none;
+  }
+
+  & button {
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    display: inline-flex;
+    align-items: center;
+    padding: 4px;
+    background-color: #fff;
+    cursor: pointer;
+    color: inherit;
+    outline: none;
+  }
+}
+
+.backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 1;
+}
+
+.hint {
+  background-color: #fff;
+  color: #444;
+  padding: 2px;
+  border-radius: 4px;
+  border: 1px solid #ccc;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.06);
+}

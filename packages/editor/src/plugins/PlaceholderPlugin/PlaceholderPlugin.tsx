@@ -1,9 +1,9 @@
-import { type Descendant, Editor, type Element, Node } from 'slate';
+import { type Descendant, Editor, Element, Node, Range } from 'slate';
 import {
   type RenderLeafProps,
   useFocused,
   useReadOnly,
-  useSelected,
+  useSlateSelection,
 } from 'slate-react';
 import type { CustomElement } from '../../../types';
 import type { IPlugin } from '../../types';
@@ -22,19 +22,16 @@ export class PlaceholderPlugin implements IPlugin {
   leafs = [
     {
       render: (props: RenderLeafProps, editor: Editor) => {
-        const isSelected = useSelected();
+        const selection = useSlateSelection();
         const isReadOnly = useReadOnly();
         const isFocused = useFocused();
 
         const entity = Editor.above<CustomElement>(editor, {
-          at: editor.selection?.focus,
+          at: selection ? Range.start(selection) : Editor.start(editor, []),
+          match: (node) =>
+            Element.isElement(node) && Editor.isBlock(editor, node),
           mode: 'lowest',
           voids: true,
-        });
-
-        const firstEntity = Editor.above(editor, {
-          mode: 'lowest',
-          at: [0, 0],
         });
 
         if (entity && this.options.ignoreNodes?.includes(entity[0].type)) {
@@ -46,28 +43,32 @@ export class PlaceholderPlugin implements IPlugin {
         });
 
         const isEmpty =
-          (!entity || Node.string(entity[0]) === '') &&
+          !!entity &&
+          Node.string(entity[0]) === '' &&
           !hasVoids &&
-          !Editor.isVoid(editor, entity?.[0] as Element);
+          !Editor.isVoid(editor, entity[0]);
 
-        const isEditorEmpty = isEditorEmptyFn(editor.children)
+        const isEditorEmpty = isEditorEmptyFn(editor.children);
+        const isFirstText =
+          !!entity &&
+          Node.leaf(editor, Editor.start(editor, entity[1]).path) ===
+            props.text;
 
         const isVisible =
-          (isEmpty && !isReadOnly && isSelected) || isEditorEmpty;
+          isFirstText &&
+          ((isEmpty && !isReadOnly && !!selection) || isEditorEmpty);
 
         return (
-          <>
-            <span {...props.attributes}>
-              <span
-                className={isVisible ? styles.placeholder : styles.hidden}
-                data-placeholder={
-                  isFocused ? this.options.focused : this.options.unfocused
-                }
-              >
-                {props.children}
-              </span>
+          <span {...props.attributes}>
+            <span
+              className={isVisible ? styles.placeholder : styles.hidden}
+              data-placeholder={
+                isFocused ? this.options.focused : this.options.unfocused
+              }
+            >
+              {props.children}
             </span>
-          </>
+          </span>
         );
       },
     },

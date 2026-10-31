@@ -1,4 +1,3 @@
-import { useStore } from '@nanostores/react';
 import { useEffect, useRef, useState } from 'react';
 import { type ConnectDropTarget, useDrag, useDrop } from 'react-dnd';
 import { NativeTypes } from 'react-dnd-html5-backend';
@@ -15,8 +14,13 @@ import {
   getCollapsibleSectionPaths,
   isHiddenByCollapsedSection,
 } from '../CollapsibleBlocksPlugin/CollapsibleBlocksPlugin';
-import type { EditorDragItem, NodeWithId, Options } from './types';
-import { getNodesByNodeIds } from './utils';
+import { animateDrop } from './animateDrop';
+import type {
+  DragNode,
+  EditorDragItem,
+  EditorInnerDragItem,
+  Options,
+} from './types';
 
 export class DnDPlugin implements IPlugin {
   constructor(private options: Options) {}
@@ -37,7 +41,6 @@ export class DnDPlugin implements IPlugin {
     const editor = useSlate();
 
     const { selectedNodes } = useEditorContext();
-    const $selectedNodes = useStore(selectedNodes);
 
     const isCopying = useRef(false);
     const options = this.options;
@@ -51,30 +54,33 @@ export class DnDPlugin implements IPlugin {
     const dropTargetRef = useRef<HTMLElement | null>(null);
 
     const customType = options.customTypes?.[props.element.type];
-    const currentElement = props.element as NodeWithId;
+    const currentElement = props.element;
     const path = ReactEditor.findPath(editor, props.element);
     const isHidden = isHiddenByCollapsedSection(editor, path);
 
-    const [, drag, preview] = useDrag({
+    const [, drag, preview] = useDrag<EditorInnerDragItem>({
       type: customType?.type || DnDPlugin.DND_BLOCK_ELEMENT,
       item: () => {
-        const selected: Array<NodeWithId> = $selectedNodes;
-        const sectionPaths = getCollapsibleSectionPaths(editor, path);
-
-        /**
-         * We copy nodes that the user is dragging.
-         * If a user drags multiple nodes, and the current node is one of them,
-         * we copy selected nodes. Otherwise, we copy only the current node.
-         */
-        const nodes = sectionPaths
-          ? getNodesAtPaths(editor, sectionPaths)
-          : selected.length > 0 &&
-              selected.find((node) => node.nodeId === currentElement.nodeId)
-            ? getNodesByNodeIds(
-                editor,
-                selected.map((node) => node.nodeId),
-              )
-            : [structuredClone(props.element as NodeWithId)];
+        const selected = selectedNodes.get();
+        const sourcePath = ReactEditor.findPath(editor, props.element);
+        const sectionPaths = getCollapsibleSectionPaths(editor, sourcePath);
+        const selectedSet = new Set(
+          selected.includes(currentElement) ? selected : [currentElement],
+        );
+        const paths =
+          sectionPaths ||
+          Array.from(
+            Editor.nodes(editor, {
+              at: [],
+              match: (node) =>
+                Element.isElement(node) &&
+                Editor.isBlock(editor, node) &&
+                selectedSet.has(node),
+              mode: 'highest',
+            }),
+            ([, path]) => path,
+          );
+        const nodes = getNodesAtPaths(editor, paths);
 
         const item =
           this.options.customTypes?.[currentElement.type]?.getData?.(
@@ -90,7 +96,7 @@ export class DnDPlugin implements IPlugin {
           })
           .filter(Boolean);
 
-        const dragItem: EditorDragItem = {
+        const dragItem: EditorInnerDragItem = {
           kind: 'inner',
           nodes,
           item,
@@ -98,15 +104,17 @@ export class DnDPlugin implements IPlugin {
           source: {
             editor,
             documentId: options.documentId,
-            path,
+            path: sourcePath,
             sectionPaths: sectionPaths || undefined,
+            pathRefs: paths.map((path) => Editor.pathRef(editor, path)),
           },
         };
 
         return dragItem;
       },
       canDrag: !isReadOnly,
-      end: () => {
+      end: (item) => {
+        releaseDragRefs(item);
         selectedNodes.set([]);
       },
     });
@@ -137,102 +145,123 @@ export class DnDPlugin implements IPlugin {
         if (position) setDropPosition(position);
       },
       drop: (data, monitor) => {
-        const itemType = monitor.getItemType();
-        const sourceEditor = data.kind === 'inner' ? data.source?.editor : null;
+        if (monitor.didDrop()) return;
+        try {
+          const itemType = monitor.getItemType();
+          const sourceEditor =
+            data.kind === 'inner' ? data.source?.editor : null;
 
-        const isSameDocument =
-          data.kind === 'inner' &&
-          data.source?.documentId === this.options.documentId &&
-          this.options.documentId !== undefined;
-        const isSameEditor =
-          data.kind === 'inner' && data.source?.editor === editor;
+          const isSameDocument =
+            data.kind === 'inner' &&
+            data.source?.documentId === this.options.documentId &&
+            typeof this.options.documentId === 'string' &&
+            this.options.documentId.length > 0;
+          const isSameEditor =
+            data.kind === 'inner' && data.source?.editor === editor;
 
-        const sourceTo = ReactEditor.findPath(editor, props.element);
+          const sourceTo = ReactEditor.findPath(editor, props.element);
 
-        if (!sourceTo) return;
+          if (!sourceTo) return;
 
-        const position =
-          getDropPosition(dropTargetRef.current, monitor) ||
-          dropPosition ||
-          'bottom';
+          const position =
+            getDropPosition(dropTargetRef.current, monitor) ||
+            dropPosition ||
+            'bottom';
 
-        const insertAt = getDropPath(editor, sourceTo, position);
+          const insertAt = getDropPath(editor, sourceTo, position);
 
-        if (!insertAt) return;
+          if (!insertAt) return;
 
-        const customDropHandler =
-          itemType && options.customDropHandlers?.[itemType];
+          const customDropHandler =
+            itemType && options.customDropHandlers?.[itemType];
 
-        if (customDropHandler && data.kind === 'outer') {
-          customDropHandler.onDrop({ editor, data, insertAt });
-          return;
-        }
+          if (customDropHandler && data.kind === 'outer') {
+            customDropHandler.onDrop({ editor, data, insertAt });
+            return;
+          }
 
-        switch (itemType) {
-          case NativeTypes.FILE:
-            options.onDropFiles(
-              editor,
-              (data as unknown as { files: File[] }).files,
-              insertAt,
-            );
-            break;
-          default: {
-            const dragItem = data as EditorDragItem;
+          switch (itemType) {
+            case NativeTypes.FILE:
+              options.onDropFiles(
+                editor,
+                (data as unknown as { files: File[] }).files,
+                insertAt,
+              );
+              break;
+            default: {
+              const dragItem = data as EditorDragItem;
 
-            // We don't know what "default" behavior for the outer items is
-            if (dragItem.kind === 'outer') {
-              return;
-            }
-
-            if (!dragItem.nodes.length) {
-              return;
-            }
-
-            const nodeIds = dragItem.nodes
-              .map((node) => node.nodeId)
-              .filter((nodeId): nodeId is string => typeof nodeId === 'string');
-
-            if (isSameDocument || isSameEditor) {
-              if (!isCopying.current) {
-                moveNode(
-                  editor,
-                  sourceTo,
-                  nodeIds,
-                  position,
-                  dragItem.source.path,
-                  dragItem.source.sectionPaths,
-                );
-              } else {
-                if (!generateId) {
-                  return;
-                }
-
-                const clonedNodes = cloneWithNewIds(dragItem.nodes, generateId);
-                insertNodes(editor, insertAt, clonedNodes);
-              }
-            } else {
-              if (!generateId) {
+              // We don't know what "default" behavior for the outer items is
+              if (dragItem.kind === 'outer') {
                 return;
               }
 
-              const clonedNodes = cloneWithNewIds(dragItem.nodes, generateId);
+              // Resolve the live source at drop time: edits can shift paths,
+              // change content, or delete some of the dragged blocks.
+              const sourcePaths = getSourcePaths(dragItem);
+              const nodes = dragItem.source.pathRefs
+                ? getNodesAtPaths(dragItem.source.editor, sourcePaths)
+                : dragItem.nodes;
+              if (!nodes.length || !sourcePaths.length) return;
 
-              insertNodes(editor, insertAt, clonedNodes);
-              if (!isCopying.current && sourceEditor) {
-                removeNodes(
-                  sourceEditor,
-                  nodeIds,
-                  dragItem.source.sectionPaths,
+              if (isCopying.current) {
+                insertNodes(
+                  editor,
+                  insertAt,
+                  cloneForInsert(nodes, generateId),
                 );
+              } else if (isSameEditor) {
+                animateDrop(editor, () =>
+                  moveNode(
+                    editor,
+                    sourceTo,
+                    [],
+                    position,
+                    undefined,
+                    sourcePaths,
+                  ),
+                );
+              } else if (isSameDocument) {
+                // Path references belong to the source editor. Separate views of
+                // one document must map every block by a stable ID instead.
+                const nodeIds = nodes.flatMap((node) =>
+                  typeof node.nodeId === 'string' ? [node.nodeId] : [],
+                );
+                const mappedPaths = getPathsByIds(editor, nodeIds);
+                if (
+                  nodeIds.length !== nodes.length ||
+                  mappedPaths.length !== nodes.length ||
+                  new Set(nodeIds).size !== nodes.length
+                )
+                  return;
+                animateDrop(editor, () =>
+                  moveNode(
+                    editor,
+                    sourceTo,
+                    [],
+                    position,
+                    undefined,
+                    mappedPaths,
+                  ),
+                );
+              } else {
+                insertNodes(
+                  editor,
+                  insertAt,
+                  cloneForInsert(nodes, generateId),
+                );
+                if (sourceEditor)
+                  removeNodes(sourceEditor, getSourcePaths(dragItem));
               }
+              selectedNodes.set([]);
+              break;
             }
-            selectedNodes.set([]);
-            break;
           }
+        } finally {
+          if (data.kind === 'inner') releaseDragRefs(data);
+          isCopying.current = false;
+          setDropPosition(null);
         }
-
-        isCopying.current = false;
-        setDropPosition(null);
       },
     });
 
@@ -255,7 +284,10 @@ export class DnDPlugin implements IPlugin {
     }
 
     return (
-      <div hidden={isHidden}>
+      <div
+        hidden={isHidden}
+        data-editor-dnd-block={ReactEditor.findKey(editor, props.element).id}
+      >
         {options.renderBlock?.({
           props,
           dragRef: drag,
@@ -267,14 +299,13 @@ export class DnDPlugin implements IPlugin {
           },
           onToggleSelected: (event) => {
             event.stopPropagation();
-            if ($selectedNodes.includes(props.element)) {
+            const selected = selectedNodes.get();
+            if (selected.includes(props.element)) {
               selectedNodes.set(
-                [...$selectedNodes].filter(
-                  (element) => element !== props.element,
-                ),
+                [...selected].filter((element) => element !== props.element),
               );
             } else {
-              selectedNodes.set([...$selectedNodes, props.element]);
+              selectedNodes.set([...selected, props.element]);
             }
           },
         })}
@@ -319,7 +350,7 @@ export const moveNode = (
   nodeIds: string[],
   position: 'top' | 'bottom',
   sourcePath?: Path,
-  sectionPaths?: Path[],
+  sourcePaths?: Path[],
 ) => {
   const dropPath = getDropPath(editor, targetNodePath, position);
 
@@ -328,8 +359,8 @@ export const moveNode = (
     return;
   }
 
-  const explicitPaths = sectionPaths?.length
-    ? sectionPaths
+  const explicitPaths = sourcePaths
+    ? sourcePaths
     : nodeIds.length === 0 && sourcePath
       ? [sourcePath]
       : undefined;
@@ -345,11 +376,12 @@ export const moveNode = (
       at: [],
       match: (n) => {
         if (explicitNodes) return explicitNodes.has(n);
+        const nodeId = (n as DragNode).nodeId;
         return (
           Element.isElement(n) &&
           Editor.isBlock(editor, n) &&
-          typeof (n as NodeWithId).nodeId === 'string' &&
-          nodeIds.includes((n as NodeWithId).nodeId)
+          typeof nodeId === 'string' &&
+          nodeIds.includes(nodeId)
         );
       },
       mode: 'highest',
@@ -409,7 +441,7 @@ const isValidInsertPath = (editor: Editor, path: Path) => {
   return 'children' in parent && index <= parent.children.length;
 };
 
-const insertNodes = (editor: Editor, path: Path, nodes: NodeWithId[]) => {
+const insertNodes = (editor: Editor, path: Path, nodes: DragNode[]) => {
   Editor.withoutNormalizing(editor, () => {
     Transforms.insertNodes(editor, nodes, { at: path });
   });
@@ -418,64 +450,81 @@ const insertNodes = (editor: Editor, path: Path, nodes: NodeWithId[]) => {
 const getNodesAtPaths = (editor: Editor, paths: Path[]) =>
   paths
     .filter((path) => Editor.hasPath(editor, path))
-    .map((path) => structuredClone(Editor.node(editor, path)[0] as NodeWithId));
+    .map((path) => structuredClone(Editor.node(editor, path)[0] as DragNode));
 
-const removeNodes = (
-  editor: Editor,
-  nodeIds: string[],
-  sectionPaths?: Path[],
-) => {
-  try {
-    if (sectionPaths?.length) {
-      const paths = sectionPaths
-        .filter((path) => Editor.hasPath(editor, path))
-        .sort((left, right) => Path.compare(right, left));
-
-      Editor.withoutNormalizing(editor, () => {
-        paths.forEach((path) => {
-          Transforms.removeNodes(editor, { at: path });
-        });
-      });
-      return;
+const removeNodes = (editor: Editor, paths: Path[]) => {
+  const refs = paths.map((path) => Editor.pathRef(editor, path));
+  Editor.withoutNormalizing(editor, () => {
+    try {
+      for (const ref of refs.reverse()) {
+        if (ref.current) Transforms.removeNodes(editor, { at: ref.current });
+      }
+    } finally {
+      for (const ref of refs) ref.unref();
     }
-
-    Transforms.removeNodes(editor, {
-      at: [],
-      match: (n) => {
-        if (!Element.isElement(n)) {
-          return false;
-        }
-
-        if (!Editor.isBlock(editor, n)) {
-          return false;
-        }
-
-        const node = n as NodeWithId;
-        return typeof node.nodeId === 'string' && nodeIds.includes(node.nodeId);
-      },
-      mode: 'highest',
-    });
-  } catch {
-    return;
-  }
+  });
 };
 
-const cloneWithNewIds = (
-  nodes: NodeWithId[],
-  generateId: () => string,
-): NodeWithId[] => {
+const getPathsByIds = (editor: Editor, nodeIds: string[]): Path[] => {
+  const ids = new Set(nodeIds);
+  if (!ids.size) return [];
+  const entries = Array.from(
+    Editor.nodes<DragNode>(editor, {
+      at: [],
+      match: (node) => {
+        const nodeId = (node as DragNode).nodeId;
+        return (
+          Element.isElement(node) &&
+          Editor.isBlock(editor, node) &&
+          typeof nodeId === 'string' &&
+          ids.has(nodeId)
+        );
+      },
+      mode: 'highest',
+    }),
+  );
+  // Require a one-to-one mapping, including when a view has duplicate IDs.
+  if (
+    entries.length !== ids.size ||
+    new Set(entries.map(([node]) => node.nodeId)).size !== ids.size
+  )
+    return [];
+  return entries.map(([, path]) => path);
+};
+
+const getSourcePaths = (item: EditorInnerDragItem): Path[] => {
+  if (item.source.pathRefs) {
+    return item.source.pathRefs.flatMap((ref) =>
+      ref.current ? [ref.current] : [],
+    );
+  }
+  // Keep accepting drag payloads from consumers using the previous shape.
+  if (item.source.sectionPaths) return item.source.sectionPaths;
+  const nodeIds = item.nodes.flatMap((node) =>
+    typeof node.nodeId === 'string' ? [node.nodeId] : [],
+  );
+  if (nodeIds.length) return getPathsByIds(item.source.editor, nodeIds);
+  return item.source.path ? [item.source.path] : [];
+};
+
+const releaseDragRefs = (item: EditorInnerDragItem) => {
+  for (const ref of item.source.pathRefs || []) ref.unref();
+};
+
+const cloneForInsert = (
+  nodes: DragNode[],
+  generateId?: () => string,
+): DragNode[] => {
   const copy = structuredClone(nodes);
-
-  const assignId = (node: NodeWithId): void => {
-    node.nodeId = generateId();
-    node.children.forEach((node) => {
-      if ('children' in node) {
-        assignId(node);
-      }
-    });
+  const assignId = (node: DragNode): void => {
+    if (generateId) node.nodeId = generateId();
+    // Let a destination NodeIdPlugin assign IDs on insertion when no
+    // generator was supplied to DnD; never duplicate source IDs.
+    else delete node.nodeId;
+    for (const child of node.children) {
+      if ('children' in child) assignId(child);
+    }
   };
-
   copy.forEach(assignId);
-
   return copy;
 };

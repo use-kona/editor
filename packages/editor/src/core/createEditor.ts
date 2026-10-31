@@ -24,8 +24,14 @@ export const createEditor = (plugins: IPlugin[]) => () => {
     return editor;
   }, baseEditor);
 
-  const { isInline, isVoid, deleteFragment, deleteBackward, deleteForward } =
-    editorWithPlugins;
+  const {
+    isInline,
+    isVoid,
+    isSelectable,
+    deleteFragment,
+    deleteBackward,
+    deleteForward,
+  } = editorWithPlugins;
 
   editorWithPlugins.getCommands = (plugin: new () => IPlugin) => {
     const pluginInstance = pluginsMap.get(plugin);
@@ -61,6 +67,19 @@ export const createEditor = (plugins: IPlugin[]) => () => {
     }, undefined);
 
     return result ?? isInline(element);
+  };
+
+  editorWithPlugins.isSelectable = (element) => {
+    const result = plugins.reduce<boolean | undefined>((result, plugin) => {
+      const match = plugin.blocks?.find((el) => element?.type === el.type);
+      if (match && 'isSelectable' in match) {
+        return match.isSelectable;
+      }
+
+      return result;
+    }, undefined);
+
+    return result ?? isSelectable(element);
   };
 
   editorWithPlugins.deleteForward = async (unit) => {

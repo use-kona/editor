@@ -1,13 +1,187 @@
 // @vitest-environment jsdom
 import { act, cleanup, fireEvent, render } from '@testing-library/react';
+import type { WritableAtom } from 'nanostores';
 import { Node, Transforms } from 'slate';
 import { ReactEditor, Slate } from 'slate-react';
-import { afterEach, expect, it } from 'vitest';
+import { afterEach, expect, it, vi } from 'vitest';
+import type { CustomElement } from '../../types';
+import { useEditorContext } from '../provider';
 import type { IPlugin } from '../types';
 import { createEditable } from './createEditable';
 import { createEditor } from './createEditor';
 
 afterEach(cleanup);
+
+const paragraph = (text: string): CustomElement => ({
+  type: 'paragraph',
+  children: [{ text }],
+});
+
+const setupBlockSelection = (
+  value: CustomElement[],
+  plugins: IPlugin[] = [],
+  readOnly = false,
+) => {
+  let selection!: WritableAtom<CustomElement[]>;
+  const CaptureSelection = () => {
+    selection = useEditorContext().selectedNodes;
+    return null;
+  };
+  const allPlugins = [...plugins, { ui: () => <CaptureSelection /> }];
+  const editor = createEditor(allPlugins)();
+  const Editable = createEditable(editor, allPlugins);
+  const { container } = render(
+    <Slate editor={editor} initialValue={value}>
+      <Editable readOnly={readOnly} />
+    </Slate>,
+  );
+  const editable = container.querySelector<HTMLElement>('[data-slate-editor]');
+  if (!editable) throw new Error('Editor is missing');
+  Object.defineProperty(editable, 'isContentEditable', { value: !readOnly });
+  const select = (nodes: CustomElement[]) => act(() => selection.set(nodes));
+  const press = async (key: 'Backspace' | 'Delete') => {
+    await act(async () => {
+      fireEvent.keyDown(editable, {
+        key,
+        keyCode: key === 'Backspace' ? 8 : 46,
+      });
+    });
+  };
+  return { editor, selection: () => selection.get(), select, press };
+};
+
+it.each(['Backspace', 'Delete'] as const)(
+  '%s removes all selected blocks, keeps gaps, and supports undo',
+  async (key) => {
+    const value = ['First', 'Keep', 'Third', 'Last'].map(paragraph);
+    const pluginKeyDown = vi.fn();
+    const view = setupBlockSelection(value, [
+      { handlers: { onKeyDown: pluginKeyDown } },
+    ]);
+    // Block selection can be disjoint and ordered differently from the document.
+    view.select([value[2], value[0]]);
+    await act(async () => {
+      Transforms.select(view.editor, { path: [0, 0], offset: 2 });
+    });
+    await view.press(key);
+
+    expect(view.editor.children.map(Node.string)).toEqual(['Keep', 'Last']);
+    expect(view.selection()).toEqual([]);
+    expect(pluginKeyDown).not.toHaveBeenCalled();
+
+    await act(async () => view.editor.undo());
+    expect(view.editor.children).toEqual(value);
+    await act(async () => view.editor.redo());
+    expect(view.editor.children.map(Node.string)).toEqual(['Keep', 'Last']);
+  },
+);
+
+it('deletes a selected parent and child only once, and leaves an editable paragraph when all blocks are removed', async () => {
+  const child = { type: 'item', children: [{ text: 'Nested' }] };
+  const value = [{ type: 'list', children: [child] }, paragraph('Last')];
+  const view = setupBlockSelection(value, [
+    {
+      blocks: ['list', 'item'].map((type) => ({
+        type,
+        render: (props) => <div {...props.attributes}>{props.children}</div>,
+      })),
+    },
+  ]);
+  view.select([child, value[0], value[1]]);
+  await view.press('Delete');
+
+  expect(view.editor.children).toEqual([paragraph('')]);
+  expect(view.editor.selection).toEqual({
+    anchor: { path: [0, 0], offset: 0 },
+    focus: { path: [0, 0], offset: 0 },
+  });
+  expect(view.selection()).toEqual([]);
+});
+
+it('checks deletion hooks before removing the group and preserves selection when vetoed', async () => {
+  const value = [
+    paragraph('First'),
+    { type: 'widget', children: [{ text: '' }] },
+    paragraph('Last'),
+  ];
+  const onBeforeDelete = vi.fn().mockResolvedValue(false);
+  const onDelete = vi.fn();
+  const view = setupBlockSelection(value, [
+    {
+      blocks: [
+        {
+          type: 'widget',
+          isVoid: true,
+          render: (props) => <div {...props.attributes}>{props.children}</div>,
+          onBeforeDelete,
+          onDelete,
+        },
+      ],
+    },
+  ]);
+  view.select(value.slice(0, 2));
+  await view.press('Backspace');
+
+  expect(view.editor.children).toEqual(value);
+  expect(view.selection()).toEqual(value.slice(0, 2));
+  expect(onBeforeDelete).toHaveBeenCalledWith([value[1]]);
+  expect(onDelete).not.toHaveBeenCalled();
+
+  onBeforeDelete.mockResolvedValue(true);
+  await view.press('Delete');
+  expect(view.editor.children).toEqual([value[2]]);
+  expect(onDelete).toHaveBeenCalledWith([value[1]]);
+});
+
+it('does not delete a block selection in a read-only editor', async () => {
+  const value = [paragraph('First'), paragraph('Second')];
+  const view = setupBlockSelection(value, [], true);
+  view.select(value);
+  await view.press('Delete');
+  expect(view.editor.children).toEqual(value);
+});
+
+it('tracks block paths during asynchronous hooks and ignores repeated delete presses', async () => {
+  let approve!: (allowed: boolean) => void;
+  const onBeforeDelete = vi.fn(
+    () =>
+      new Promise<boolean>((resolve) => {
+        approve = resolve;
+      }),
+  );
+  const onDelete = vi.fn();
+  const value = [paragraph('First'), paragraph('Second'), paragraph('Last')];
+  const view = setupBlockSelection(value, [
+    {
+      blocks: [
+        {
+          type: 'paragraph',
+          render: (props) => <p {...props.attributes}>{props.children}</p>,
+          onBeforeDelete,
+          onDelete,
+        },
+      ],
+    },
+  ]);
+  view.select([value[0]]);
+  await view.press('Delete');
+  await view.press('Delete');
+  expect(onBeforeDelete).toHaveBeenCalledTimes(1);
+  expect(view.editor.children).toEqual(value);
+
+  await act(async () => {
+    Transforms.insertNodes(view.editor, paragraph('Inserted'), { at: [0] });
+    approve(true);
+  });
+  expect(view.editor.children.map(Node.string)).toEqual([
+    'Inserted',
+    'Second',
+    'Last',
+  ]);
+  expect(onDelete).toHaveBeenCalledWith([value[0]]);
+  expect(view.selection()).toEqual([]);
+  expect(view.editor.pathRefs().size).toBe(0);
+});
 
 it.each([
   {

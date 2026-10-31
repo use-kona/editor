@@ -111,7 +111,14 @@ export class ListsPlugin implements IPlugin {
 
         if (
           this.isList(editor, prevNode) &&
-          prevNode.type === (node as CustomElement).type
+          prevNode.type === (node as CustomElement).type &&
+          (prevNode.type !== ListsPlugin.NUMBERED_LIST_ELEMENT ||
+            (node as CustomElement).start === undefined ||
+            (node as CustomElement).start ===
+              (prevNode.start ?? 1) +
+                prevNode.children.filter((child) =>
+                  this.isListItem(editor, child as CustomElement),
+                ).length)
         ) {
           Transforms.mergeNodes(editor, { at: path });
           return;
@@ -184,14 +191,19 @@ export class ListsPlugin implements IPlugin {
       type: ListsPlugin.NUMBERED_LIST_ELEMENT,
       render: (props: RenderElementProps) => {
         return (
-          <ol className={styles.list} {...props.attributes}>
+          <ol
+            className={styles.list}
+            start={(props.element as CustomElement).start}
+            {...props.attributes}
+          >
             {props.children}
           </ol>
         );
       },
       serialize: (element, children) => {
         if (element.type === ListsPlugin.NUMBERED_LIST_ELEMENT) {
-          return `<ol>${children}</ol>`;
+          const start = element.start;
+          return `<ol${start === undefined ? '' : ` start="${start}"`}>${children}</ol>`;
         }
       },
       deserialize: (element: HTMLElement, children) => {
@@ -199,7 +211,12 @@ export class ListsPlugin implements IPlugin {
         if (nodeName === 'OL') {
           return jsx(
             'element',
-            { type: ListsPlugin.NUMBERED_LIST_ELEMENT },
+            {
+              type: ListsPlugin.NUMBERED_LIST_ELEMENT,
+              ...(element.hasAttribute('start')
+                ? { start: (element as HTMLOListElement).start }
+                : {}),
+            },
             children,
           );
         }

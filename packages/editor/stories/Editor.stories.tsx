@@ -2,33 +2,33 @@ import { useStore } from '@nanostores/react';
 import type { Meta, StoryObj } from '@storybook/react';
 import { map, type ReadableAtom } from 'nanostores';
 import { type ChangeEvent, useRef, useState } from 'react';
-import { DndProvider, useDrag, useDrop } from 'react-dnd';
+import { DndProvider, useDrag } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import { Transforms } from 'slate';
-import { useFocused } from 'slate-react';
-import { DragBlock } from '../../../apps/site/examples/DragBlock';
-import { ExampleEditor } from '../../../apps/site/examples/Editor';
-import { getPlugins } from '../../../apps/site/examples/getPlugins';
-import { DragIcon } from '../../../apps/site/examples/icons/drag';
-import {
-  type Task,
-  type TaskElement,
-  TasksPlugin,
-} from '../../../apps/site/examples/plugins/TasksPlugin/TasksPlugin';
 import {
   AttachmentsPlugin,
   CodeBlockPlugin,
   DnDPlugin,
+  HeadingsPlugin,
   LinksPlugin,
   ListsPlugin,
   NodeIdPlugin,
 } from '../src';
 import type {
   CustomDropContext,
-  EditorDragItem,
   EditorOuterDragItem,
 } from '../src/plugins/DnDPlugin/types';
 import type { CustomElement } from '../types';
+import { Color } from './examples/colors';
+import { DragBlock } from './examples/DragBlock';
+import { ExampleEditor } from './examples/Editor';
+import { getPlugins } from './examples/getPlugins';
+import { DragIcon } from './examples/icons/drag';
+import {
+  type Task,
+  type TaskElement,
+  TasksPlugin,
+} from './examples/plugins/TasksPlugin/TasksPlugin';
 
 const TASK_TYPE = Symbol('task');
 
@@ -140,6 +140,82 @@ export const Primary: Story = {
       </div>
     );
   },
+};
+
+export const Highlights: Story = {
+  render: () => (
+    <div className="root">
+      <ExampleEditor
+        value={[
+          {
+            type: 'paragraph',
+            children: [
+              { text: 'First', highlight: Color.Yellow },
+              { text: ' text' },
+            ],
+          },
+          {
+            type: 'paragraph',
+            children: [{ text: 'Plain text aligned with highlighted text.' }],
+          },
+          {
+            type: 'paragraph',
+            children: [
+              { text: 'Second', highlight: Color.Red },
+              { text: ' text', highlight: Color.Blue },
+            ],
+          },
+          {
+            type: 'paragraph',
+            children: [
+              {
+                text: 'A highlight can wrap across lines while keeping padding on both sides of every line.',
+                highlight: Color.Blue,
+              },
+            ],
+          },
+        ]}
+      />
+    </div>
+  ),
+};
+
+export const TableOfContentsWithEmojis: Story = {
+  name: 'Table of contents with emojis',
+  render: () => (
+    <div className="root">
+      <ExampleEditor
+        value={[
+          {
+            type: HeadingsPlugin.HeadingLevel1,
+            children: [
+              { text: '' },
+              { type: 'emoji', emoji: 'rocket', children: [{ text: '' }] },
+              { text: ' Launch plans' },
+            ],
+          },
+          {
+            type: HeadingsPlugin.HeadingLevel2,
+            children: [
+              { text: 'Release ' },
+              { text: 'notes', bold: true },
+              { text: ' ' },
+              { type: 'emoji', emoji: 'tada', children: [{ text: '' }] },
+              { text: ' for today' },
+            ],
+          },
+          {
+            type: HeadingsPlugin.HeadingLevel3,
+            children: [
+              { text: '' },
+              { type: 'emoji', emoji: 'kona', children: [{ text: '' }] },
+              { text: '' },
+            ],
+          },
+        ]}
+      />
+    </div>
+  ),
 };
 
 export const Deserialize: Story = {
