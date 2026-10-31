@@ -6,15 +6,15 @@ import { DndProvider, useDrag, useDrop } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import { Transforms } from 'slate';
 import { useFocused } from 'slate-react';
-import { DragBlock } from '../../../apps/site/examples/DragBlock';
-import { ExampleEditor } from '../../../apps/site/examples/Editor';
-import { getPlugins } from '../../../apps/site/examples/getPlugins';
-import { DragIcon } from '../../../apps/site/examples/icons/drag';
+import { DragBlock } from './examples/DragBlock';
+import { ExampleEditor } from './examples/Editor';
+import { getPlugins } from './examples/getPlugins';
+import { DragIcon } from './examples/icons/drag';
 import {
   type Task,
   type TaskElement,
   TasksPlugin,
-} from '../../../apps/site/examples/plugins/TasksPlugin/TasksPlugin';
+} from './examples/plugins/TasksPlugin/TasksPlugin';
 import {
   AttachmentsPlugin,
   CodeBlockPlugin,

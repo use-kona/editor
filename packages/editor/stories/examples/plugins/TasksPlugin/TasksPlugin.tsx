@@ -7,7 +7,7 @@ import { ReactEditor, useSlateStatic } from 'slate-react';
 import type {
   CustomElement,
   IPlugin,
-} from '../../../../../packages/editor/src';
+} from '@use-kona/editor';
 
 type TasksPluginOptions = {
   $tasks: MapStore<Record<number, Task>>;
