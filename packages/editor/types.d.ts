@@ -6,6 +6,7 @@ type CustomText = { text: string };
 type CustomElement = {
   type: string;
   collapsed?: boolean;
+  start?: number;
   children: (CustomElement | CustomText)[];
 };
 

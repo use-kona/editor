@@ -155,6 +155,9 @@ const replaceWithList = (
 
     Transforms.wrapNodes(editor, {
       type: listType,
+      ...(listType === ListsPlugin.NUMBERED_LIST_ELEMENT
+        ? { start: Number.parseInt(match.before?.[0] || '1', 10) }
+        : {}),
       children: []
     });
   })
