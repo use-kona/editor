@@ -43,9 +43,8 @@ export const EditorSurface = ({ children }: { children: ReactNode }) => {
         const isBlock = block.hasAttribute('data-editor-block');
         const isSelected =
           isBlock &&
-          (block.querySelector('[data-editor-block][data-editor-selected]') ||
-            (block.hasAttribute('data-editor-selected') &&
-              !block.querySelector('[data-editor-block]')));
+          (block.hasAttribute('data-editor-selected') ||
+            block.querySelector('[data-editor-block][data-editor-selected]'));
         const rect = block.getBoundingClientRect();
 
         // A nested selection highlights its top-level block, as before.

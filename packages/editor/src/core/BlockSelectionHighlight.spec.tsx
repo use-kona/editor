@@ -36,6 +36,10 @@ const setup = () => {
       type: 'list',
       children: [{ type: 'item', children: [{ text: 'Nested' }] }],
     },
+    {
+      type: 'code',
+      children: [{ type: 'code-line', children: [{ text: 'const x = 123;' }] }],
+    },
   ];
   const result = render(
     <Slate editor={editor} initialValue={value}>
@@ -109,6 +113,30 @@ it('highlights the top-level parent of a nested selection and skips collapsed bl
     '30px',
     '30px',
   ]);
+});
+
+it.each([
+  { name: 'list', index: 3 },
+  { name: 'code block', index: 4 },
+])('highlights a selected $name containing nested blocks', ({ index }) => {
+  const { value, bounds, blocks, highlights, select } = setup();
+  bounds[index].mockReturnValue(rect(120 + index * 30, 60));
+
+  select([value[index]]);
+  expect(blocks[index].hasAttribute('data-editor-selected')).toBe(true);
+  expect(highlights()).toHaveLength(1);
+  expect(highlights()[0].style.transform).toBe(
+    `translate(20px, ${20 + index * 30}px)`,
+  );
+  expect(highlights()[0].style.height).toBe('60px');
+
+  // A selected parent joins the preceding selected block into one highlight.
+  select([value[index - 1], value[index]]);
+  expect(highlights()).toHaveLength(1);
+  expect(highlights()[0].style.height).toBe('90px');
+
+  select([]);
+  expect(highlights()).toHaveLength(0);
 });
 
 it('tracks scroll offsets, layout changes, and deletion without changing selection state', async () => {

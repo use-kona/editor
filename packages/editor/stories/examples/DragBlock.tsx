@@ -5,7 +5,7 @@ import type {
   ConnectDragSource,
   ConnectDropTarget,
 } from 'react-dnd';
-import { type RenderElementProps, useSelected } from 'slate-react';
+import type { RenderElementProps } from 'slate-react';
 import styles from './DragBlock.module.css';
 import { DragHandler } from './DragHandler';
 import { useMergeRefs } from './ui/useMergeRefs';
@@ -31,12 +31,6 @@ export const DragBlock = (props: Props) => {
     onToggleSelected,
     onNativeDrop,
   } = props;
-
-  const handleToggleSelected = (event: React.MouseEvent<HTMLDivElement>) => {
-    if (event.metaKey) {
-      onToggleSelected(event);
-    }
-  };
 
   const handleNativeDrop = (event: React.DragEvent<HTMLDivElement>) => {
     if (onNativeDrop) {
@@ -65,7 +59,7 @@ export const DragBlock = (props: Props) => {
           ref={(element) => {
             drag(element);
           }}
-          onClick={handleToggleSelected}
+          onClick={onToggleSelected}
           contentEditable={false}
         >
           <DragHandler attributes={attributes} element={element}>
