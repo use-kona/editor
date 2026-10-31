@@ -1,3 +1,14 @@
+.inlineCode {
+  font-family: monospace;
+  font-size: 0.9em;
+  padding: 0.1em 0.25em;
+  border-radius: 0.2em;
+  background-color: var(
+    --kona-editor-inline-code-background,
+    rgb(127 127 127 / 0.12)
+  );
+}
+
 .root {
   counter-reset: line;
   overflow: hidden;

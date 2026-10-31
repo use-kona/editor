@@ -1,3 +1,4 @@
+import escapeHtml from 'escape-html';
 import Prism from 'prismjs';
 import { type KeyboardEvent, type ReactNode, useCallback, useRef } from 'react';
 import {
@@ -6,20 +7,20 @@ import {
   Element,
   Node,
   type NodeEntry,
+  type Point,
+  Range,
+  Text,
   Transforms,
 } from 'slate';
-import {
-  ReactEditor,
-  type RenderElementProps,
-  type RenderLeafProps,
-} from 'slate-react';
+import { ReactEditor, type RenderElementProps } from 'slate-react';
 import type { IPlugin } from '../../types';
 import { CodeBlock } from './CodeBlock';
 import type { CodeElement } from './types';
 import { normalizeTokens } from './utils';
 import 'prismjs/themes/prism.css';
-import type { CustomElement } from '../../../types';
+import type { CustomElement, CustomText } from '../../../types';
 import { CodeBlockLine } from './CodeBlockLine';
+import styles from './styles.module.css';
 
 // Import all supported languages
 import 'prismjs/components/prism-javascript';
@@ -55,6 +56,8 @@ type Options = {
   ) => React.ReactNode;
 };
 
+type CodeLeaf = CustomText & { code?: boolean };
+
 const CodeBlockRenderer = ({
   editor,
   renderCodeBlock,
@@ -80,11 +83,79 @@ const CodeBlockRenderer = ({
   );
 };
 
-export class CodeBlockPlugin implements IPlugin {
+export class CodeBlockPlugin
+  implements IPlugin<Editor, CustomElement, CodeLeaf>
+{
   constructor(private options: Options) {}
 
   static CODE_ELEMENT = 'code';
   static CODE_LINE_ELEMENT = 'code-line';
+
+  init(editor: Editor) {
+    const { insertText } = editor;
+
+    editor.insertText = (text) => {
+      const { selection } = editor;
+      if (
+        text !== '`' ||
+        !selection ||
+        !Range.isCollapsed(selection) ||
+        CodeBlockPlugin.isCodeBlockActive(editor) ||
+        (Editor.marks(editor) as Omit<CodeLeaf, 'text'> | null)?.code
+      ) {
+        return insertText(text);
+      }
+
+      const block = Editor.above(editor, {
+        match: (node) =>
+          Element.isElement(node) && Editor.isBlock(editor, node),
+      });
+      if (!block) return insertText(text);
+
+      const beforeRange = {
+        anchor: Editor.start(editor, block[1]),
+        focus: selection.anchor,
+      };
+      const before = Editor.string(editor, beforeRange);
+      // Only match a single opening backtick with nonempty, single-line content.
+      const match = /(?:^|[^`])`([^`\n]+)$/.exec(before);
+      if (!match) return insertText(text);
+
+      let offset = before.length - match[1].length - 1;
+      let start: Point | undefined;
+      for (const [node, path] of Editor.nodes(editor, {
+        at: beforeRange,
+        match: Text.isText,
+      })) {
+        if (!Text.isText(node)) continue;
+        if (offset < node.text.length) {
+          start = { path, offset };
+          break;
+        }
+        offset -= node.text.length;
+      }
+      if (!start) return insertText(text);
+
+      const opening = start;
+      const marks = Editor.marks(editor);
+
+      Editor.withoutNormalizing(editor, () => {
+        Transforms.select(editor, { anchor: opening, focus: selection.anchor });
+        Transforms.delete(editor, {
+          at: {
+            anchor: opening,
+            focus: { ...opening, offset: opening.offset + 1 },
+          },
+        });
+        Editor.addMark(editor, 'code', true);
+        Transforms.collapse(editor, { edge: 'end' });
+        // Continue with the formatting active before the shortcut ran.
+        editor.marks = { ...marks };
+      });
+    };
+
+    return editor;
+  }
 
   handlers = {
     onKeyDown: (event: KeyboardEvent, editor: Editor) => {
@@ -243,17 +314,31 @@ export class CodeBlockPlugin implements IPlugin {
     },
   ];
 
-  leafs = [
+  leafs: IPlugin<Editor, CustomElement, CodeLeaf>['leafs'] = [
     {
-      render: (props: RenderLeafProps) => {
+      render: (props) => {
         const { leaf, attributes, children } = props;
-        const { text, ...rest } = leaf;
+        const { text: _text, code, ...rest } = leaf;
 
         return (
           <span {...attributes} className={Object.keys(rest).join(' ')}>
-            {children}
+            {code ? (
+              <code className={styles.inlineCode}>{children}</code>
+            ) : (
+              children
+            )}
           </span>
         );
+      },
+      serialize: (node) => {
+        if (Text.isText(node) && (node as CodeLeaf).code) {
+          return `<code>${escapeHtml(node.text)}</code>`;
+        }
+      },
+      deserialize: (element, children) => {
+        if (element.nodeName === 'CODE' && !element.closest('pre')) {
+          return children?.map((child) => jsx('text', { code: true }, child));
+        }
       },
     },
   ];
