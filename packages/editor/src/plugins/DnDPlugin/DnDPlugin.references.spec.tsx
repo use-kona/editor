@@ -212,6 +212,143 @@ const setup = (
   };
 };
 
+describe('drop transitions', () => {
+  let frames: FrameRequestCallback[];
+  let animated: { element: HTMLElement; keyframes: Keyframe[] }[];
+  const originalAnimate = Object.getOwnPropertyDescriptor(
+    HTMLElement.prototype,
+    'animate',
+  );
+
+  beforeEach(() => {
+    frames = [];
+    animated = [];
+    vi.stubGlobal('matchMedia', () => ({ matches: false }));
+    vi.spyOn(window, 'requestAnimationFrame').mockImplementation((callback) => {
+      frames.push(callback);
+      return frames.length;
+    });
+    Object.defineProperty(HTMLElement.prototype, 'animate', {
+      configurable: true,
+      value(this: HTMLElement, keyframes: Keyframe[]) {
+        animated.push({ element: this, keyframes });
+        return { cancel() {} };
+      },
+    });
+    vi.spyOn(HTMLElement.prototype, 'getBoundingClientRect').mockImplementation(
+      function (this: HTMLElement) {
+        const blocks = Array.from(
+          this.closest('[data-slate-editor]')?.querySelectorAll(
+            '[data-editor-dnd-block]',
+          ) ?? [],
+        );
+        const index = blocks.indexOf(this);
+        return new DOMRect(0, Math.max(index, 0) * 100, 100, 100);
+      },
+    );
+  });
+
+  afterEach(() => {
+    vi.unstubAllGlobals();
+    if (originalAnimate)
+      Object.defineProperty(HTMLElement.prototype, 'animate', originalAnimate);
+    else delete HTMLElement.prototype.animate;
+  });
+
+  const finishFrame = () => {
+    act(() => {
+      const callbacks = frames.splice(0);
+      callbacks.forEach((callback) => {
+        callback(0);
+      });
+    });
+  };
+
+  it('slides a dropped selection and the blocks making room after React commits', async () => {
+    const view = setup([
+      { value: ['A', 'B', 'C', 'D'].map((text) => paragraph(text)) },
+    ]);
+    view.select('A');
+    view.select('B');
+    view.begin('A');
+    await view.drop('D');
+    view.end();
+    expect(view.texts()).toEqual(['C', 'D', 'A', 'B']);
+    expect(animated).toHaveLength(0);
+
+    finishFrame();
+
+    expect(
+      animated.map(({ element, keyframes }) => ({
+        text: element
+          .querySelector('[data-test-block]')
+          ?.getAttribute('data-test-block'),
+        from: keyframes[0].transform,
+      })),
+    ).toEqual([
+      { text: 'C', from: 'translate(0px, 200px)' },
+      { text: 'D', from: 'translate(0px, 200px)' },
+      { text: 'A', from: 'translate(0px, -200px)' },
+      { text: 'B', from: 'translate(0px, -200px)' },
+    ]);
+  });
+
+  it('keeps reduced-motion drops immediate', async () => {
+    vi.stubGlobal('matchMedia', () => ({ matches: true }));
+    const view = setup([{ value: ['A', 'B'].map((text) => paragraph(text)) }]);
+    view.begin('A');
+    await view.drop('B');
+    view.end();
+    finishFrame();
+    expect(view.texts()).toEqual(['B', 'A']);
+    expect(animated).toHaveLength(0);
+  });
+
+  it('moves nested lists without applying the parent displacement twice', async () => {
+    const view = setup([
+      {
+        value: ['AB', 'CD'].map((text, index) => ({
+          type: index === 0 ? 'ul' : 'ol',
+          children: [...text].map((letter) => ({
+            type: 'li',
+            children: [{ text: letter }],
+          })),
+        })),
+        plugins: [new ListsPlugin()],
+      },
+    ]);
+    view.begin('AB');
+    await view.drop('CD');
+    view.end();
+    finishFrame();
+
+    expect(view.texts()).toEqual(['CD', 'AB']);
+    expect(
+      animated.map(({ element }) =>
+        element
+          .querySelector('[data-test-block]')
+          ?.getAttribute('data-test-block'),
+      ),
+    ).toEqual(['CD', 'AB']);
+  });
+
+  it('does not animate a self-drop or an ordinary text edit', async () => {
+    const view = setup([{ value: ['A', 'B'].map((text) => paragraph(text)) }]);
+    view.begin('A');
+    await view.drop('A');
+    view.end();
+    finishFrame();
+    expect(view.texts()).toEqual(['A', 'B']);
+    await act(async () => {
+      Transforms.insertText(view.editors[0], '!', {
+        at: { path: [0, 0], offset: 1 },
+      });
+    });
+    finishFrame();
+    expect(animated).toHaveLength(0);
+  });
+});
+
 describe('DnD without node IDs', () => {
   it('moves initial ID-less selections with NodeIdPlugin installed', async () => {
     let sequence = 0;

@@ -14,6 +14,7 @@ import {
   getCollapsibleSectionPaths,
   isHiddenByCollapsedSection,
 } from '../CollapsibleBlocksPlugin/CollapsibleBlocksPlugin';
+import { animateDrop } from './animateDrop';
 import type {
   DragNode,
   EditorDragItem,
@@ -210,13 +211,15 @@ export class DnDPlugin implements IPlugin {
                   cloneForInsert(nodes, generateId),
                 );
               } else if (isSameEditor) {
-                moveNode(
-                  editor,
-                  sourceTo,
-                  [],
-                  position,
-                  undefined,
-                  sourcePaths,
+                animateDrop(editor, () =>
+                  moveNode(
+                    editor,
+                    sourceTo,
+                    [],
+                    position,
+                    undefined,
+                    sourcePaths,
+                  ),
                 );
               } else if (isSameDocument) {
                 // Path references belong to the source editor. Separate views of
@@ -231,13 +234,15 @@ export class DnDPlugin implements IPlugin {
                   new Set(nodeIds).size !== nodes.length
                 )
                   return;
-                moveNode(
-                  editor,
-                  sourceTo,
-                  [],
-                  position,
-                  undefined,
-                  mappedPaths,
+                animateDrop(editor, () =>
+                  moveNode(
+                    editor,
+                    sourceTo,
+                    [],
+                    position,
+                    undefined,
+                    mappedPaths,
+                  ),
                 );
               } else {
                 insertNodes(
@@ -279,7 +284,10 @@ export class DnDPlugin implements IPlugin {
     }
 
     return (
-      <div hidden={isHidden}>
+      <div
+        hidden={isHidden}
+        data-editor-dnd-block={ReactEditor.findKey(editor, props.element).id}
+      >
         {options.renderBlock?.({
           props,
           dragRef: drag,
