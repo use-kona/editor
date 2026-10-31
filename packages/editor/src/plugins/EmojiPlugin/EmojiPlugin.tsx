@@ -1,7 +1,7 @@
 import { useStore } from '@nanostores/react';
 import { type MapStore, map } from 'nanostores';
 import type { ReactNode } from 'react';
-import { Editor, Node, Transforms } from 'slate';
+import { Editor, Range, Transforms } from 'slate';
 import type { CustomElement } from '../../../types';
 import type { IPlugin } from '../../types';
 import { Menu } from './Menu';
@@ -105,12 +105,31 @@ export class EmojiPlugin implements IPlugin {
 }
 
 const getCurrentText = (editor: Editor) => {
+  const { selection } = editor;
+  if (!selection || !Range.isCollapsed(selection)) {
+    return '';
+  }
+
   const entry = Editor.above(editor, {
     match: (n) => Editor.isBlock(editor, n as CustomElement),
   });
 
   if (entry) {
-    return Node.string(entry[0]);
+    const start = Editor.start(editor, entry[1]);
+    const end = Editor.end(editor, entry[1]);
+    const textAfter = Editor.string(editor, {
+      anchor: selection.focus,
+      focus: end,
+    });
+
+    if (/^\S/.test(textAfter)) {
+      return '';
+    }
+
+    return Editor.string(editor, {
+      anchor: start,
+      focus: selection.focus,
+    });
   } else {
     return '';
   }
