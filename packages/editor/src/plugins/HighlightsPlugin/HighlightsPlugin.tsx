@@ -1,6 +1,7 @@
 import { Editor } from 'slate';
 import type { RenderLeafProps } from 'slate-react';
 import type { IPlugin } from '../../types';
+import styles from './styles.module.css';
 
 type HighlightElement = {
   highlight: string;
@@ -41,6 +42,7 @@ export class HighlightsPlugin implements IPlugin {
         if ((leaf as unknown as HighlightElement).highlight) {
           content = (
             <span
+              className={styles.highlight}
               style={{
                 backgroundColor:
                   this.options.colors[

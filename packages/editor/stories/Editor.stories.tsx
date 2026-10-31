@@ -19,6 +19,7 @@ import type {
   EditorOuterDragItem,
 } from '../src/plugins/DnDPlugin/types';
 import type { CustomElement } from '../types';
+import { Color } from './examples/colors';
 import { DragBlock } from './examples/DragBlock';
 import { ExampleEditor } from './examples/Editor';
 import { getPlugins } from './examples/getPlugins';
@@ -139,6 +140,44 @@ export const Primary: Story = {
       </div>
     );
   },
+};
+
+export const Highlights: Story = {
+  render: () => (
+    <div className="root">
+      <ExampleEditor
+        value={[
+          {
+            type: 'paragraph',
+            children: [
+              { text: 'First', highlight: Color.Yellow },
+              { text: ' text' },
+            ],
+          },
+          {
+            type: 'paragraph',
+            children: [{ text: 'Plain text aligned with highlighted text.' }],
+          },
+          {
+            type: 'paragraph',
+            children: [
+              { text: 'Second', highlight: Color.Red },
+              { text: ' text', highlight: Color.Blue },
+            ],
+          },
+          {
+            type: 'paragraph',
+            children: [
+              {
+                text: 'A highlight can wrap across lines while keeping padding on both sides of every line.',
+                highlight: Color.Blue,
+              },
+            ],
+          },
+        ]}
+      />
+    </div>
+  ),
 };
 
 export const TableOfContentsWithEmojis: Story = {

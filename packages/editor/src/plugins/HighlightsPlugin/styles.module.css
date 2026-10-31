@@ -1,0 +1,14 @@
+.highlight {
+  padding-inline: 0.15em;
+  margin-inline: -0.15em;
+  border-radius: 0.12em;
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
+}
+
+/* Give neighboring highlights enough room for both padded edges. */
+:global([data-slate-node="text"]):has(.highlight)
+  + :global([data-slate-node="text"])
+  .highlight {
+  margin-inline-start: 0.15em;
+}
