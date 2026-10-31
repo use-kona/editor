@@ -32,26 +32,30 @@
     flex-grow: 1;
     outline: none;
     padding: 16px 16px;
-    font-size: 14px;
+    font-size: 16px;
   }
 
   h1,
   h2,
   h3 {
-    margin: 0;
+    margin: 8px 0 0;
     font-weight: 600;
   }
 
+  & [data-slate-editor] > :first-child :is(h1, h2, h3) {
+    margin-top: 0;
+  }
+
   h1 {
-    font-size: 18px;
+    font-size: 20px;
   }
 
   h2 {
-    font-size: 16px;
+    font-size: 18px;
   }
 
   h3 {
-    font-size: 15px;
+    font-size: 17px;
   }
 
   ol {
