@@ -4,7 +4,7 @@ import type {
   ConnectDragSource,
   ConnectDropTarget,
 } from 'react-dnd';
-import type { Editor, Path } from 'slate';
+import type { Editor, Path, PathRef } from 'slate';
 import type { RenderElementProps } from 'slate-react';
 import type { CustomElement, CustomText } from '../../../types';
 import type { NodeIdPlugin } from '../NodeIdPlugin';
@@ -12,6 +12,11 @@ import type { NodeIdPlugin } from '../NodeIdPlugin';
 export type NodeWithId = Omit<CustomElement, 'children'> & {
   nodeId: string;
   children: (NodeWithId | CustomText)[];
+};
+
+export type DragNode = Omit<CustomElement, 'children'> & {
+  nodeId?: string;
+  children: (DragNode | CustomText)[];
 };
 
 export const isNodeWithId = (node: unknown): node is NodeWithId =>
@@ -45,6 +50,7 @@ export type Options = {
   customDropHandlers?: {
     [type: string | symbol]: CustomDropHandler;
   };
+  /** Optional ID generator for inserted copies; selection and movement do not require it. */
   nodeIdPlugin?: NodeIdPlugin;
 };
 
@@ -58,7 +64,7 @@ type DropResult = 'handled' | 'ignored';
 
 export type EditorInnerDragItem<TItem = unknown> = {
   kind: 'inner';
-  nodes: NodeWithId[];
+  nodes: DragNode[];
   item?: TItem;
   items?: TItem[];
   source: {
@@ -74,6 +80,8 @@ export type EditorInnerDragItem<TItem = unknown> = {
     documentId?: string | null;
     path?: Path;
     sectionPaths?: Path[];
+    /** Live references in the source editor; never use them in another editor. */
+    pathRefs?: PathRef[];
   };
   data?: Record<string, unknown>;
 };
