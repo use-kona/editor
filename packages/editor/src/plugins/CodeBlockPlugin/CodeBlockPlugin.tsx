@@ -1,5 +1,5 @@
 import Prism from 'prismjs';
-import type { KeyboardEvent, ReactNode } from 'react';
+import { type KeyboardEvent, type ReactNode, useCallback, useRef } from 'react';
 import {
   type DecoratedRange,
   Editor,
@@ -53,6 +53,31 @@ type Options = {
       element: CodeElement;
     },
   ) => React.ReactNode;
+};
+
+const CodeBlockRenderer = ({
+  editor,
+  renderCodeBlock,
+  ...props
+}: RenderElementProps & Options & { editor: Editor }) => {
+  const element = props.element as CodeElement;
+  const elementRef = useRef(element);
+  elementRef.current = element;
+
+  // Menus can retain this callback while Slate replaces nodes as text is edited.
+  const onChange = useCallback(
+    (language: string) => {
+      const path = ReactEditor.findPath(editor, elementRef.current);
+      Transforms.setNodes<CodeElement>(editor, { language }, { at: path });
+    },
+    [editor],
+  );
+  // biome-ignore lint/correctness/noNestedComponentDefinitions: renderCodeBlock expects a Content component bound to these Slate render props
+  const Content = (): ReactNode => <CodeBlock {...props} element={element} />;
+
+  return (
+    <>{renderCodeBlock(element.language, onChange, { element, Content })}</>
+  );
 };
 
 export class CodeBlockPlugin implements IPlugin {
@@ -188,28 +213,9 @@ export class CodeBlockPlugin implements IPlugin {
   blocks = [
     {
       type: CodeBlockPlugin.CODE_ELEMENT,
-      render: (props: RenderElementProps, editor: Editor) => {
-        const { language } = props.element as CodeElement;
-        const onChange = (language: string) => {
-          const path = ReactEditor.findPath(editor, props.element);
-          Transforms.setNodes<CodeElement>(editor, { language }, { at: path });
-        };
-
-        const Content = (): ReactNode => {
-          return (
-            <CodeBlock {...props} element={props.element as CodeElement} />
-          );
-        };
-
-        return (
-          <>
-            {this.options.renderCodeBlock(language, onChange, {
-              element: props.element as CodeElement,
-              Content,
-            })}
-          </>
-        );
-      },
+      render: (props: RenderElementProps, editor: Editor) => (
+        <CodeBlockRenderer {...props} {...this.options} editor={editor} />
+      ),
       deserialize: (el: HTMLElement, children) => {
         const { nodeName } = el;
 
