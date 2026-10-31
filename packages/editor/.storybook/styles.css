@@ -1,6 +1,7 @@
 .root {
   font-family: "Open Sans", sans-serif;
   --kona-editor-background-color: #fff;
+  --kona-editor-alt-background-color: #f8f8f8;
   --kona-editor-border-color: #e3e3e3;
   --kona-editor-text-color: #444;
   --kona-editor-border-selected-color: rgb(0 123 255 / 0.8);

@@ -79,7 +79,7 @@ export class CodeBlockPlugin implements IPlugin {
         event.preventDefault();
 
         if (!event.shiftKey) {
-          editor.insertText('    ');
+          editor.insertText('  ');
         } else {
           const { selection } = editor;
           if (selection && selection.anchor.offset === selection.focus.offset) {

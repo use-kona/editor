@@ -2,19 +2,9 @@ import { useStore } from '@nanostores/react';
 import type { Meta, StoryObj } from '@storybook/react';
 import { map, type ReadableAtom } from 'nanostores';
 import { type ChangeEvent, useRef, useState } from 'react';
-import { DndProvider, useDrag, useDrop } from 'react-dnd';
+import { DndProvider, useDrag } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import { Transforms } from 'slate';
-import { useFocused } from 'slate-react';
-import { DragBlock } from './examples/DragBlock';
-import { ExampleEditor } from './examples/Editor';
-import { getPlugins } from './examples/getPlugins';
-import { DragIcon } from './examples/icons/drag';
-import {
-  type Task,
-  type TaskElement,
-  TasksPlugin,
-} from './examples/plugins/TasksPlugin/TasksPlugin';
 import {
   AttachmentsPlugin,
   CodeBlockPlugin,
@@ -25,10 +15,18 @@ import {
 } from '../src';
 import type {
   CustomDropContext,
-  EditorDragItem,
   EditorOuterDragItem,
 } from '../src/plugins/DnDPlugin/types';
 import type { CustomElement } from '../types';
+import { DragBlock } from './examples/DragBlock';
+import { ExampleEditor } from './examples/Editor';
+import { getPlugins } from './examples/getPlugins';
+import { DragIcon } from './examples/icons/drag';
+import {
+  type Task,
+  type TaskElement,
+  TasksPlugin,
+} from './examples/plugins/TasksPlugin/TasksPlugin';
 
 const TASK_TYPE = Symbol('task');
 
