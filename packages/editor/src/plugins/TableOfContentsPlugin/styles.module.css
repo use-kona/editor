@@ -82,6 +82,15 @@
   }
 }
 
+.emoji {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 1em;
+  line-height: 1;
+  vertical-align: middle;
+}
+
 .max .h1 {
   cursor: pointer;
   font-size: 13px;

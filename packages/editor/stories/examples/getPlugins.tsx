@@ -140,6 +140,7 @@ export const getPlugins = () => {
       ignoreNodes: [CodeBlockPlugin.CODE_LINE_ELEMENT],
     }),
     new TableOfContentsPlugin({
+      renderEmoji: (emoji) => <Emoji id={emoji} />,
       levels: {
         [HeadingsPlugin.HeadingLevel1]: 1,
         [HeadingsPlugin.HeadingLevel2]: 2,

@@ -1,15 +1,17 @@
 import { useStore } from '@nanostores/react';
 import { type MapStore, map } from 'nanostores';
-import { type MouseEvent, useEffect } from 'react';
+import { Fragment, type MouseEvent, type ReactNode, useEffect } from 'react';
 import { Editor, type NodeEntry, Operation, Text } from 'slate';
 import { ReactEditor } from 'slate-react';
-import type { CustomElement } from '../../../types';
+import type { CustomElement, CustomText } from '../../../types';
 import type { IPlugin, UiParams } from '../../types';
 import { scrollToHeading } from './scrollToHeading';
 import styles from './styles.module.css';
 
 type Options = {
   levels: Record<string, 1 | 2 | 3>;
+  /** Use the same emoji ID renderer as EmojiPlugin, including custom emojis. */
+  renderEmoji?: (emoji: string) => ReactNode;
 };
 
 export class TableOfContentsPlugin implements IPlugin {
@@ -19,6 +21,28 @@ export class TableOfContentsPlugin implements IPlugin {
     this.$store = map({
       headings: [],
     });
+  }
+
+  private renderHeadingContent(node: CustomElement | CustomText): ReactNode {
+    if (Text.isText(node)) {
+      return node.text;
+    }
+
+    if (
+      node.type === 'emoji' &&
+      'emoji' in node &&
+      typeof node.emoji === 'string'
+    ) {
+      const emoji = this.options.renderEmoji?.(node.emoji);
+
+      return emoji == null ? null : (
+        <span className={styles.emoji}>{emoji}</span>
+      );
+    }
+
+    return node.children.map((child, index) => (
+      <Fragment key={index}>{this.renderHeadingContent(child)}</Fragment>
+    ));
   }
 
   init(editor: Editor) {
@@ -85,7 +109,7 @@ export class TableOfContentsPlugin implements IPlugin {
             className={styles[`h${level}`]}
             onMouseDown={handleMouseDown}
           >
-            {Text.isText(node.children[0]) ? node.children[0].text : ''}
+            {this.renderHeadingContent(node)}
           </div>
         );
       },

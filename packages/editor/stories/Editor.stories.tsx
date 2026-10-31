@@ -9,6 +9,7 @@ import {
   AttachmentsPlugin,
   CodeBlockPlugin,
   DnDPlugin,
+  HeadingsPlugin,
   LinksPlugin,
   ListsPlugin,
   NodeIdPlugin,
@@ -138,6 +139,44 @@ export const Primary: Story = {
       </div>
     );
   },
+};
+
+export const TableOfContentsWithEmojis: Story = {
+  name: 'Table of contents with emojis',
+  render: () => (
+    <div className="root">
+      <ExampleEditor
+        value={[
+          {
+            type: HeadingsPlugin.HeadingLevel1,
+            children: [
+              { text: '' },
+              { type: 'emoji', emoji: 'rocket', children: [{ text: '' }] },
+              { text: ' Launch plans' },
+            ],
+          },
+          {
+            type: HeadingsPlugin.HeadingLevel2,
+            children: [
+              { text: 'Release ' },
+              { text: 'notes', bold: true },
+              { text: ' ' },
+              { type: 'emoji', emoji: 'tada', children: [{ text: '' }] },
+              { text: ' for today' },
+            ],
+          },
+          {
+            type: HeadingsPlugin.HeadingLevel3,
+            children: [
+              { text: '' },
+              { type: 'emoji', emoji: 'kona', children: [{ text: '' }] },
+              { text: '' },
+            ],
+          },
+        ]}
+      />
+    </div>
+  ),
 };
 
 export const Deserialize: Story = {
