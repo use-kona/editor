@@ -60,6 +60,7 @@ export type Block<
   deserialize?: Deserialize;
   isVoid?: boolean;
   isInline?: boolean;
+  isSelectable?: boolean;
   onBeforeDelete?: (blocks: TBlock[]) => Promise<boolean>;
   onDelete?: (blocks: TBlock[]) => void;
 };

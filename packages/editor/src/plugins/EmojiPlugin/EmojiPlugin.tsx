@@ -33,13 +33,15 @@ export class EmojiPlugin implements IPlugin {
     {
       isInline: true,
       isVoid: true,
+      isSelectable: false,
       type: 'emoji',
       render: (props) => {
-        const children = this.options.renderEmoji(props.element.emoji);
-
         return (
           <span {...props.attributes} className={styles.emojiRoot}>
-            {children}
+            {props.children}
+            <span contentEditable={false}>
+              {this.options.renderEmoji(props.element.emoji)}
+            </span>
           </span>
         );
       },
