@@ -2,6 +2,11 @@
 This fill will contain all the changes for `@use-kona/editor`
 since version `0.1.11`.
 
+## 0.2.2
+### Core
+**Fixed**
+* Selecting a list item now highlights only that item instead of the entire list. Adjacent selected items share a highlight, separated selections keep their gaps clear, and selecting a parent block still highlights its full contents once.
+
 ## 0.2.1
 ### DnDPlugin
 **Fixed**

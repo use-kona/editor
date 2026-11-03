@@ -4,6 +4,7 @@ import type { WritableAtom } from 'nanostores';
 import { Slate } from 'slate-react';
 import { afterEach, expect, it, vi } from 'vitest';
 import type { CustomElement } from '../../types';
+import { ListsPlugin } from '../plugins/ListsPlugin';
 import { useEditorContext } from '../provider';
 import type { IPlugin } from '../types';
 import { createEditable } from './createEditable';
@@ -19,16 +20,22 @@ afterEach(() => {
 const rect = (top: number, height = 30, left = 70, width = 400) =>
   new DOMRect(left, top, width, height);
 
-const setup = () => {
+const setup = (
+  initialValue?: CustomElement[],
+  extraPlugins: IPlugin[] = [],
+) => {
   let selection!: WritableAtom<CustomElement[]>;
   const CaptureSelection = () => {
     selection = useEditorContext().selectedNodes;
     return null;
   };
-  const plugins: IPlugin[] = [{ ui: () => <CaptureSelection /> }];
+  const plugins: IPlugin[] = [
+    ...extraPlugins,
+    { ui: () => <CaptureSelection /> },
+  ];
   const editor = createEditor(plugins)();
   const Editable = createEditable(editor, plugins);
-  const value: CustomElement[] = [
+  const value: CustomElement[] = initialValue ?? [
     { type: 'paragraph', children: [{ text: 'First' }] },
     { type: 'paragraph', children: [{ text: 'Second' }] },
     { type: 'paragraph', children: [{ text: 'Third' }] },
@@ -100,11 +107,18 @@ it('moves the same highlight between store selections, grows adjacent groups, an
   expect(highlights()).toHaveLength(0);
 });
 
-it('highlights the top-level parent of a nested selection and skips collapsed blocks', () => {
-  const { value, bounds, highlights, select } = setup();
+it('highlights the nested selection itself and skips collapsed blocks', () => {
+  const { value, blocks, bounds, highlights, select } = setup();
+  const nested = blocks[3].querySelector<HTMLElement>('[data-editor-block]');
+  if (!nested) throw new Error('Nested block is missing');
+  vi.spyOn(nested, 'getBoundingClientRect').mockReturnValue(
+    rect(215, 20, 90, 360),
+  );
   select([value[3].children[0] as CustomElement]);
   expect(highlights()).toHaveLength(1);
-  expect(highlights()[0].style.transform).toBe('translate(20px, 110px)');
+  expect(highlights()[0].style.transform).toBe('translate(40px, 115px)');
+  expect(highlights()[0].style.height).toBe('20px');
+  expect(highlights()[0].style.width).toBe('360px');
 
   bounds[1].mockReturnValue(rect(150, 0));
   select([value[0], value[1], value[2]]);
@@ -114,6 +128,54 @@ it('highlights the top-level parent of a nested selection and skips collapsed bl
     '30px',
   ]);
 });
+
+it.each(['ul', 'ol'])(
+  'highlights only the selected item in a %s list',
+  (type) => {
+    const items: CustomElement[] = ['First', 'Second', 'Third'].map((text) => ({
+      type: 'li',
+      children: [{ text }],
+    }));
+    const { value, blocks, bounds, highlights, select } = setup(
+      [{ type, children: items }],
+      [new ListsPlugin()],
+    );
+    bounds[0].mockReturnValue(rect(120, 90));
+    const itemBlocks = blocks[0].querySelectorAll<HTMLElement>(
+      '[data-editor-block]',
+    );
+    itemBlocks.forEach((block, index) => {
+      vi.spyOn(block, 'getBoundingClientRect').mockReturnValue(
+        rect(120 + index * 30),
+      );
+    });
+
+    select([items[1]]);
+    expect(itemBlocks[1].hasAttribute('data-editor-selected')).toBe(true);
+    expect(itemBlocks[0].hasAttribute('data-editor-selected')).toBe(false);
+    expect(itemBlocks[2].hasAttribute('data-editor-selected')).toBe(false);
+    expect(highlights()).toHaveLength(1);
+    expect(highlights()[0].style.transform).toBe('translate(20px, 50px)');
+    expect(highlights()[0].style.height).toBe('30px');
+
+    select([items[1], items[0]]);
+    expect(highlights()).toHaveLength(1);
+    expect(highlights()[0].style.transform).toBe('translate(20px, 20px)');
+    expect(highlights()[0].style.height).toBe('60px');
+
+    select([items[0], items[2]]);
+    expect(highlights()).toHaveLength(2);
+    expect(highlights().map((highlight) => highlight.style.height)).toEqual([
+      '30px',
+      '30px',
+    ]);
+
+    // Explicitly selecting the list still covers the whole container once.
+    select([value[0], items[1]]);
+    expect(highlights()).toHaveLength(1);
+    expect(highlights()[0].style.height).toBe('90px');
+  },
+);
 
 it.each([
   { name: 'list', index: 3 },

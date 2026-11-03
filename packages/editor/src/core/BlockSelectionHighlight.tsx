@@ -37,17 +37,23 @@ export const EditorSurface = ({ children }: { children: ReactNode }) => {
       const origin = container.getBoundingClientRect();
       const next: Highlight[] = [];
       let group: Highlight | undefined;
-      const blocks = Array.from(editable.children);
+      const blocks = Array.from(
+        editable.querySelectorAll<HTMLElement>('[data-editor-block]'),
+      );
 
       for (const block of blocks) {
-        const isBlock = block.hasAttribute('data-editor-block');
-        const isSelected =
-          isBlock &&
-          (block.hasAttribute('data-editor-selected') ||
-            block.querySelector('[data-editor-block][data-editor-selected]'));
+        // A selected container already covers its descendants. Otherwise,
+        // measure nested blocks themselves (for example, individual list items).
+        if (
+          block.parentElement?.closest(
+            '[data-editor-block][data-editor-selected]',
+          )
+        ) {
+          continue;
+        }
+        const isSelected = block.hasAttribute('data-editor-selected');
         const rect = block.getBoundingClientRect();
 
-        // A nested selection highlights its top-level block, as before.
         // Empty/collapsed blocks have no visible area to highlight.
         if (!isSelected || rect.width === 0 || rect.height === 0) {
           group = undefined;
@@ -82,7 +88,7 @@ export const EditorSurface = ({ children }: { children: ReactNode }) => {
           : next,
       );
 
-      // Watch every top-level block: resizing an unselected predecessor also
+      // Watch every block: resizing an unselected predecessor also
       // moves the selection. Refresh the targets when Slate adds/removes blocks.
       const targets = new Set<Element>([container, editable, ...blocks]);
       for (const target of observed) {
