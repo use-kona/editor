@@ -462,7 +462,9 @@ describe('DnDPlugin', () => {
       );
 
       for (const index of selected) {
-        fireEvent.click(within(view.container).getAllByText('Select')[index]);
+        fireEvent.click(within(view.container).getAllByText('Select')[index], {
+          altKey: true,
+        });
       }
 
       const originalRect = HTMLElement.prototype.getBoundingClientRect;

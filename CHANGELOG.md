@@ -2,6 +2,11 @@
 This fill will contain all the changes for `@use-kona/editor`
 since version `0.1.11`.
 
+## 0.2.1
+### DnDPlugin
+**Fixed**
+* Plain-clicking a drag handle now selects only that block, including when it is already selected. Alt-clicking toggles the block while preserving other selected blocks. Existing handle click wiring remains sufficient, and Alt-drag copying is unchanged.
+
 ## 0.2.0
 ### DnDPlugin
 **Changed (breaking)**

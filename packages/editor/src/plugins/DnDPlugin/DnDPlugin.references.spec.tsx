@@ -141,7 +141,7 @@ const setup = (
       ':scope > [data-select]',
     );
     if (!button) throw new Error('Select button not found');
-    fireEvent.click(button);
+    fireEvent.click(button, { altKey: true });
   };
   const begin = (text: string, document = 0) => {
     const button = block(text, document).querySelector<HTMLElement>(

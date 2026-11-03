@@ -299,6 +299,10 @@ export class DnDPlugin implements IPlugin {
           },
           onToggleSelected: (event) => {
             event.stopPropagation();
+            if (!event.altKey) {
+              selectedNodes.set([props.element]);
+              return;
+            }
             const selected = selectedNodes.get();
             if (selected.includes(props.element)) {
               selectedNodes.set(
